@@ -37,10 +37,10 @@ export const Navbar = () => {
 
     return (
         <nav className="relative navbar_bg">
-            <div className="mx-auto max-w-7xl px-2 sm:px-6 lg:px-8">
+            <div className="mx-auto px-5">
                 <div className="relative flex h-16 items-center justify-between">
                     {/* Logo */}
-                    <div className="flex flex-1 items-center justify-center sm:items-stretch sm:justify-start">
+                    <div className="flex flex-1 items-stretch justify-start">
                         <div className="flex shrink-0 items-center">
                             <img alt="Reno" src={RenoLogo} className="h-8 w-auto" />
                         </div>
