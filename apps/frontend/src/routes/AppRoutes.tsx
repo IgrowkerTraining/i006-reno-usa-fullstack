@@ -5,6 +5,7 @@ import PublicRoute from "./PublicRoute";
 import Login from "../pages/Login";
 import Register from "../pages/Register";
 import Dashboard from "../pages/Dashboard";
+import ProjectGeneralView from "../pages/Vista-proyecto";
 
 export const AppRoutes: React.FC = () => {
   return (
@@ -30,6 +31,14 @@ export const AppRoutes: React.FC = () => {
         element={
           <ProtectedRoute>
             <Dashboard />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/proyecto/:id"
+        element={
+          <ProtectedRoute>
+            <ProjectGeneralView />
           </ProtectedRoute>
         }
       />

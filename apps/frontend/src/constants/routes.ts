@@ -6,7 +6,7 @@ export const ROUTES = {
 } as const;
 
 export const API_ENDPOINTS = {
-  BASE: 'http://localhost:3000/api',
+  BASE: 'https://vigilant-meme-q7x5wvrwjpv5cx9jg-3000.app.github.dev/api',
   AUTH: {
     LOGIN: '/auth/login',
     REGISTER: '/auth/register',
