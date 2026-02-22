@@ -45,11 +45,13 @@ const Login: React.FC = () => {
     <div className="min-h-screen flex items-center justify-center p-8 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-blue-400">
       <div className="w-full max-w-md">
         <div className="bg-white backdrop-blur-xl p-8 rounded-2xl shadow-2xl">
-          <div className="flex flex-col items-center mb-8">
-            <div className="w-32 h-32 rounded-xl flex items-center justify-center mb-4">
+          <div className="flex flex-col items-center mb-10">
+            <div className="w-32 h-32 rounded-xl items-center justify-center mb-4">
               <img alt="Reno" src={RenoLogo} className="h-32 w-auto" />
+
+              <h1 className="text_logo mb-2 text-center">RENO</h1>
+
             </div>
-            <h1 className="text_logo">RENO</h1>
           </div>
 
           <form onSubmit={handleSubmit} className="space-y-4">
@@ -74,7 +76,7 @@ const Login: React.FC = () => {
             )}
 
             <Input
-              label="Email Address"
+              label="Correo electrónico"
               placeholder="name@company.com"
               type="email"
               required
@@ -85,7 +87,7 @@ const Login: React.FC = () => {
             />
 
             <Input
-              label="Password"
+              label="Contraseña"
               placeholder="••••••••"
               type="password"
               required
@@ -111,10 +113,10 @@ const Login: React.FC = () => {
               </button>
             </div>
 
-            <Button 
-            type="submit" 
-            className="w-full mt-4 bg-blue-900 hover:bg-blue-600" 
-            isLoading={isLoading}>
+            <Button
+              type="submit"
+              className="w-full mt-4 bg-blue-900 hover:bg-blue-600"
+              isLoading={isLoading}>
               Acceder
             </Button>
           </form>
