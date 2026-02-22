@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useParams } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 
 // --- TYPES ---
 type TimelineState = 'completed' | 'current' | 'pending';
@@ -64,6 +64,7 @@ const CheckIcon = () => (
 // --- MAIN COMPONENT ---
 const ProjectGeneralView: React.FC = () => {
   const { id } = useParams<{ id: string }>();
+  const navigate = useNavigate();
   const [data, setData] = useState<ProjectData | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
@@ -213,7 +214,7 @@ const ProjectGeneralView: React.FC = () => {
             ))}
           </div>
 
-          <button className="w-full py-4 bg-[#0A1F61] hover:bg-[#1a2f71] text-white rounded-lg text-lg font-semibold transition-colors">
+          <button onClick={() => navigate('/editar-proyecto/123')} className="w-full py-4 bg-[#0A1F61] hover:bg-[#1a2f71] text-white rounded-lg text-lg font-semibold transition-colors">
             Registrar avance
           </button>
         </div>
