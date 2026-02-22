@@ -80,7 +80,7 @@ const Dashboard: React.FC = () => {
         <header className="mb-10">
           <h2 className="text-3xl font-bold text-white mb-2">{greeting}</h2>
           <p className="text-slate-400">
-            Everything looks optimal in your workspace today.
+            Everything looks optimal in your workspace todayy.
           </p>
         </header>
 
