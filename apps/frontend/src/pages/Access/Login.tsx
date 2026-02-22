@@ -2,20 +2,20 @@ import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 
 //assets
-import RenoLogo from "../assets/RenoLogo.png";
+import RenoLogo from "../../assets/RenoLogo.png";
 
 //css
 import "./access.css";
 
 //components
-import { Input } from "../components/common/Input";
-import { Button } from "../components/common/Button";
+import { Input } from "../../components/common/Input";
+import { Button } from "../../components/common/Button";
 
 //services
-import { api } from "../services/api";
+import { api } from "../../services/api";
 
 //hooks
-import { useAuth } from "../hooks/useAuth";
+import { useAuth } from "../../hooks/useAuth";
 
 const Login: React.FC = () => {
   const navigate = useNavigate();

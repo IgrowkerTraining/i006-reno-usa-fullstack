@@ -2,8 +2,8 @@ import React from "react";
 import { Routes, Route, Navigate } from "react-router-dom";
 import ProtectedRoute from "./ProtectedRoute";
 import PublicRoute from "./PublicRoute";
-import Login from "../pages/Login";
-import Register from "../pages/Register";
+import Login from "../pages/Access/Login";
+import Register from "../pages/Access/Register";
 import Dashboard from "../pages/Dashboard";
 
 export const AppRoutes: React.FC = () => {
