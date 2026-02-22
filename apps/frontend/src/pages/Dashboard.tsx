@@ -4,9 +4,11 @@ import { Button } from "../components/common/Button";
 import { getAIGreeting } from "../services/service";
 import { api } from "../services/api";
 import { useAuth } from "../hooks/useAuth";
+import { useNavigate } from "react-router-dom";
 
 const Dashboard: React.FC = () => {
   const { user, logout } = useAuth();
+  const navigate = useNavigate();
   const [greeting, setGreeting] = useState<string>("Loading greeting...");
   const [isBackendOnline, setIsBackendOnline] = useState<boolean | null>(null);
   const [stats] = useState([
@@ -189,6 +191,12 @@ const Dashboard: React.FC = () => {
               <Button variant="primary" className="w-full mt-6">
                 Edit Profile
               </Button>
+              <button
+      onClick={() => navigate('/proyecto/123')}
+      className="bg-[#0A1F61] hover:bg-[#1a2f71] text-white font-semibold py-2 px-6 rounded-lg transition-colors shadow-sm w-full mt-4"
+    >
+      Ver Proyecto Gamma
+    </button>
             </div>
           </section>
         </div>
