@@ -4,8 +4,7 @@ import { Button } from "../components/common/Button";
 import { getAIGreeting } from "../services/service";
 import { api } from "../services/api";
 import { useAuth } from "../hooks/useAuth";
-import { Navigate } from "react-router-dom";
-
+import { useNavigate } from "react-router-dom";
 const Dashboard: React.FC = () => {
 
   // Prototipo de proyectos activos
@@ -16,6 +15,8 @@ const Dashboard: React.FC = () => {
     { id: 4, name: "Proyecto Delta", status: "En Progreso" },
     { id: 5, name: "Proyecto Epsilon", status: "Completado" },
   ];
+
+    const navigate = useNavigate();
 
   // const [greeting, setGreeting] = useState("");
   // const [isBackendOnline, setIsBackendOnline] = useState(false);
@@ -39,7 +40,7 @@ const Dashboard: React.FC = () => {
         <div className="text-center">
           <p className="text-xl font-extrabold mt-10">No hay proyectos activos</p>
           <div className="p-2 text-center rounded-md bg-blue-900 mt-4">
-            <button type="submit" className="text-white text-xl font-mono" onClick={() => Navigate("/vista-proyecto")}>
+            <button type="submit" className="text-white text-xl font-mono" onClick={() => navigate("/Vista-proyecto")}>
               Nuevo Proyecto
             </button>
           </div>
@@ -82,7 +83,7 @@ const Dashboard: React.FC = () => {
             ))}
           </div>
           <div className="p-2 text-center rounded-md bg-blue-900 mt-4">
-            <button type="submit" className="text-white text-xl font-mono" onClick={() => Navigate("/vista-proyecto")}>
+            <button type="submit" className="text-white text-xl font-mono" onClick={() => navigate("/Vista-proyecto")}>
               Nuevo Proyecto
             </button>
           </div>
