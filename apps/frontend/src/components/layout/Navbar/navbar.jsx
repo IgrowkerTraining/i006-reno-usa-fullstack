@@ -4,7 +4,7 @@ import { useState } from "react";
 import "./navbar.css";
 
 //assets
-import RenoLogo from "../../assets/RenoLogo.png";
+import RenoLogo from "../../../assets/RenoLogo.png";
 import { useLocation } from "react-router-dom";
 
 export const Navbar = () => {
