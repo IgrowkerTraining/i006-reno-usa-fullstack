@@ -75,6 +75,7 @@ const Register: React.FC = () => {
     try {
       const response = await api.register({
         name: formData.name,
+        lastName: formData.lastName,
         email: formData.email,
         password: formData.password,
       });
@@ -142,11 +143,11 @@ const Register: React.FC = () => {
             <div className="md:col-span-2">
               <Input
                 label="Apellidos"
-                name="name"
+                name="lastName"
                 placeholder="Introduzca sus apellidos"
                 required
                 disabled={isLoading}
-                value={formData.name}
+                value={formData.lastName}
                 className="text-zinc-600 bg-white placeholder:text-zinc-300"
                 onChange={handleChange}
               />
