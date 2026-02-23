@@ -1,11 +1,22 @@
 import React, { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { Input } from "../components/common/Input";
-import { Button } from "../components/common/Button";
-import { User } from "../types";
-import { getSecurityTip } from "../services/service";
-import { api } from "../services/api";
-import { useAuth } from "../hooks/useAuth";
+
+//assets
+import RenoLogo from "../../assets/RenoLogo.png";
+
+//css
+import "./access.css";
+
+//components
+import { Input } from "../../components/common/Input";
+import { Button } from "../../components/common/Button";
+
+//services
+import { getSecurityTip } from "../../services/service";
+import { api } from "../../services/api";
+
+//hooks
+import { useAuth } from "../../hooks/useAuth";
 
 const Register: React.FC = () => {
   const navigate = useNavigate();
@@ -64,6 +75,7 @@ const Register: React.FC = () => {
     try {
       const response = await api.register({
         name: formData.name,
+        lastName: formData.lastName,
         email: formData.email,
         password: formData.password,
       });
@@ -77,14 +89,19 @@ const Register: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center p-4 bg-[radial-gradient(ellipse_at_bottom,_var(--tw-gradient-stops))] from-indigo-900/20 via-slate-950 to-slate-950">
+    <div className="min-h-screen flex items-center justify-center p-4 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-blue-400">
       <div className="w-full max-w-lg">
-        <div className="bg-slate-900/40 backdrop-blur-xl border border-slate-800 p-8 rounded-2xl shadow-2xl">
-          <div className="flex flex-col items-center mb-6">
-            <h1 className="text-3xl font-bold text-white mb-1">
-              Create Account
-            </h1>
-            <p className="text-slate-400">Join the Example digital ecosystem</p>
+        <div className="bg-white backdrop-blur-xl p-8 rounded-2xl shadow-2xl">
+          <div className="flex flex-col items-center mb-10">
+            <p className="text-3xl font-bold text-blue-900 mb-6">
+              Crear cuenta
+            </p>
+            <div className="w-32 h-32 rounded-xl items-center justify-center mb-4">
+              <img alt="Reno" src={RenoLogo} className="h-32 w-auto" />
+
+              <h1 className="text_logo mb-2 text-center">RENO</h1>
+
+            </div>
           </div>
 
           {serverError && (
@@ -113,29 +130,43 @@ const Register: React.FC = () => {
           >
             <div className="md:col-span-2">
               <Input
-                label="Full Name"
+                label="Nombre"
                 name="name"
-                placeholder="John Doe"
+                placeholder="Introduzca su nombre"
                 required
                 disabled={isLoading}
                 value={formData.name}
+                className="text-zinc-600 bg-white placeholder:text-zinc-300"
                 onChange={handleChange}
               />
             </div>
             <div className="md:col-span-2">
               <Input
-                label="Email Address"
+                label="Apellidos"
+                name="lastName"
+                placeholder="Introduzca sus apellidos"
+                required
+                disabled={isLoading}
+                value={formData.lastName}
+                className="text-zinc-600 bg-white placeholder:text-zinc-300"
+                onChange={handleChange}
+              />
+            </div>
+            <div className="md:col-span-2">
+              <Input
+                label="Correo electrónico"
                 name="email"
                 type="email"
                 placeholder="name@company.com"
                 required
                 disabled={isLoading}
                 value={formData.email}
+                className="text-zinc-600 bg-white placeholder:text-zinc-300"
                 onChange={handleChange}
               />
             </div>
             <Input
-              label="Password"
+              label="Contraseña"
               name="password"
               type="password"
               placeholder="••••••••"
@@ -143,10 +174,11 @@ const Register: React.FC = () => {
               disabled={isLoading}
               error={errors.password}
               value={formData.password}
+              className="text-zinc-600 bg-white placeholder:text-zinc-300"
               onChange={handleChange}
             />
             <Input
-              label="Confirm Password"
+              label="Confirmar contraseña"
               name="confirmPassword"
               type="password"
               placeholder="••••••••"
@@ -154,47 +186,25 @@ const Register: React.FC = () => {
               disabled={isLoading}
               error={errors.confirmPassword}
               value={formData.confirmPassword}
+              className="text-zinc-600 bg-white placeholder:text-zinc-300"
               onChange={handleChange}
             />
 
             <div className="md:col-span-2 mt-4">
-              <Button type="submit" className="w-full" isLoading={isLoading}>
-                Complete Registration
+              <Button type="submit" className="w-full mt-4 bg-blue-900 hover:bg-blue-600" isLoading={isLoading}>
+                Registrarse
               </Button>
             </div>
           </form>
 
-          {securityTip && (
-            <div className="mt-6 p-4 bg-indigo-500/5 border border-indigo-500/10 rounded-xl">
-              <div className="flex items-start gap-3">
-                <div className="p-1.5 bg-indigo-500/20 rounded-lg text-indigo-400 mt-0.5">
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    strokeWidth={2}
-                    stroke="currentColor"
-                    className="w-4 h-4"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      d="M9.813 15.904 9 18.75l-.813-2.846a4.5 4.5 0 0 0-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 0 0 3.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 0 0 3.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 0 0-3.09 3.09ZM18.259 8.715 18 9.75l-.259-1.035a3.375 3.375 0 0 0-2.455-2.456L14.25 6l1.036-.259a3.375 3.375 0 0 0 2.456-2.454L18 2.25l.259 1.035a3.375 3.375 0 0 0 2.456 2.456L21.75 6l-1.035.259a3.375 3.375 0 0 0-2.456 2.456ZM16.894 20.567 16.5 21.75l-.394-1.183a2.25 2.25 0 0 0-1.423-1.423L13.5 18.75l1.183-.394a2.25 2.25 0 0 0 1.423-1.423l.394-1.183.394 1.183a2.25 2.25 0 0 0 1.423 1.423l1.183.394-1.183.394a2.25 2.25 0 0 0-1.423 1.423Z"
-                    />
-                  </svg>
-                </div>
-              </div>
-            </div>
-          )}
-
           <div className="mt-8 pt-6 border-t border-slate-800 text-center">
             <p className="text-slate-400 text-sm">
-              Already have an account?{" "}
+              ¿Ya tienes una cuenta?{" "}
               <Link
                 to="/login"
-                className="text-indigo-400 hover:text-indigo-300 font-semibold transition-colors"
+                className="text-blue-400 hover:text-blue-600 font-semibold transition-colors"
               >
-                Sign In
+                Iniciar sessión
               </Link>
             </p>
           </div>
