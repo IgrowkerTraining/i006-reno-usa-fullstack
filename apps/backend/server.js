@@ -16,7 +16,7 @@ app.use(cookieParser());
 
 // Rutas
 app.use("/api", apiRoutes);
-app.use("/auth", authRoutes); // Ejemplo: rutas de login/registro
+app.use("/auth", authRoutes); 
 
 // Levantar servidor
 app.listen(config.port, () => {
