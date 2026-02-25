@@ -6,6 +6,7 @@ import Login from "../pages/Access/Login";
 import Register from "../pages/Access/Register";
 import Dashboard from "../pages/Dashboard";
 import ProjectGeneralView from "../pages/Vista-proyecto";
+import ControlAvance  from "../pages/Control-avance";
 import { ProgressReport } from "../pages/Report/ProgressReport";
 
 export const AppRoutes: React.FC = () => {
@@ -51,6 +52,15 @@ export const AppRoutes: React.FC = () => {
           </ProtectedRoute>
         }
       />
+      <Route
+        path="/control-project"
+        element={
+          <ProtectedRoute>
+            <ControlAvance />
+          </ProtectedRoute>
+        }
+      />
+      
       <Route path="/" element={<Navigate to="/login" replace />} />
     </Routes>
   );
