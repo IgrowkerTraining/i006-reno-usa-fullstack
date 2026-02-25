@@ -30,4 +30,4 @@ class Phase {
     }
 }
 
-module.exports = Phase;
+export default Phase;

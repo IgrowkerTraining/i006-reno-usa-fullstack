@@ -27,4 +27,4 @@ class ProjectSnapshot {
     }
 }
 
-module.exports = ProjectSnapshot;
+export default ProjectSnapshot;

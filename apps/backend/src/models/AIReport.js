@@ -28,4 +28,4 @@ class AIReport {
     }
 }
 
-module.exports = AIReport;
+export default AIReport;

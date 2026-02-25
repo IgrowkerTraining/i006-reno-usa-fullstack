@@ -27,4 +27,4 @@ class MaterialUsage {
     }
 }
 
-module.exports = MaterialUsage;
+export default MaterialUsage;

@@ -30,4 +30,4 @@ class WorkerCoverage {
     }
 }
 
-module.exports = WorkerCoverage;
+export default WorkerCoverage;

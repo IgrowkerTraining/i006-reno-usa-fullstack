@@ -36,4 +36,4 @@ class DailyLog {
     }
 }
 
-module.exports = DailyLog;
+export default DailyLog;

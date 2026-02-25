@@ -24,4 +24,4 @@ class ExecutedTask {
     }
 }
 
-module.exports = ExecutedTask;
+export default ExecutedTask;

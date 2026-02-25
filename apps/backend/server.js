@@ -1,15 +1,24 @@
-const express = require("express");
-const { setupMiddleware } = require("./src/middleware");
-const apiRoutes = require("./src/routes");
-const config = require("./src/config");
+import express from "express";
+import cookieParser from "cookie-parser"; 
+import setupMiddleware from "./src/middleware/index.js";
+import apiRoutes from "./src/routes/index.js";
+import authRoutes from "./src/routes/auth.routes.js";
+import config from "./src/config/index.js";
+import logger from "./src/utils/logger.js";
 
 const app = express();
 
+// Middleware global
 setupMiddleware(app);
 
-app.use("/api", apiRoutes);
+// Middleware para parsear cookies
+app.use(cookieParser());
 
+// Rutas
+app.use("/api", apiRoutes);
+app.use("/auth", authRoutes); // Ejemplo: rutas de login/registro
+
+// Levantar servidor
 app.listen(config.port, () => {
-  console.log(`Example Auth Backend running on port ${config.port}`);
-  console.log(`Environment: ${config.nodeEnv}`);
+  logger.info(`Server running on http://localhost:${config.port}`);
 });

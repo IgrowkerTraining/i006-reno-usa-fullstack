@@ -33,4 +33,4 @@ class TechnicalApproval {
     }
 }
 
-module.exports = TechnicalApproval;
+export default TechnicalApproval;

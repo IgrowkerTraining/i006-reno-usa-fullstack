@@ -24,4 +24,4 @@ class SafetyMeasure {
     }
 }
 
-module.exports = SafetyMeasure;
+export default SafetyMeasure;
