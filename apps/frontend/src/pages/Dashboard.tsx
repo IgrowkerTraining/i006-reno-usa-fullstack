@@ -9,14 +9,15 @@ const Dashboard: React.FC = () => {
 
   // Prototipo de proyectos activos
   const projects = [
-    { id: 1, name: "Proyecto Alpha", status: "En Progreso" },
-    { id: 2, name: "Proyecto Beta", status: "Completado" },
-    { id: 3, name: "Proyecto Gamma", status: "En Progreso" },
-    { id: 4, name: "Proyecto Delta", status: "En Progreso" },
-    { id: 5, name: "Proyecto Epsilon", status: "Completado" },
+    { id: 1, name: "Project Alpha", status: "In Progress" },
+    { id: 2, name: "Project Beta", status: "Completed" },
+    { id: 3, name: "Project Gamma", status: "In Progress" },
+    { id: 4, name: "Project Delta", status: "In Progress" },
+    { id: 5, name: "Project Epsilon", status: "Completed" },
   ];
 
-    const navigate = useNavigate();
+
+  const navigate = useNavigate();
 
   // const [greeting, setGreeting] = useState("");
   // const [isBackendOnline, setIsBackendOnline] = useState(false);
@@ -38,17 +39,17 @@ const Dashboard: React.FC = () => {
     <div>
       {projects.length === 0 ? (
         <div className="text-center">
-          <p className="text-xl font-extrabold mt-10">No hay proyectos activos</p>
+          <p className="text-xl font-extrabold mt-10">There are no active projects</p>
           <div className="p-2 text-center rounded-md bg-blue-900 mt-4">
             <button type="submit" className="text-white text-xl font-mono" onClick={() => navigate("/Vista-proyecto")}>
-              Nuevo Proyecto
+              New Project
             </button>
           </div>
         </div>
       ) : (
         <div className="container text-black mx-auto mt-10 p-4">
           <h1 className="text-xl font-extrabold font-serif text-blue-950">
-            PROYECTOS ACTIVOS
+            ALLOCATED PROJECTS
           </h1>
 
           <div className="my-4 space-y-4">
@@ -76,15 +77,16 @@ const Dashboard: React.FC = () => {
                 <button
                   type="button"
                   className="rounded w-35 p-2 bg-blue-900 text-white"
+                  onClick={() => navigate(`/proyecto/${project.id}`)}
                 >
-                  Editar Proyecto
+                  Edit Project
                 </button>
               </div>
             ))}
           </div>
           <div className="p-2 text-center rounded-md bg-blue-900 mt-4">
             <button type="submit" className="text-white text-xl font-mono" onClick={() => navigate("/Vista-proyecto")}>
-              Nuevo Proyecto
+              New Project
             </button>
           </div>
         </div>
