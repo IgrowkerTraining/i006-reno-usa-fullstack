@@ -2,9 +2,12 @@ import React from "react";
 import { Routes, Route, Navigate } from "react-router-dom";
 import ProtectedRoute from "./ProtectedRoute";
 import PublicRoute from "./PublicRoute";
-import Login from "../pages/Login";
-import Register from "../pages/Register";
+import Login from "../pages/Access/Login";
+import Register from "../pages/Access/Register";
 import Dashboard from "../pages/Dashboard";
+import ProjectGeneralView from "../pages/Vista-proyecto";
+import ControlAvance  from "../pages/Control-avance";
+import { ProgressReport } from "../pages/Report/ProgressReport";
 
 export const AppRoutes: React.FC = () => {
   return (
@@ -26,6 +29,14 @@ export const AppRoutes: React.FC = () => {
         }
       />
       <Route
+        path="/proyecto/:id/report"
+        element={
+          <ProtectedRoute>
+            <ProgressReport />
+          </ProtectedRoute>
+        }
+      />
+      <Route
         path="/dashboard"
         element={
           <ProtectedRoute>
@@ -33,6 +44,23 @@ export const AppRoutes: React.FC = () => {
           </ProtectedRoute>
         }
       />
+      <Route
+        path="/proyecto/:id"
+        element={
+          <ProtectedRoute>
+            <ProjectGeneralView />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/control-project"
+        element={
+          <PublicRoute>
+            <ControlAvance />
+          </PublicRoute>
+        }
+      />
+      
       <Route path="/" element={<Navigate to="/login" replace />} />
     </Routes>
   );

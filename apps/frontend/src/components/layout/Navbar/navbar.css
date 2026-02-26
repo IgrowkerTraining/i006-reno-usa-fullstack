@@ -1,0 +1,11 @@
+.reno_logo_name{
+    font-family:'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    color: #D9D9D9;
+    font-weight: 900;
+    font-size: 1.2rem;
+    letter-spacing: 2px;
+}
+
+.navbar_bg{
+    background-color: #0C277B;
+}
