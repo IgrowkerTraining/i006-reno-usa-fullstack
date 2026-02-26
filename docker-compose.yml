@@ -8,8 +8,9 @@ services:
     ports:
       - "3000:3000"
     environment:
-      - NODE_ENV=development
-      - PORT=3000
+    - NODE_ENV=development
+    - PORT=3000
+    - DATABASE_URL=postgresql://postgres:postgres@db:5432/reno_usa_db
     volumes:
       - ./apps/backend:/app
       - /app/node_modules
@@ -20,6 +21,8 @@ services:
       timeout: 10s
       retries: 3
       start_period: 40s
+    depends_on:
+      - db
 
   frontend:
     build:
@@ -37,6 +40,18 @@ services:
       backend:
         condition: service_healthy
 
+  db:
+    image: postgres:15
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: reno_usa_db
+    ports:
+      - "5433:5432"
+    volumes:
+      - db-data:/var/lib/postgresql/data
+
   # Production services (uncomment for production)
   # backend-prod:
   #   build:
@@ -53,6 +68,9 @@ services:
   #     timeout: 10s
   #     retries: 3
   #     start_period: 40s
+
+volumes:
+  db-data:
 
 networks:
   default:

@@ -24,4 +24,4 @@ class ResponseHelper {
   }
 }
 
-module.exports = ResponseHelper;
+export default ResponseHelper;
