@@ -4,29 +4,35 @@ import { Button } from "../components/common/Button";
 import { getAIGreeting } from "../services/service";
 import { api } from "../services/api";
 import { useAuth } from "../hooks/useAuth";
-
+import { useNavigate } from "react-router-dom";
 const Dashboard: React.FC = () => {
-  const { user, logout } = useAuth();
-  const [greeting, setGreeting] = useState<string>("Loading greeting...");
-  const [isBackendOnline, setIsBackendOnline] = useState<boolean | null>(null);
-  const [stats] = useState([
-    { label: "Cloud Storage", value: "1.2 TB", icon: "☁️" },
-    { label: "Active Sessions", value: "4", icon: "💻" },
-    { label: "Security Score", value: "98%", icon: "🛡️" },
-    { label: "Network Speed", value: "850 Mbps", icon: "⚡" },
-  ]);
 
-  useEffect(() => {
-    const initDashboard = async () => {
-      const [msg, online] = await Promise.all([
-        getAIGreeting(user?.name || ""),
-        api.checkHealth(),
-      ]);
-      setGreeting(msg);
-      setIsBackendOnline(online);
-    };
-    initDashboard();
-  }, [user?.name]);
+  // Prototipo de proyectos activos
+  const projects = [
+    { id: 1, name: "Project Alpha", status: "In Progress" },
+    { id: 2, name: "Project Beta", status: "Completed" },
+    { id: 3, name: "Project Gamma", status: "In Progress" },
+    { id: 4, name: "Project Delta", status: "In Progress" },
+    { id: 5, name: "Project Epsilon", status: "Completed" },
+  ];
+
+
+  const navigate = useNavigate();
+
+  // const [greeting, setGreeting] = useState("");
+  // const [isBackendOnline, setIsBackendOnline] = useState(false);
+
+  // useEffect(() => {
+  //   const initDashboard = async () => {
+  //     const [msg, online] = await Promise.all([
+  //       getAIGreeting(user?.name || ""),
+  //       api.checkHealth(),
+  //     ]);
+  //     setGreeting(msg);
+  //     setIsBackendOnline(online);
+  //   };
+  //   initDashboard();
+  // }, [user?.name]);
 
   return (
 
@@ -76,25 +82,13 @@ const Dashboard: React.FC = () => {
                   Edit Project
                 </button>
               </div>
-              <div className="space-y-4">
-                <div className="flex justify-between text-sm">
-                  <span className="text-slate-400">Account ID</span>
-                  <span className="text-slate-200 font-mono">{user.id}</span>
-                </div>
-                <div className="flex justify-between text-sm">
-                  <span className="text-slate-400">Encryption Level</span>
-                  <span className="text-emerald-400 font-bold">SHA-512</span>
-                </div>
-                <div className="flex justify-between text-sm">
-                  <span className="text-slate-400">Member Since</span>
-                  <span className="text-slate-200">Feb 2024</span>
-                </div>
-              </div>
-              <Button variant="primary" className="w-full mt-6">
-                Edit Profile
-              </Button>
-            </div>
-          </section>
+            ))}
+          </div>
+          <div className="p-2 text-center rounded-md bg-blue-900 mt-4">
+            <button type="submit" className="text-white text-xl font-mono" onClick={() => navigate("/Vista-proyecto")}>
+              New Project
+            </button>
+          </div>
         </div>
       )}
     </div>
