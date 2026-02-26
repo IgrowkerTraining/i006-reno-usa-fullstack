@@ -37,6 +37,22 @@ export const AppRoutes: React.FC = () => {
         }
       />
       <Route
+        path="/report"
+        element={
+          <PublicRoute>
+            <ProgressReport />
+          </PublicRoute>
+        }
+      />
+      <Route
+        path="/report"
+        element={
+          <PublicRoute>
+            <ProgressReport />
+          </PublicRoute>
+        }
+      />
+      <Route
         path="/dashboard"
         element={
           <ProtectedRoute>
