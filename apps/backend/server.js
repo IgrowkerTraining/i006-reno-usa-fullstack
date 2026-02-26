@@ -3,6 +3,7 @@ import cookieParser from "cookie-parser";
 import setupMiddleware from "./src/middleware/index.js";
 import apiRoutes from "./src/routes/index.js";
 import authRoutes from "./src/routes/auth.routes.js";
+import projectsRoutes from "./src/routes/project.routes.js"; //aca meti
 import config from "./src/config/index.js";
 import logger from "./src/utils/logger.js";
 
@@ -16,8 +17,8 @@ app.use(cookieParser());
 
 // Rutas
 app.use("/api", apiRoutes);
-app.use("/auth", authRoutes); 
-
+app.use("/auth", authRoutes);
+app.use("/projects",projectsRoutes); //aca meti
 // Levantar servidor
 app.listen(config.port, () => {
   logger.info(`Server running on http://localhost:${config.port}`);
