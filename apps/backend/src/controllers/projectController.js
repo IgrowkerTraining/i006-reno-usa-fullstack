@@ -2,53 +2,95 @@ import {
   createProject,
   getProjects,
   getProjectById,
+  updateProject,
+  deleteProject,
 } from "../services/project.service.js";
 
-export const create = async (req, res) => {
+/**
+ * Proyecto creado
+ */
+export const create = async (req, res, next) => {
   try {
-    const {
-      name,
-      location,
-      surface_sqft,
-      structure_type,
-      intervention_type,
-      userId,
-    } = req.body;
-
     const project = await createProject({
-      name,
-      location,
-      surface_sqft,
-      structure_type,
-      intervention_type,
-      userId,
+      ...req.body,
+      userId: req.user.id, 
     });
 
-    res.status(201).json({
-      message: "Project created",
-      project,
-    });
+    res.status(201).json(project);
   } catch (error) {
-    res.status(400).json({ error: error.message });
+    next(error);
   }
 };
 
-export const getAll = async (req, res) => {
+/**
+ * Traer todos los proyectos del usuario logueado
+ */
+export const getAll = async (req, res, next) => {
   try {
-    const projects = await getProjects();
+    const projects = await getProjects(req.user.id);
     res.json(projects);
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    next(error);
   }
 };
 
-export const getOne = async (req, res) => {
+/**
+ * Traer unico proyecto (solo para el que esta logueado)
+ */
+export const getOne = async (req, res, next) => {
   try {
-    const { id } = req.params;
-    const project = await getProjectById(id);
+    const project = await getProjectById(
+      req.params.id,
+      req.user.id
+    );
+
+    if (!project) {
+      return res.status(404).json({ message: "Project not found" });
+    }
 
     res.json(project);
   } catch (error) {
-    res.status(404).json({ error: error.message });
+    next(error);
+  }
+};
+
+/**
+ * Proyecto actualizado (solo para el que esta logueado)
+ */
+export const update = async (req, res, next) => {
+  try {
+    const project = await updateProject(
+      req.params.id,
+      req.user.id,
+      req.body
+    );
+
+    if (!project) {
+      return res.status(404).json({ message: "Project not found" });
+    }
+
+    res.json(project);
+  } catch (error) {
+    next(error);
+  }
+};
+
+/**
+ * Proyecto eliminado (solo para el que esta logueado)
+ */
+export const remove = async (req, res, next) => {
+  try {
+    const deleted = await deleteProject(
+      req.params.id,
+      req.user.id
+    );
+
+    if (!deleted) {
+      return res.status(404).json({ message: "Project not found" });
+    }
+
+    res.json({ message: "Project deleted successfully" });
+  } catch (error) {
+    next(error);
   }
 };

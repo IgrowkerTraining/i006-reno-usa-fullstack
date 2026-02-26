@@ -1,28 +1,26 @@
 import prisma from "../lib/prisma.js";
 import Project from "../models/Project.js";
 
-export const createProject = async ({
-  name,
-  location,
-  surface_sqft,
-  structure_type,
-  intervention_type,
-  userId,
-}) => {
-  if (!name || !location || !userId) {
-    throw new Error("Missing required fields");
-  }
-
-  const projectInstance = Project.create({
+/* =========================
+   Crear proyecto
+========================= */
+export const createProject = async (data) => {
+  const {
     name,
     location,
     surface_sqft,
     structure_type,
     intervention_type,
     userId,
-  });
+  } = data;
 
-  const project = await prisma.project.create({
+  if (!name || !location || !userId) {
+    throw new Error("Missing required fields");
+  }
+
+  const projectInstance = Project.create(data);
+
+  return await prisma.project.create({
     data: {
       code: projectInstance.code,
       name,
@@ -33,41 +31,78 @@ export const createProject = async ({
       userId,
     },
   });
+};
+
+/* =========================
+   Leer todos los proyectos del usuario logueado
+========================= */
+export const getProjects = async (userId) => {
+  return await prisma.project.findMany({
+    where: { userId }, // 🔒 FILTRADO POR USUARIO
+    include: {
+      phases: true,
+    },
+  });
+};
+
+/* =========================
+   Leer unico proyecto (solo si pertenece al usuario)
+========================= */
+export const getProjectById = async (id, userId) => {
+  const project = await prisma.project.findFirst({
+    where: {
+      id,
+      userId, // 🔒 DOBLE CONDICIÓN
+    },
+    include: {
+      phases: true,
+    },
+  });
+
+  if (!project) {
+    return null; // el controller maneja el 404
+  }
 
   return project;
 };
 
-export const getProjects = async () => {
-  const projects = await prisma.project.findMany({
-    include: {
-      user: {
-        select: {
-          id: true,
-          name: true,
-          email: true,
-        },
-      },
+/* =========================
+   Actualizar proyecto (solo si pertenece al usuario)
+========================= */
+export const updateProject = async (id, userId, data) => {
+  const existing = await prisma.project.findFirst({
+    where: {
+      id,
+      userId,
     },
   });
 
-  return projects;
+  if (!existing) {
+    return null;
+  }
+
+  return await prisma.project.update({
+    where: { id },
+    data,
+  });
 };
 
-export const getProjectById = async (id) => {
-  const project = await prisma.project.findUnique({
-    where: { id: Number(id) },
-    include: {
-      user: {
-        select: {
-          id: true,
-          name: true,
-          email: true,
-        },
-      },
+/* =========================
+   Eliminar proyecto (solo si pertenece al usuario)
+========================= */
+export const deleteProject = async (id, userId) => {
+  const existing = await prisma.project.findFirst({
+    where: {
+      id,
+      userId,
     },
   });
 
-  if (!project) throw new Error("Project not found");
+  if (!existing) {
+    return null;
+  }
 
-  return project;
+  return await prisma.project.delete({
+    where: { id },
+  });
 };
