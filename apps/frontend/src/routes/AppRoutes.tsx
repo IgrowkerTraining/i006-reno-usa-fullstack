@@ -4,9 +4,11 @@ import ProtectedRoute from "./ProtectedRoute";
 import PublicRoute from "./PublicRoute";
 import Login from "../pages/Access/Login";
 import Register from "../pages/Access/Register";
-import Login from "../pages/Access/Login";
-import Register from "../pages/Access/Register";
+import Login from "../pages/Access/Access/Login";
+import Register from "../pages/Access/Access/Register";
 import Dashboard from "../pages/Dashboard";
+import ProjectGeneralView from "../pages/Vista-proyecto";
+import { ProgressReport } from "../pages/Report/ProgressReport";
 import ProjectGeneralView from "../pages/Vista-proyecto";
 import { ProgressReport } from "../pages/Report/ProgressReport";
 
@@ -46,10 +48,26 @@ export const AppRoutes: React.FC = () => {
         }
       />
       <Route
+        path="/report"
+        element={
+          <PublicRoute>
+            <ProgressReport />
+          </PublicRoute>
+        }
+      />
+      <Route
         path="/dashboard"
         element={
           <ProtectedRoute>
             <Dashboard />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/proyecto/:id"
+        element={
+          <ProtectedRoute>
+            <ProjectGeneralView />
           </ProtectedRoute>
         }
       />
