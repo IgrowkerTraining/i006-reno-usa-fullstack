@@ -1,10 +1,10 @@
-const express = require('express');
-const authRoutes = require('./auth');
-const healthRoutes = require('./health');
+import express from 'express';
+import authRoutes from './auth.routes.js';
+import healthRoutes from './health.js';
 
 const router = express.Router();
 
 router.use('/auth', authRoutes);
 router.use('/health', healthRoutes);
 
-module.exports = router;
+export default router;

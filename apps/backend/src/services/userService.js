@@ -1,40 +1,61 @@
-const User = require('../models/User');
+import bcrypt from "bcrypt";
+import prisma from "../lib/prisma.js";
 
 class UserService {
-  constructor() {
-    this.users = [];
-  }
+  async create({ name, email, password, username, role }) {
+    const existingUser = await prisma.user.findUnique({
+      where: { email },
+    });
 
-  findByEmail(email) {
-    return this.users.find(user => user.email === email);
-  }
-
-  findById(id) {
-    return this.users.find(user => user.id === id);
-  }
-
-  async create(userData) {
-    const existingUser = this.findByEmail(userData.email);
     if (existingUser) {
-      throw new Error('User already exists');
+      throw new Error("User already exists");
     }
 
-    const newUser = User.create(userData);
-    this.users.push(newUser);
-    return newUser;
+    const hashedPassword = await bcrypt.hash(password, 10);
+
+    const user = await prisma.user.create({
+      data: {
+        name,
+        email,
+        password: hashedPassword,
+        username,
+        role: role || "user",
+      },
+    });
+
+    const { password: _, ...safeUser } = user;
+    return safeUser;
   }
 
   async authenticate(email, password) {
-    const user = this.findByEmail(email);
-    if (!user || user.password !== password) {
-      throw new Error('Invalid email or password');
+    const user = await prisma.user.findUnique({
+      where: { email },
+    });
+
+    if (!user) {
+      throw new Error("Invalid email or password");
     }
-    return user;
+
+    const isValid = await bcrypt.compare(password, user.password);
+
+    if (!isValid) {
+      throw new Error("Invalid email or password");
+    }
+
+    const { password: _, ...safeUser } = user;
+    return safeUser;
   }
 
-  getAllUsers() {
-    return this.users.map(user => user.toJSON());
+  async findById(id) {
+    const user = await prisma.user.findUnique({
+      where: { id },
+    });
+
+    if (!user) return null;
+
+    const { password: _, ...safeUser } = user;
+    return safeUser;
   }
 }
 
-module.exports = new UserService();
+export default new UserService();

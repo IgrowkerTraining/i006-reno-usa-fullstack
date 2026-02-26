@@ -18,3 +18,4 @@ export enum AuthView {
   REGISTER = "REGISTER",
   DASHBOARD = "DASHBOARD",
 }
+
