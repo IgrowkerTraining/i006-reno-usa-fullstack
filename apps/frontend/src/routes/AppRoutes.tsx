@@ -29,27 +29,11 @@ export const AppRoutes: React.FC = () => {
         }
       />
       <Route
-        path="/report"
+        path="/proyecto/:id/report"
         element={
-          <PublicRoute>
+          <ProtectedRoute>
             <ProgressReport />
-          </PublicRoute>
-        }
-      />
-      <Route
-        path="/report"
-        element={
-          <PublicRoute>
-            <ProgressReport />
-          </PublicRoute>
-        }
-      />
-      <Route
-        path="/report"
-        element={
-          <PublicRoute>
-            <ProgressReport />
-          </PublicRoute>
+          </ProtectedRoute>
         }
       />
       <Route

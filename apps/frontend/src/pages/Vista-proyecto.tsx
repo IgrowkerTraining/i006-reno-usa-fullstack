@@ -213,8 +213,8 @@ const ProjectGeneralView: React.FC = () => {
               </div>
             ))}
           </div>
-
-          <button onClick={() => navigate('/editar-proyecto/123')} className="w-full py-4 bg-[#0A1F61] hover:bg-[#1a2f71] text-white rounded-lg text-lg font-semibold transition-colors">
+            
+          <button onClick={() => navigate(`/proyecto/123/report`)} className="w-full py-4 bg-[#0A1F61] hover:bg-[#1a2f71] text-white rounded-lg text-lg font-semibold transition-colors">
             Registrar avance
           </button>
         </div>
