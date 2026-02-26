@@ -16,9 +16,9 @@ const ControlAvance: React.FC = () => {
     type TimelineState = 'completed' | 'current' | 'pending' | 'none';
 
     const projectData = [
-        { id: 1, name: "Projecto Alpha" },
-        // { id: 2, name: "Projecto Beta" },
-        // { id: 3, name: "Projecto Gamma" },
+        { id: 1, name: "Project Alpha" },
+        // { id: 2, name: "Project Beta" },
+        // { id: 3, name: "Project Gamma" },
     ]
 
     const workers = [
@@ -59,12 +59,12 @@ const ControlAvance: React.FC = () => {
                     <h1 className="text-3xl font-bold mb-6">No se encontraron proyectos</h1>
                 </div>
             ) : (projectData.map((project) => (
-                <div className=" flex flex-beetween items-center justify-between bg-white text-black p-5" key={project.id}>
-                    <div className="bg-white text-black text-center" key={project.id}>
-                        <h1 className="text-3xl font-bold mb-6">{project.name}</h1>
+                <div className=" flex flex-row mx-auto bg-white text-black border-b-4 border-gray-600 mt-5" key={project.id}>
+                    <div className="basis-2/3 bg-white text-black text-start flex items-center px-5" key={project.id}>
+                        <h1 className="text-3xl font-bold mb-3">{project.name}</h1>
                     </div>
-                    <div>
-                        <button className="flex flex-1 justify-center items-center bg-blue-900 text-white py-2 px-4 rounded hover:bg-blue-600">Planos</button>
+                    <div className="basis-1/3 flex justify-end items-center pr-3">
+                        <button className="bg-blue-900 text-white hover:bg-blue-600 py-2 px-4 rounded w-40 h-10 flex items-center justify-center">Planos</button>
                     </div>
                 </div>
             ))
@@ -163,9 +163,17 @@ const ControlAvance: React.FC = () => {
                     </div>
                 </div>
 
-                {/* <!-- Button approve progress  --> */}
-                <div className="p-2 my-3 text-center bg-blue-900 hover:bg-blue-600 mt-4 w-60 mx-auto rounded">
-                    <button type="submit" id="new-project" className="text-white text-xl font-mono">Approve progress</button>
+                {/* <!-- Buttons --> */}
+                <div className="flex justify-around bg-white text-black p-5">
+                    {/* <!-- Button approve progress  --> */}
+                    <div className="p-2 my-3 text-center bg-blue-900 hover:bg-blue-600 mt-4 w-60 rounded">
+                        <button type="submit" id="new-project" className="text-white text-xl font-mono">Approve progress</button>
+                    </div>
+
+                    {/* button AI analysis */}
+                    <div className="p-2 my-3 text-center bg-blue-900 hover:bg-blue-600 mt-4 w-60 rounded bg-gradient-to-r from-blue-900 to-orange-700">
+                        <button type="submit" id="ai-analysis" className="text-white text-xl font-mono">AI Analysis ✨</button>
+                    </div>
                 </div>
             </div>
         </>
