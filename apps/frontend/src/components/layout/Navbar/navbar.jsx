@@ -6,7 +6,7 @@ import "./navbar.css";
 //assets
 import RenoLogo from "../../../assets/RenoLogo.png";
 import { useLocation } from "react-router-dom";
-import AvatarPlaceholder from "@/src/pages/Access/AvatarPlaceHolder";
+import { useAvatar } from "@/src/pages/Access/AvatarPlaceHolder";
 import { useAuth } from "@/src/context/AuthContext";
 
 export const Navbar = () => {
@@ -15,8 +15,8 @@ export const Navbar = () => {
     const { userAuth, logout } = useAuth();
     const user = JSON.parse(localStorage.getItem("user") || "{}");
 
-    const my_photo = AvatarPlaceholder({ username: user.name || user.username || "User" });
-    const my_profile_name = user.name || user.username || "User";
+    const my_photo = useAvatar(user?.name || user?.username || "User");
+    const my_profile_name = user?.name || user?.username || "User";
 
     const handleLogout = () => {
         logout(); // this calls the logout function from your AuthContext
