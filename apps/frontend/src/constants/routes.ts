@@ -15,6 +15,6 @@ export const API_ENDPOINTS = {
 } as const;
 
 export const STORAGE_KEYS = {
-  USER: 'example_user',
-  TOKEN: 'example_token',
+  USER: 'user',
+  TOKEN: 'token',
 } as const;

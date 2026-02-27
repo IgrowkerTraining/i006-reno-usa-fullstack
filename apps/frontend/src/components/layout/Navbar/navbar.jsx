@@ -6,19 +6,27 @@ import "./navbar.css";
 //assets
 import RenoLogo from "../../../assets/RenoLogo.png";
 import { useLocation } from "react-router-dom";
+import AvatarPlaceholder from "@/src/pages/Access/AvatarPlaceHolder";
+import { useAuth } from "@/src/context/AuthContext";
 
 export const Navbar = () => {
 
-    const my_photo = "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?ixlib=rb-1.2.1&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80";
-    const my_profile_name = "Serati Ma";
-
     const location = useLocation();
+    const { userAuth, logout } = useAuth();
+    const user = JSON.parse(localStorage.getItem("user") || "{}");
+
+    const my_photo = AvatarPlaceholder({ username: user.name || user.username || "User" });
+    const my_profile_name = user.name || user.username || "User";
+
+    const handleLogout = () => {
+        logout(); // this calls the logout function from your AuthContext
+    };
 
     const hideOnNavigation =
-		location.pathname === "/register" ||
-		location.pathname === "/login" ||
-		location.pathname === "/forgot-password" ||
-		location.pathname.startsWith("/reset-password/");
+        location.pathname === "/register" ||
+        location.pathname === "/login" ||
+        location.pathname === "/forgot-password" ||
+        location.pathname.startsWith("/reset-password/");
 
     const [my_notifications, setNotifications] = useState([
         { id: 1, message: "Tienes una nueva tarea asignada", read: false },
@@ -32,7 +40,7 @@ export const Navbar = () => {
         setNotifications(prev =>
             prev.map(n => n.id === id ? { ...n, read: true } : n)
         );
-        // Aquí puedes agregar la llamada a tu API si quieres marcarlo en backend
+        // Add here the API call to the backend
     };
 
     return (
@@ -56,16 +64,16 @@ export const Navbar = () => {
                             fill="none" viewBox="0 0 24 24"
                             strokeWidth={1.5}
                             stroke="currentColor"
-                            className="size-6 text-white">
+                            className={hideOnNavigation ? "hidden" : "size-6 text-white"}>
                             <path strokeLinecap="round" strokeLinejoin="round" d="m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.607 10.607Z" />
                         </svg>
 
                         {/* Botón FAQ */}
-                        <svg 
-                        xmlns="http://www.w3.org/2000/svg" 
-                        fill="none" viewBox="0 0 22 22"
-                        strokeWidth={1.5} stroke="currentColor" 
-                        className="size-6 mx-5 text-base text-white">
+                        <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            fill="none" viewBox="0 0 22 22"
+                            strokeWidth={1.5} stroke="currentColor"
+                            className="size-6 mx-5 text-base text-white">
                             <path strokeLinecap="round" strokeLinejoin="round" d="M9.879 7.519c1.171-1.025 3.071-1.025 4.242 0 1.172 1.025 1.172 2.687 0 3.712-.203.179-.43.326-.67.442-.745.361-1.45.999-1.45 1.827v.75M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Zm-9 5.25h.008v.008H12v-.008Z" />
                         </svg>
 
@@ -124,13 +132,15 @@ export const Navbar = () => {
 
                             <div className="absolute right-0 z-10 mt-2 w-48 rounded-md bg-white py-1 shadow-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-150">
                                 <a href="#" className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
-                                    Mi perfil
+                                    My profile
                                 </a>
                                 <a href="#" className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
-                                    Configuración
+                                    Settings
                                 </a>
-                                <a href="#" className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
-                                    Salir
+                                <a
+                                    className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                                    onClick={handleLogout}>
+                                    Log out
                                 </a>
                             </div>
                         </div>
