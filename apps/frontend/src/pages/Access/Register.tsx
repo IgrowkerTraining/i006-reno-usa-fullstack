@@ -13,7 +13,7 @@ import { Button } from "../../components/common/Button";
 
 //services
 import { getSecurityTip } from "../../services/service";
-import { api } from "../../services/api";
+import { api } from "../../services/authServices";
 
 //hooks
 import { useAuth } from "../../hooks/useAuth";
@@ -137,86 +137,104 @@ const Register: React.FC = () => {
             className="grid grid-cols-1 md:grid-cols-2 gap-4"
           >
             <div className="md:col-span-2">
-              <Input
-                label="Nombre"
-                name="name"
-                placeholder="Introduzca su nombre"
-                required
-                disabled={isLoading}
-                value={formData.name}
-                className="text-zinc-600 bg-white placeholder:text-zinc-300"
-                onChange={handleChange}
-              />
-            </div>
-            <div className="md:col-span-2">
-              <Input
-                label="Apellidos"
-                name="lastName"
-                placeholder="Introduzca sus apellidos"
-                required
-                disabled={isLoading}
-                value={formData.lastName}
-                className="text-zinc-600 bg-white placeholder:text-zinc-300"
-                onChange={handleChange}
-              />
-            </div>
-            <div className="md:col-span-2">
-              <Input
-                label="Correo electrónico"
-                name="email"
-                type="email"
-                placeholder="name@company.com"
-                required
-                disabled={isLoading}
-                value={formData.email}
-                className="text-zinc-600 bg-white placeholder:text-zinc-300"
-                onChange={handleChange}
-              />
-            </div>
-
-            <div className="md:col-span-2">
+              <div className="text-zinc-600 mb-2">
+                <label htmlFor="role">Select your role:</label>
+              </div>
               <select
                 name="role"
                 required
                 disabled={isLoading}
                 value={formData.role}
-                className="text-zinc-600 bg-white placeholder:text-zinc-300"
+                className="bg_inputs text-zinc-600 placeholder:text-zinc-300 my-2 w-48 p-2 border-2 border-slate-300 rounded-md"
                 onChange={handleChange}
               >
-                <option value="">Seleccionar rol</option>
+                <option value="">---</option>
                 <option value="professional">Professional</option>
                 <option value="user">User</option>
               </select>
 
             </div>
 
-            <Input
-              label="Contraseña"
-              name="password"
-              type="password"
-              placeholder="••••••••"
-              required
-              disabled={isLoading}
-              error={errors.password}
-              value={formData.password}
-              className="text-zinc-600 bg-white placeholder:text-zinc-300"
-              onChange={handleChange}
-            />
-            <Input
-              label="Confirmar contraseña"
-              name="confirmPassword"
-              type="password"
-              placeholder="••••••••"
-              required
-              disabled={isLoading}
-              error={errors.confirmPassword}
-              value={formData.confirmPassword}
-              className="text-zinc-600 bg-white placeholder:text-zinc-300"
-              onChange={handleChange}
-            />
+            <div className="md:col-span-2">
+              <div className="text-zinc-600 mb-2">
+                <label htmlFor="role">Name:</label>
+              </div>
+              <Input
+                name="name"
+                placeholder="Add your name and middle name here"
+                required
+                disabled={isLoading}
+                value={formData.name}
+                className="bg_inputs text-zinc-600 bg_inputs placeholder:text-zinc-300"
+                onChange={handleChange}
+              />
+            </div>
+            <div className="md:col-span-2">
+              <div className="text-zinc-600 mb-2">
+                <label htmlFor="role">Last name:</label>
+              </div>
+              <Input
+                name="lastName"
+                placeholder="Add all of your last names"
+                required
+                disabled={isLoading}
+                value={formData.lastName}
+                className="bg_inputs text-zinc-600 placeholder:text-zinc-300"
+                onChange={handleChange}
+              />
+            </div>
+            <div className="md:col-span-2">
+              <div className="text-zinc-600 mb-2">
+                <label htmlFor="role">Email:</label>
+              </div>
+              <Input
+                name="email"
+                type="email"
+                placeholder="name@company.com"
+                required
+                disabled={isLoading}
+                value={formData.email}
+                className="bg_inputs text-zinc-600 placeholder:text-zinc-300"
+                onChange={handleChange}
+              />
+            </div>
+
+            <div className="md:col-span-2">
+              <div className="text-zinc-600 mb-2">
+                <label htmlFor="role">Password:</label>
+              </div>
+              <Input
+                name="password"
+                type="password"
+                placeholder="••••••••"
+                required
+                disabled={isLoading}
+                error={errors.password}
+                value={formData.password}
+                className="bg_inputs text-zinc-600 placeholder:text-zinc-300"
+                onChange={handleChange}
+              />
+            </div>
+
+            <div className="md:col-span-2">
+              <div className="text-zinc-600 mb-2">
+                <label htmlFor="role">Confirm password:</label>
+              </div>
+              <Input
+                name="confirmPassword"
+                type="password"
+                placeholder="••••••••"
+                required
+                disabled={isLoading}
+                error={errors.confirmPassword}
+                value={formData.confirmPassword}
+                className="bg_inputs text-zinc-600 placeholder:text-zinc-300"
+                onChange={handleChange}
+              />
+            </div>
 
             <div className="md:col-span-2 mt-4">
-              <Button type="submit" className="w-full mt-4 bg-blue-900 hover:bg-blue-600" isLoading={isLoading}>
+              <Button type="submit" className="w-full mt-4 bg-blue-900 hover:bg-blue-700" isLoading={isLoading}>
                 Registrarse
               </Button>
             </div>

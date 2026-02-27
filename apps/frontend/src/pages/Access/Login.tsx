@@ -12,7 +12,7 @@ import { Input } from "../../components/common/Input";
 import { Button } from "../../components/common/Button";
 
 //services
-import { api } from "../../services/api";
+import { api } from "../../services/authServices";
 
 //hooks
 import { useAuth } from "../../hooks/useAuth";
@@ -75,27 +75,35 @@ const Login: React.FC = () => {
               </div>
             )}
 
-            <Input
-              label="Correo electrónico"
-              placeholder="name@company.com"
-              type="email"
-              required
-              disabled={isLoading}
-              value={email}
-              className="text-zinc-600 bg-white placeholder:text-zinc-300"
-              onChange={(e) => setEmail(e.target.value)}
-            />
+            <div className="md:col-span-2">
+              <div className="text-zinc-600 mb-2">
+                <label htmlFor="role">Email:</label>
+              </div>
+              <Input
+                placeholder="name@company.com"
+                type="email"
+                required
+                disabled={isLoading}
+                value={email}
+                className="bg_inputs text-zinc-600 placeholder:text-zinc-300"
+                onChange={(e) => setEmail(e.target.value)}
+              />
+            </div>
 
-            <Input
-              label="Contraseña"
-              placeholder="••••••••"
-              type="password"
-              required
-              disabled={isLoading}
-              value={password}
-              className="text-zinc-600 bg-white placeholder:text-zinc-300"
-              onChange={(e) => setPassword(e.target.value)}
-            />
+            <div className="md:col-span-2">
+              <div className="text-zinc-600 mb-2">
+                <label htmlFor="role">Password:</label>
+              </div>
+              <Input
+                placeholder="••••••••"
+                type="password"
+                required
+                disabled={isLoading}
+                value={password}
+                className="bg_inputs text-zinc-600 placeholder:text-zinc-300"
+                onChange={(e) => setPassword(e.target.value)}
+              />
+            </div>
 
             <div className="flex items-center justify-between">
               <label className="flex items-center gap-2 cursor-pointer">
@@ -115,7 +123,7 @@ const Login: React.FC = () => {
 
             <Button
               type="submit"
-              className="w-full mt-4 bg-blue-900 hover:bg-blue-600"
+              className="w-full mt-4 bg-blue-900 hover:bg-blue-700"
               isLoading={isLoading}>
               Acceder
             </Button>

@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { User } from "../types";
 import { Button } from "../components/common/Button";
 import { getAIGreeting } from "../services/service";
-import { api } from "../services/api";
+import { api } from "../services/authServices";
 import { useAuth } from "../hooks/useAuth";
 import { useNavigate } from "react-router-dom";
 const Dashboard: React.FC = () => {
