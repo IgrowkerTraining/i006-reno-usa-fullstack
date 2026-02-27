@@ -23,9 +23,11 @@ const Register: React.FC = () => {
   const { login } = useAuth();
   const [formData, setFormData] = useState({
     name: "",
+    lastName: "",
     email: "",
     password: "",
     confirmPassword: "",
+    role: "user"
   });
   const [isLoading, setIsLoading] = useState(false);
   const [securityTip, setSecurityTip] = useState<string | null>(null);
@@ -40,17 +42,23 @@ const Register: React.FC = () => {
     fetchTip();
   }, []);
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
+  ) => {
     const { name, value } = e.target;
+
+    // Actualiza formData
     setFormData((prev) => ({ ...prev, [name]: value }));
-    setServerError(null);
-    if (errors[name]) {
-      setErrors((prev) => {
-        const newErrors = { ...prev };
-        delete newErrors[name];
-        return newErrors;
-      });
-    }
+
+    // Limpia error del input actual
+    setErrors((prev) => {
+      if (prev[name]) {
+        const { [name]: _, ...rest } = prev;
+        return rest;
+      }
+      return prev;
+    });
+
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -74,10 +82,10 @@ const Register: React.FC = () => {
 
     try {
       const response = await api.register({
-        name: formData.name,
-        lastName: formData.lastName,
-        email: formData.email,
-        password: formData.password,
+        name: formData.name + " " + formData.lastName.trim(),
+        email: formData.email.trim(),
+        password: formData.password.trim(),
+        role: formData.role.trim() || "user"
       });
       login(response.user);
       navigate("/dashboard");
@@ -91,7 +99,7 @@ const Register: React.FC = () => {
   return (
     <div className="min-h-screen flex items-center justify-center p-4 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-blue-400">
       <div className="w-full max-w-lg">
-        <div className="bg-white backdrop-blur-xl p-8 rounded-2xl shadow-2xl">
+        <div className="bg-white p-8 rounded-2xl shadow-2xl">
           <div className="flex flex-col items-center mb-10">
             <p className="text-3xl font-bold text-blue-900 mb-6">
               Crear cuenta
@@ -165,6 +173,23 @@ const Register: React.FC = () => {
                 onChange={handleChange}
               />
             </div>
+
+            <div className="md:col-span-2">
+              <select
+                name="role"
+                required
+                disabled={isLoading}
+                value={formData.role}
+                className="text-zinc-600 bg-white placeholder:text-zinc-300"
+                onChange={handleChange}
+              >
+                <option value="">Seleccionar rol</option>
+                <option value="professional">Professional</option>
+                <option value="user">User</option>
+              </select>
+
+            </div>
+
             <Input
               label="Contraseña"
               name="password"

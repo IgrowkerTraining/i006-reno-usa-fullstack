@@ -44,7 +44,7 @@ const Login: React.FC = () => {
   return (
     <div className="min-h-screen flex items-center justify-center p-8 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-blue-400">
       <div className="w-full max-w-md">
-        <div className="bg-white backdrop-blur-xl p-8 rounded-2xl shadow-2xl">
+        <div className="bg-white p-8 rounded-2xl shadow-2xl">
           <div className="flex flex-col items-center mb-10">
             <div className="w-32 h-32 rounded-xl items-center justify-center mb-4">
               <img alt="Reno" src={RenoLogo} className="h-32 w-auto" />
