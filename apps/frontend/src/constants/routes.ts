@@ -6,10 +6,10 @@ export const ROUTES = {
 } as const;
 
 export const API_ENDPOINTS = {
-  BASE: 'https://vigilant-meme-q7x5wvrwjpv5cx9jg-3000.app.github.dev/api',
+  BASE: 'https://fluffy-rotary-phone-7g5prwxwg553wwg6-3000.app.github.dev',
   AUTH: {
-    LOGIN: '/auth/login',
-    REGISTER: '/auth/register',
+    LOGIN: '/api/auth/login',
+    REGISTER: '/api/auth/register',
   },
   HEALTH: '/health',
 } as const;

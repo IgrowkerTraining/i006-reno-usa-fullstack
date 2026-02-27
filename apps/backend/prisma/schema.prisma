@@ -1,55 +1,50 @@
-// prisma/schema.prisma
-
 generator client {
-  provider = "prisma-client-js"
-  output   = "../src/generated/prisma"
+  provider      = "prisma-client-js"
+  output        = "../src/generated/prisma"
   binaryTargets = ["native", "linux-musl-openssl-3.0.x"]
 }
 
 datasource db {
   provider = "postgresql"
-  url = env("DATABASE_URL")
+  url      = env("DATABASE_URL")
 }
 
 model User {
-  id       String  @id @default(cuid())
-  name     String
-  email    String  @unique
-  password String
-  username String
-  avatar   String?
-  role     String
-
+  id                 String              @id @default(cuid())
+  name               String
+  email              String              @unique
+  password           String
+  username           String
+  avatar             String?
+  role               String
   dailyLogs          DailyLog[]
-  technicalApprovals TechnicalApproval[]
   projects           Project[]
+  technicalApprovals TechnicalApproval[]
 }
 
 model Project {
-  id                String @id @default(cuid())
-  code              String @unique
+  id                String            @id @default(cuid())
+  code              String            @unique
   name              String
   location          String
   surface_sqft      Float
   structure_type    String
   intervention_type String
   userId            String
-  user              User   @relation(fields: [userId], references: [id])
-
-  phases           Phase[]
-  projectSnapshots ProjectSnapshot[]
+  phases            Phase[]
+  user              User              @relation(fields: [userId], references: [id])
+  projectSnapshots  ProjectSnapshot[]
 }
 
 model Phase {
-  id            String   @id @default(cuid())
-  name          String
-  planned_start DateTime
-  planned_end   DateTime
-  projectId     String
-  project       Project  @relation(fields: [projectId], references: [id])
-
-  tasks              Task[]
+  id                 String              @id @default(cuid())
+  name               String
+  planned_start      DateTime
+  planned_end        DateTime
+  projectId          String
   dailyLogs          DailyLog[]
+  project            Project             @relation(fields: [projectId], references: [id])
+  tasks              Task[]
   technicalApprovals TechnicalApproval[]
 }
 
@@ -57,47 +52,43 @@ model Trade {
   id          String  @id @default(cuid())
   name        String
   description String?
-
-  tasks Task[]
+  tasks       Task[]
 }
 
 model Task {
-  id          String  @id @default(cuid())
-  name        String
-  description String?
-  phaseId     String
-  tradeId     String
-  phase       Phase   @relation(fields: [phaseId], references: [id])
-  trade       Trade   @relation(fields: [tradeId], references: [id])
-
+  id            String         @id @default(cuid())
+  name          String
+  description   String?
+  phaseId       String
+  tradeId       String
   executedTasks ExecutedTask[]
+  phase         Phase          @relation(fields: [phaseId], references: [id])
+  trade         Trade          @relation(fields: [tradeId], references: [id])
 }
 
 model ExecutedTask {
-  id         String   @id @default(cuid())
-  taskId     String
-  dailyLogId String
-  task       Task     @relation(fields: [taskId], references: [id])
-  dailyLog   DailyLog @relation(fields: [dailyLogId], references: [id])
-
+  id             String          @id @default(cuid())
+  taskId         String
+  dailyLogId     String
+  dailyLog       DailyLog        @relation(fields: [dailyLogId], references: [id])
+  task           Task            @relation(fields: [taskId], references: [id])
   materialUsages MaterialUsage[]
 }
 
 model DailyLog {
-  id                    String   @id @default(cuid())
+  id                    String           @id @default(cuid())
   notes                 String?
-  log_date              DateTime @default(now())
+  log_date              DateTime         @default(now())
   completion_percentage Float?
   schedule_deviation    Float?
   userId                String
   phaseId               String
-  user                  User     @relation(fields: [userId], references: [id])
-  phase                 Phase    @relation(fields: [phaseId], references: [id])
-
-  executedTasks   ExecutedTask[]
-  incidents       Incident[]
-  safetyMeasures  SafetyMeasure[]
-  workerCoverages WorkerCoverage[]
+  phase                 Phase            @relation(fields: [phaseId], references: [id])
+  user                  User             @relation(fields: [userId], references: [id])
+  executedTasks         ExecutedTask[]
+  incidents             Incident[]
+  safetyMeasures        SafetyMeasure[]
+  workerCoverages       WorkerCoverage[]
 }
 
 model Incident {
@@ -131,8 +122,8 @@ model TechnicalApproval {
   approval_date DateTime @default(now())
   userId        String
   phaseId       String
-  user          User     @relation(fields: [userId], references: [id])
   phase         Phase    @relation(fields: [phaseId], references: [id])
+  user          User     @relation(fields: [userId], references: [id])
 }
 
 model ProjectSnapshot {
@@ -140,8 +131,8 @@ model ProjectSnapshot {
   snapshot_date DateTime   @default(now())
   period_label  String
   projectId     String
-  project       Project    @relation(fields: [projectId], references: [id])
   aiReports     AIReport[]
+  project       Project    @relation(fields: [projectId], references: [id])
 }
 
 model AIReport {
@@ -153,11 +144,10 @@ model AIReport {
 }
 
 model Material {
-  id          String  @id @default(cuid())
-  name        String
-  unit        String
-  description String?
-
+  id             String          @id @default(cuid())
+  name           String
+  unit           String
+  description    String?
   materialUsages MaterialUsage[]
 }
 
