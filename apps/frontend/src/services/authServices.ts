@@ -3,12 +3,13 @@ import { API_ENDPOINTS } from "../constants/routes";
 import { storage } from "../utils/storage";
 
 export const api = {
-  async register(data: any): Promise<{ user: User; token: string; message: string }> {
+  async register(data: any): Promise<{ user: User; token?: string; message: string }> {
     const response = await fetch(
       `${API_ENDPOINTS.BASE}${API_ENDPOINTS.AUTH.REGISTER}`,
       {
         method: "POST",
         headers: { "Content-Type": "application/json" },
+        credentials: "include", 
         body: JSON.stringify(data),
       },
     );
@@ -18,19 +19,19 @@ export const api = {
       throw new Error(result.error || "Registration failed");
     }
 
-    // Save user and token
     storage.setUser(result.user);
-    storage.setToken(result.token);
+    if (result.token) storage.setToken(result.token);
 
     return result;
   },
 
-  async login(data: any): Promise<{ user: User; token: string; message: string }> {
+  async login(data: any): Promise<{ user: User; token?: string; message: string }> {
     const response = await fetch(
       `${API_ENDPOINTS.BASE}${API_ENDPOINTS.AUTH.LOGIN}`,
       {
         method: "POST",
         headers: { "Content-Type": "application/json" },
+        credentials: "include", 
         body: JSON.stringify(data),
       },
     );
@@ -40,9 +41,8 @@ export const api = {
       throw new Error(result.error || "Login failed");
     }
 
-    // Save user and token
     storage.setUser(result.user);
-    storage.setToken(result.token);
+    if (result.token) storage.setToken(result.token);
 
     return result;
   },

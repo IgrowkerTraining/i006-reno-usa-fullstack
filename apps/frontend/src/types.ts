@@ -19,3 +19,21 @@ export enum AuthView {
   DASHBOARD = "DASHBOARD",
 }
 
+export interface Project {
+  id: string;
+  code: string;
+  name: string;
+  location: string;
+  surface_sqft: number;
+  structure_type: string;
+  intervention_type: string;
+  userId: string;
+}
+
+export interface ProjectInput {
+  name: string;
+  location: string;
+  surface_sqft: number;
+  structure_type: string;
+  intervention_type: string;
+}
