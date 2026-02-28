@@ -96,6 +96,29 @@ docker-compose -f docker-compose.yml -f docker-compose.prod.yml up
 - pnpm (recomendado) o npm
 - Docker y Docker Compose (opcional)
 
+## Configuración de Entorno (Local y Codespaces)
+Antes de instalar y ejecutar, debes configurar las variables de entorno basándote en los archivos de ejemplo. Ejecuta esto en tu terminal:
+
+- Para el Frontend:
+
+Bash
+cp apps/frontend/.env.example apps/frontend/.env
+
+- Para el Backend:
+
+Bash
+cp apps/backend/.env.example apps/backend/.env
+
+- Si usas GitHub Codespaces:
+
+Abre la pestaña Ports (Puertos) en la terminal de VS Code.
+
+Cambia la visibilidad (Visibility) de los puertos 3000 y 5173 a Public.
+
+Abre tus archivos .env recién creados y reemplaza las rutas de localhost por las URLs "Forwarded Address" que te proporciona Codespaces (ej. https://tu-usuario-puerto.github.dev).
+
+- Si el backend ya estaba corriendo, reinícialo (docker compose restart backend) para aplicar los cambios de CORS.
+
 ### 1. Instalar Dependencias
 
 ```bash
