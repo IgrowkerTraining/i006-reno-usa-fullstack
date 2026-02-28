@@ -4,7 +4,10 @@ import pinoHttp from "pino-http";
 import logger from "../utils/logger.js";
 
 const setupMiddleware = (app) => {
-  app.use(cors());
+  app.use(cors({
+  origin: 'http://localhost:5173',
+  credentials: true,
+}));
 
   app.use(
     pinoHttp({
