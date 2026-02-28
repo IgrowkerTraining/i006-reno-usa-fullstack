@@ -6,7 +6,7 @@ export const ROUTES = {
 } as const;
 
 export const API_ENDPOINTS = {
-  BASE: 'https://fluffy-rotary-phone-7g5prwxwg553wwg6-3000.app.github.dev',
+  BASE: import.meta.env.VITE_API_BASE_URL || "http://localhost:3000",
   AUTH: {
     LOGIN: '/api/auth/login',
     REGISTER: '/api/auth/register',
