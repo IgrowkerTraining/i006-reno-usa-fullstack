@@ -9,7 +9,7 @@ const Dashboard: React.FC = () => {
 
   // Prototipo de proyectos activos
   const projects = [
-    { id: 1, name: "Project Alpha", status: "In Progress" },
+    { id: "cmm5x88kw000bup5loxgrm4f2", name: "Project Alpha", status: "In Progress" },
     { id: 2, name: "Project Beta", status: "Completed" },
     { id: 3, name: "Project Gamma", status: "In Progress" },
     { id: 4, name: "Project Delta", status: "In Progress" },

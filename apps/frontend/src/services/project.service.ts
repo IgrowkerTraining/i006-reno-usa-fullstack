@@ -1,17 +1,26 @@
 import { Project, ProjectInput } from '../types';
+import { API_ENDPOINTS } from '../constants/routes';
 
-const API_URL = '/api/projects';
+const API_URL = `${API_ENDPOINTS.BASE}/api/projects`;
 
 // --- SERVICIOS DE PROYECTOS ---
 export const projectService = {
   getAll: async (): Promise<Project[]> => {
-    const response = await fetch(API_URL, { credentials: 'include' });
+    const response = await fetch(API_URL, {
+      method: 'GET',
+      headers: { 'Content-Type': 'application/json' },
+      credentials: 'include',
+    });
     if (!response.ok) throw new Error('Error al obtener proyectos');
     return response.json();
   },
 
   getById: async (id: string): Promise<Project> => {
-    const response = await fetch(`${API_URL}/${id}`, { credentials: 'include' });
+    const response = await fetch(`${API_URL}/${id}`, {
+      method: 'GET',
+      headers: { 'Content-Type': 'application/json' },
+      credentials: 'include',
+    });
     if (!response.ok) throw new Error('Error al obtener el proyecto');
     return response.json();
   },
@@ -41,6 +50,7 @@ export const projectService = {
   remove: async (id: string): Promise<{ message: string }> => {
     const response = await fetch(`${API_URL}/${id}`, {
       method: 'DELETE',
+      headers: { 'Content-Type': 'application/json' },
       credentials: 'include',
     });
     if (!response.ok) throw new Error('Error al eliminar proyecto');
