@@ -101,12 +101,10 @@ Antes de instalar y ejecutar, debes configurar las variables de entorno basándo
 
 - Para el Frontend:
 
-Bash
 cp apps/frontend/.env.example apps/frontend/.env
 
 - Para el Backend:
 
-Bash
 cp apps/backend/.env.example apps/backend/.env
 
 - Si usas GitHub Codespaces:
@@ -125,6 +123,11 @@ Abre tus archivos .env recién creados y reemplaza las rutas de localhost por la
 # Backend
 cd apps/backend
 npm install
+
+# generar tablas BBDD (first time)
+cd apps/backend
+npx prisma generate
+npx prisma db push
 
 # Frontend
 cd apps/frontend
