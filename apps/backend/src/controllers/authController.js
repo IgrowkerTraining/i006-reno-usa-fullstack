@@ -1,5 +1,5 @@
 import { registerUser, loginUser } from "../services/auth.service.js";
-import Validator from "../utils/Validator.js";
+import Validator from "../utils/validator.js";
 
 /* =========================
    REGISTER
