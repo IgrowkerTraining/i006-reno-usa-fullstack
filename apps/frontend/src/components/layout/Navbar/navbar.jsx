@@ -5,9 +5,11 @@ import "./navbar.css";
 
 //assets
 import RenoLogo from "../../../assets/RenoLogo.png";
-import { useLocation } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import { useAvatar } from "@/src/pages/Access/AvatarPlaceHolder";
 import { useAuth } from "@/src/context/AuthContext";
+import { SearchBar } from "./searchBar";
+import error_icons from "../../common/error_icons";
 
 export const Navbar = () => {
 
@@ -19,7 +21,7 @@ export const Navbar = () => {
     const my_profile_name = user?.name || user?.username || "User";
 
     const handleLogout = () => {
-        logout(); // this calls the logout function from your AuthContext
+        logout(); // this calls the logout function from AuthContext.jsx
     };
 
     const hideOnNavigation =
@@ -28,19 +30,49 @@ export const Navbar = () => {
         location.pathname === "/forgot-password" ||
         location.pathname.startsWith("/reset-password/");
 
-    const [my_notifications, setNotifications] = useState([
-        { id: 1, message: "Tienes una nueva tarea asignada", read: false },
-        { id: 2, message: "Tu proyecto ha sido aprobado", read: false },
-        { id: 3, message: "Recibiste un nuevo comentario", read: false },
+    const [projects, setProjects] = useState([
+        {
+            id: 1,
+            name: "Project Name",
+            notifications: [
+                { id: "09856", code: "ERROR-01", read: false },
+                { id: "1230098", code: "ERROR-02", read: false },
+                { id: "34561234098", code: "ERROR-03", read: false }
+            ]
+        },
+        {
+            id: 2,
+            name: "Project Name 2",
+            notifications: [
+                { id: "12345", code: "ERROR-01", read: true },
+                { id: "67890", code: "ERROR-03", read: false }
+            ]
+        },
+        {
+            id: 3,
+            name: "Project Name 3",
+            notifications: [
+                { id: "14567", code: "ERROR-01", read: false }
+            ]
+        }
     ]);
 
-    const unreadCount = my_notifications?.filter(n => !n.read).length || 0;
+    const errors = error_icons.filter(e => projects?.some(project => project?.notifications?.some(n => n.code === e.error_code)));
 
-    const markAsRead = (id) => {
-        setNotifications(prev =>
-            prev.map(n => n.id === id ? { ...n, read: true } : n)
+    const unreadCount =
+        projects.reduce((total, project) => {
+            return total + project?.notifications?.filter(n => !n.read).length;
+        }, 0);
+
+    const markAsRead = (notificationId) => {
+        setProjects(prev =>
+            prev.map(project => ({
+                ...project,
+                notifications: project.notifications.map(n =>
+                    n.id === notificationId ? { ...n, read: true } : n
+                )
+            }))
         );
-        // Add here the API call to the backend
     };
 
     return (
@@ -48,40 +80,37 @@ export const Navbar = () => {
             <div className="mx-auto px-5">
                 <div className="relative flex h-16 items-center justify-between">
                     {/* Logo */}
-                    <div className="flex flex-1 items-stretch justify-start">
-                        <div className="flex shrink-0 items-center">
-                            <img alt="Reno" src={RenoLogo} className="h-8 w-auto" />
+                    <Link to="/dashboard">
+                        <div className="flex flex-1 items-stretch justify-start">
+                            <div className="flex shrink-0 items-center">
+                                <img alt="Reno" src={RenoLogo} className="h-8 w-auto" />
+                            </div>
+                            <p className="reno_logo_name font-bold ml-2 mt-1">RENO</p>
                         </div>
-                        <p className="reno_logo_name font-bold ml-2 mt-1">RENO</p>
-                    </div>
+                    </Link>
 
-                    {/* Sección de la derecha */}
+                    {/* Right section */}
                     <div className="absolute inset-y-0 right-0 flex items-center pr-2 sm:static sm:inset-auto sm:ml-6 sm:pr-0">
 
-                        {/* Botón búsqueda */}
-                        <svg
-                            xmlns="http://www.w3.org/2000/svg"
-                            fill="none" viewBox="0 0 24 24"
-                            strokeWidth={1.5}
-                            stroke="currentColor"
-                            className={hideOnNavigation ? "hidden" : "size-6 text-white"}>
-                            <path strokeLinecap="round" strokeLinejoin="round" d="m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.607 10.607Z" />
-                        </svg>
+                        {/* Search button */}
+                        <SearchBar hideOnNavigation={hideOnNavigation} />
 
-                        {/* Botón FAQ */}
-                        <svg
-                            xmlns="http://www.w3.org/2000/svg"
-                            fill="none" viewBox="0 0 22 22"
-                            strokeWidth={1.5} stroke="currentColor"
-                            className="size-6 mx-5 text-base text-white">
-                            <path strokeLinecap="round" strokeLinejoin="round" d="M9.879 7.519c1.171-1.025 3.071-1.025 4.242 0 1.172 1.025 1.172 2.687 0 3.712-.203.179-.43.326-.67.442-.745.361-1.45.999-1.45 1.827v.75M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Zm-9 5.25h.008v.008H12v-.008Z" />
-                        </svg>
+                        {/*FAQ button */}
+                        <Link to="/#">
+                            <svg
+                                xmlns="http://www.w3.org/2000/svg"
+                                fill="none" viewBox="0 0 22 22"
+                                strokeWidth={1.5} stroke="currentColor"
+                                className="size-6 mx-5 text-base text-white">
+                                <path strokeLinecap="round" strokeLinejoin="round" d="M9.879 7.519c1.171-1.025 3.071-1.025 4.242 0 1.172 1.025 1.172 2.687 0 3.712-.203.179-.43.326-.67.442-.745.361-1.45.999-1.45 1.827v.75M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Zm-9 5.25h.008v.008H12v-.008Z" />
+                            </svg>
+                        </Link>
 
-                        {/* Botón notificaciones */}
+                        {/* Notifications button*/}
                         <div className={hideOnNavigation ? "hidden" : "relative group mt-1"}>
                             <button
                                 type="button"
-                                className="relative rounded-full p-1 text-gray-400 focus:outline-2 focus:outline-offset-2 focus:outline-indigo-500"
+                                className="relative rounded-full p-1 focus:outline-2 focus:outline-offset-2 focus:outline-indigo-500"
                             >
                                 <svg
                                     xmlns="http://www.w3.org/2000/svg"
@@ -89,11 +118,11 @@ export const Navbar = () => {
                                     viewBox="0 0 24 24"
                                     strokeWidth="1.5"
                                     stroke="currentColor"
-                                    className="size-6 mr-5 text-white">
+                                    className="size-6 mr-5 text-slate-50">
                                     <path strokeLinecap="round" strokeLinejoin="round" d="M14.857 17.082a23.848 23.848 0 0 0 5.454-1.31A8.967 8.967 0 0 1 18 9.75V9A6 6 0 0 0 6 9v.75a8.967 8.967 0 0 1-2.312 6.022c1.733.64 3.56 1.085 5.455 1.31m5.714 0a24.255 24.255 0 0 1-5.714 0m5.714 0a3 3 0 1 1-5.714 0" />
                                 </svg>
 
-                                {/* Badge de notificaciones */}
+                                {/* Badge for notification button*/}
                                 {unreadCount > 0 && (
                                     <span className="absolute -top-1 -right-1 inline-flex items-center justify-center px-3 ml-7 py-1 text-xs leading-none text-white bg-red-500 rounded-full">
                                         {unreadCount}
@@ -101,25 +130,44 @@ export const Navbar = () => {
                                 )}
                             </button>
 
-                            <div className="absolute right-0 z-10 mt-1 w-80 rounded-md bg-white py-1 shadow-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-150">
-                                {!my_notifications || my_notifications.length === 0 ? (
-                                    <p className="text-sm text-gray-500 p-2 justify-self-center">
+                            <div className="absolute right-0 z-10 mt-1 w-96 rounded-md notification_bg py-1 shadow-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-150">
+                                {!projects || projects.length === 0 ? (
+                                    <p className="text-sm text-gray-500 p-2 text-center">
                                         No tienes notificaciones
                                     </p>
                                 ) : (
-                                    my_notifications?.map(notification => (
-                                        <p
-                                            key={notification.id}
-                                            className={`${notification.read ? "font-normal" : "font-bold"} px-4 py-2 text-sm text-gray-700 hover:bg-gray-100`}
-                                            onClick={() => markAsRead(notification.id)}>
-                                            {notification.message}
-                                        </p>
+                                    projects.map(project => (
+                                        <div key={project.id} className="border-b border-blue-100 pb-3">
+                                            <h2 className="text-blue-900 font-bold py-2 ps-10 border-b">
+                                                {project.name}
+                                            </h2>
+
+                                            {project?.notifications?.map(notification => (
+                                                <div
+                                                    key={notification.id}
+                                                    className={`${notification.read ? "text-slate-500" : "text-slate-700"
+                                                        } px-8 py-2 hover:bg-blue-100`}
+                                                    onClick={() => markAsRead(notification.id)}
+                                                >
+                                                    <div className="flex mt-2">
+                                                        {errors.find(e => e.error_code === notification.code)?.icon || ""}
+                                                        <h4 className="ms-3 text-sm font-bold my-2">
+                                                            {errors.find(e => e.error_code === notification.code)?.error_title || notification.code}
+                                                        </h4>
+                                                    </div>
+
+                                                    <p className="text-sm">
+                                                        {errors.find(e => e.error_code === notification.code)?.description || ""}
+                                                    </p>
+                                                </div>
+                                            ))}
+                                        </div>
                                     ))
                                 )}
                             </div>
                         </div>
 
-                        {/*Dropdown perfil */}
+                        {/*Dropdown profile button */}
                         <div className={hideOnNavigation ? "hidden" : "relative ml-4 group"}>
                             <button className="relative flex rounded-full focus:outline-2 focus:outline-offset-2 focus:outline-indigo-500">
                                 <img
@@ -127,21 +175,15 @@ export const Navbar = () => {
                                     src={my_photo}
                                     className="h-8 w-8 rounded-full bg-gray-800"
                                 />
-                                <p className="ml-2 text-sm text-white mt-3">{my_profile_name}</p>
+                                <p className="ml-4 text-sm text-white mt-3 capitalize">{my_profile_name}</p>
                             </button>
 
                             <div className="absolute right-0 z-10 mt-2 w-48 rounded-md bg-white py-1 shadow-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-150">
-                                <a href="#" className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
-                                    My profile
-                                </a>
-                                <a href="#" className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
-                                    Settings
-                                </a>
-                                <a
-                                    className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                                <button
+                                    className="w-full px-4 py-2 text-sm font-bold text-red-700 hover:bg-gray-100 text-start"
                                     onClick={handleLogout}>
                                     Log out
-                                </a>
+                                </button>
                             </div>
                         </div>
                     </div>
