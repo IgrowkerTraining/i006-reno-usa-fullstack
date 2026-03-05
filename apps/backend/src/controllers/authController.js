@@ -21,26 +21,21 @@ export const register = async (req, res) => {
       role,
     });
 
-    res
+    return res
       .cookie("token", token, {
         httpOnly: true,
-        secure: false, // cambiar a true en producción
+        secure: false, // true en producción
         sameSite: "lax",
       })
       .status(201)
       .json({
         message: "User created",
-        user: {
-          id: user.id,
-          name: user.name,
-          email: user.email,
-          username: user.username,
-          role: user.role,
-        },
+        user, // 👈 devolvemos el safeUser completo
         token,
       });
+
   } catch (error) {
-    res.status(400).json({ error: error.message });
+    return res.status(400).json({ error: error.message });
   }
 };
 
@@ -59,24 +54,19 @@ export const login = async (req, res) => {
 
     const { user, token } = await loginUser(email, password);
 
-    res
+    return res
       .cookie("token", token, {
         httpOnly: true,
-        secure: false, // cambiar a true en producción
+        secure: false, // true en producción
         sameSite: "lax",
       })
       .json({
         message: "Login successful",
-        user: {
-          id: user.id,
-          name: user.name,
-          email: user.email,
-          username: user.username,
-          role: user.role,
-        },
+        user, // 👈 devolvemos el safeUser completo
         token,
       });
+
   } catch (error) {
-    res.status(401).json({ error: error.message });
+    return res.status(401).json({ error: error.message });
   }
 };

@@ -1,5 +1,30 @@
 import prisma from "../lib/prisma.js";
 import Project from "../models/Project.js";
+import { mapProject } from "../mappers/project.mapper.js";
+
+/* =========================
+   INCLUDE CENTRALIZADO
+========================= */
+const projectFullInclude = {
+  phases: {
+    include: {
+      tasks: {
+        include: {
+          executedTasks: {
+            include: {
+              dailyLog: {
+                include: {
+                  user: true,
+                },
+              },
+            },
+          },
+        },
+      },
+    },
+  },
+  projectSnapshots: true,
+};
 
 /* =========================
    Crear proyecto
@@ -11,6 +36,13 @@ export const createProject = async (data) => {
     surface_sqft,
     structure_type,
     intervention_type,
+    internal_code,
+    category,
+    initial_status,
+    assigned_professional,
+    project_team,
+    trades,
+    project_plan_photo,
     userId,
   } = data;
 
@@ -20,29 +52,39 @@ export const createProject = async (data) => {
 
   const projectInstance = Project.create(data);
 
-  return await prisma.project.create({
+  const project = await prisma.project.create({
     data: {
       code: projectInstance.code,
+      internal_code,
       name,
+      category,
       location,
       surface_sqft,
       structure_type,
       intervention_type,
+      initial_status,
+      assigned_professional,
+      project_team: project_team || [],
+      trades: trades || [],
+      project_plan_photo,
       userId,
     },
+    include: projectFullInclude,
   });
+
+  return mapProject(project);
 };
 
 /* =========================
    Leer todos los proyectos del usuario logueado
 ========================= */
 export const getProjects = async (userId) => {
-  return await prisma.project.findMany({
-    where: { userId }, // 🔒 FILTRADO POR USUARIO
-    include: {
-      phases: true,
-    },
+  const projects = await prisma.project.findMany({
+    where: { userId },
+    include: projectFullInclude,
   });
+
+  return projects.map(mapProject);
 };
 
 /* =========================
@@ -52,18 +94,16 @@ export const getProjectById = async (id, userId) => {
   const project = await prisma.project.findFirst({
     where: {
       id,
-      userId, // 🔒 DOBLE CONDICIÓN
+      userId, // 🔒 Seguridad multi-tenant
     },
-    include: {
-      phases: true,
-    },
+    include: projectFullInclude,
   });
 
   if (!project) {
-    return null; // el controller maneja el 404
+    return null;
   }
 
-  return project;
+  return mapProject(project);
 };
 
 /* =========================
@@ -71,20 +111,20 @@ export const getProjectById = async (id, userId) => {
 ========================= */
 export const updateProject = async (id, userId, data) => {
   const existing = await prisma.project.findFirst({
-    where: {
-      id,
-      userId,
-    },
+    where: { id, userId },
   });
 
   if (!existing) {
     return null;
   }
 
-  return await prisma.project.update({
+  const updated = await prisma.project.update({
     where: { id },
     data,
+    include: projectFullInclude,
   });
+
+  return mapProject(updated);
 };
 
 /* =========================
@@ -92,10 +132,7 @@ export const updateProject = async (id, userId, data) => {
 ========================= */
 export const deleteProject = async (id, userId) => {
   const existing = await prisma.project.findFirst({
-    where: {
-      id,
-      userId,
-    },
+    where: { id, userId },
   });
 
   if (!existing) {

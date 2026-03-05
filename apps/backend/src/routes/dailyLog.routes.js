@@ -10,6 +10,13 @@ import { protect } from "../middleware/auth.middleware.js";
 
 const router = Router();
 
+/**
+ * @swagger
+ * tags:
+ *   name: DailyLogs
+ *   description: Daily progress tracking
+ */
+
 router.post("/", protect, create);
 router.get("/", protect, getAll);
 router.get("/:id", protect, getOne);
