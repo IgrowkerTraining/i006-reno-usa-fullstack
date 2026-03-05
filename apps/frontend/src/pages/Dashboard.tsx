@@ -6,9 +6,11 @@ import { useAuth } from "../hooks/useAuth";
 import { useNavigate } from "react-router-dom";
 import { projectService } from "../services/project.service"
 import error_icons from "../components/common/error_icons";
-
+import { useProjects } from "../context/ProjectsContext";
 
 const Dashboard: React.FC = () => {
+
+  const { filteredProjects } = useProjects();
 
   const { user } = useAuth();
 
@@ -21,6 +23,8 @@ const Dashboard: React.FC = () => {
   const projects = [
     { id: "1", name: "project alpha", status: "progress" }
   ]
+
+  localStorage.setItem("projects", JSON.stringify(projects));
 
   const error = [
     { id: "1", name: "ERROR-01", icon: error_icons["ERROR-01"] },
@@ -82,7 +86,7 @@ const Dashboard: React.FC = () => {
             </h1>
 
             <div className="mt-4 space-y-4">
-              {projects.map((project) => (
+              {filteredProjects.map((project: Project) => (
                 <div
                   key={project.id}
                   className="flex p-4 gap-5 items-center rounded-lg bg-sky-100"
