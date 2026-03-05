@@ -3,29 +3,30 @@ import prisma from "../lib/prisma.js";
 
 class UserService {
   async create({ name, email, password, username, role }) {
-    const existingUser = await prisma.user.findUnique({
-      where: { email },
-    });
+  const existingUser = await prisma.user.findUnique({
+    where: { email },
+  });
 
-    if (existingUser) {
-      throw new Error("User already exists");
-    }
-
-    const hashedPassword = await bcrypt.hash(password, 10);
-
-    const user = await prisma.user.create({
-      data: {
-        name,
-        email,
-        password: hashedPassword,
-        username,
-        role: role || "user",
-      },
-    });
-
-    const { password: _, ...safeUser } = user;
-    return safeUser;
+  if (existingUser) {
+    throw new Error("User already exists");
   }
+
+  const hashedPassword = await bcrypt.hash(password, 10);
+
+  const user = await prisma.user.create({
+    data: {
+      name,
+      email,
+      password: hashedPassword,
+      username: username || email.split("@")[0],
+      avatar: `https://picsum.photos/seed/${email}/200`,
+      role: role || "user",
+    },
+  });
+
+  const { password: _, ...safeUser } = user;
+  return safeUser;
+}
 
   async authenticate(email, password) {
     const user = await prisma.user.findUnique({

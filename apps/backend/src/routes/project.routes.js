@@ -118,6 +118,10 @@ router.get("/:id", protect, getOne);
  *     responses:
  *       200:
  *         description: Project updated successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/ProjectResponse'
  *       404:
  *         description: Project not found
  *       401:
@@ -142,6 +146,14 @@ router.put("/:id", protect, update);
  *     responses:
  *       200:
  *         description: Project deleted successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: Project deleted successfully
  *       404:
  *         description: Project not found
  *       401:

@@ -16,6 +16,7 @@ import config from "./src/config/index.js";
 import logger from "./src/utils/logger.js";
 import swaggerUi from "swagger-ui-express";
 import swaggerSpec from "./src/docs/swagger.js";
+import taskExecutionRoutes from "./src/routes/taskExecution.routes.js";
 
 const app = express();
 
@@ -37,6 +38,7 @@ app.use("/api/technical-approvals", technicalApprovalRoutes);
 app.use("/api/safety-measures", safetyMeasureRoutes);
 app.use("/api/worker-coverages", workerCoverageRoutes);
 app.use("/api/daily-logs", dailyLogRoutes);
+app.use("/api/task-executions", taskExecutionRoutes);
 
 
 // Levantar servidor
