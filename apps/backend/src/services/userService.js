@@ -3,8 +3,7 @@ import prisma from "../lib/prisma.js";
 
 class UserService {
 
-  async createUser({ name, email, password, role }) {
-
+  async createUser({ name, email, password, role, trade }) {
     const existingUser = await prisma.user.findUnique({
       where: { email },
     });
@@ -23,6 +22,7 @@ class UserService {
         username: email.split("@")[0],
         avatar: `https://picsum.photos/seed/${email}/200`,
         role: role || "USER",
+        trade, // 🔹 se guarda correctamente
       },
     });
 
@@ -31,15 +31,11 @@ class UserService {
   }
 
   async findByEmail(email) {
-    return prisma.user.findUnique({
-      where: { email },
-    });
+    return prisma.user.findUnique({ where: { email } });
   }
 
   async findById(id) {
-    return prisma.user.findUnique({
-      where: { id },
-    });
+    return prisma.user.findUnique({ where: { id } });
   }
 }
 
