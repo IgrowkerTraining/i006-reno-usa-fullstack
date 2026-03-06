@@ -16,13 +16,9 @@ const Dashboard: React.FC = () => {
 
   const navigate = useNavigate();
 
-  // const [projects, setProjects] = useState<Project[]>([]);
+  const [projects, setProjects] = useState<Project[]>([]);
   const [loading, setLoading] = useState(true);
   const [greeting, setGreeting] = useState("");
-
-  // const projects = [
-  //   { id: "1", name: "project alpha", status: "progress" }
-  // ]
 
   localStorage.setItem("projects", JSON.stringify(projects));
 
@@ -32,8 +28,8 @@ const Dashboard: React.FC = () => {
     { id: "3", name: "ERROR-03", icon: error_icons["ERROR-03"] }
 
   ]
-
   useEffect(() => {
+
     if (!user) {
       navigate("/login")
       return;
@@ -42,8 +38,7 @@ const Dashboard: React.FC = () => {
     const fetchProjects = async () => {
       try {
         const data = await projectService.getAll()
-        setProjects(data);
-        localStorage.setItem("projects", JSON.stringify(data)); // <-- aquí
+        setProjects(data)
 
         const msg = await getAIGreeting(user.name)
         setGreeting(msg);
@@ -67,9 +62,9 @@ const Dashboard: React.FC = () => {
   return (
     <>
       <div className="bg-white h-screen">
-        {/* {greeting && (
+        {greeting && (
           <p className="text-2xl font-bold text-black mb-4">{greeting}</p>
-        )} */}
+        )}
 
         {projects.length === 0 ? (
           <div className="text-center text-black bg-white">
