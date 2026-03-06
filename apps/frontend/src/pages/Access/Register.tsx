@@ -17,6 +17,7 @@ import { api } from "../../services/authServices";
 
 //hooks
 import { useAuth } from "../../hooks/useAuth";
+import icons_trades_types from "@/src/components/common/icons_trades_types";
 
 const Register: React.FC = () => {
   const navigate = useNavigate();
@@ -27,7 +28,8 @@ const Register: React.FC = () => {
     email: "",
     password: "",
     confirmPassword: "",
-    role: "user"
+    role: "",
+    trade: ""
   });
   const [isLoading, setIsLoading] = useState(false);
   const [securityTip, setSecurityTip] = useState<string | null>(null);
@@ -47,10 +49,10 @@ const Register: React.FC = () => {
   ) => {
     const { name, value } = e.target;
 
-    // Actualiza formData
+    // Update formData
     setFormData((prev) => ({ ...prev, [name]: value }));
 
-    // Limpia error del input actual
+    // Erase the input error when the user starts to type
     setErrors((prev) => {
       if (prev[name]) {
         const { [name]: _, ...rest } = prev;
@@ -85,7 +87,8 @@ const Register: React.FC = () => {
         name: formData.name + " " + formData.lastName.trim(),
         email: formData.email.trim(),
         password: formData.password.trim(),
-        role: formData.role.trim() || "user"
+        role: formData.role.trim().toUpperCase() || "USER",
+        trade: formData.trade.trim() || null
       });
       login(response.user);
       navigate("/dashboard");
@@ -136,23 +139,45 @@ const Register: React.FC = () => {
             onSubmit={handleSubmit}
             className="grid grid-cols-1 md:grid-cols-2 gap-4"
           >
-            <div className="md:col-span-2">
-              <div className="text-zinc-600 mb-2">
-                <label htmlFor="role">Select your role:</label>
-              </div>
-              <select
-                name="role"
-                required
-                disabled={isLoading}
-                value={formData.role}
-                className="bg_inputs text-zinc-600 placeholder:text-zinc-300 my-2 w-48 p-2 border-2 border-slate-300 rounded-md"
-                onChange={handleChange}
-              >
-                <option value="">---</option>
-                <option value="professional">Professional</option>
-                <option value="user">User</option>
-              </select>
+            <div className="mt-5 flex justify-items-center gap-16">
+              <div className="md:col-span-2">
+                <div className="text-zinc-600 mb-2">
+                  <label htmlFor="role">Select your role:</label>
+                </div>
+                <select
+                  name="role"
+                  required
+                  disabled={isLoading}
+                  value={formData.role}
+                  className="bg_inputs text-zinc-600 placeholder:text-zinc-300 my-2 w-48 p-2 border-2 border-slate-300 rounded-md"
+                  onChange={handleChange}
+                >
+                  <option value="">---</option>
+                  <option value="professional">Professional</option>
+                  <option value="user">User</option>
+                </select>
 
+              </div>
+
+              <div className={formData.role === "user" ? "md:col-span-2" : "hidden"}>
+                <div className="text-zinc-600 mb-2">
+                  <label htmlFor="role">Select your trade:</label>
+                </div>
+                <select
+                  name="trade"
+                  required
+                  disabled={isLoading}
+                  value={formData.trade}
+                  className="bg_inputs text-zinc-600 placeholder:text-zinc-300 my-2 w-48 p-2 border-2 border-slate-300 rounded-md"
+                  onChange={handleChange}
+                >
+                  <option value="">---</option>
+                  {icons_trades_types?.map((trade) => (
+                    <option key={trade.trade_type} value={trade.trade_type}>{trade.trade_type}</option>
+                  ))}
+                </select>
+
+              </div>
             </div>
 
             <div className="md:col-span-2">
