@@ -56,9 +56,9 @@ export const AppRoutes: React.FC = () => {
       <Route
         path="/control-project"
         element={
-          <PublicRoute>
+          <ProtectedRoute>
             <ControlAvance />
-          </PublicRoute>
+          </ProtectedRoute>
         }
       />
 

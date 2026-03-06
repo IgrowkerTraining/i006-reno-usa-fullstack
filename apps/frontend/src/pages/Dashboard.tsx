@@ -16,13 +16,9 @@ const Dashboard: React.FC = () => {
 
   const navigate = useNavigate();
 
-  // const [projects, setProjects] = useState<Project[]>([]);
+  const [projects, setProjects] = useState<Project[]>([]);
   const [loading, setLoading] = useState(true);
   const [greeting, setGreeting] = useState("");
-
-  const projects = [
-    { id: "1", name: "project alpha", status: "progress" }
-  ]
 
   localStorage.setItem("projects", JSON.stringify(projects));
 
@@ -32,43 +28,43 @@ const Dashboard: React.FC = () => {
     { id: "3", name: "ERROR-03", icon: error_icons["ERROR-03"] }
 
   ]
-  // useEffect(() => {
+  useEffect(() => {
 
-  //   if (!user) {
-  //     navigate("/login")
-  //     return;
-  //   }
+    if (!user) {
+      navigate("/login")
+      return;
+    }
 
-  //   const fetchProjects = async () => {
-  //     try {
-  //       const data = await projectService.getAll()
-  //       setProjects(data)
+    const fetchProjects = async () => {
+      try {
+        const data = await projectService.getAll()
+        setProjects(data)
 
-  //       const msg = await getAIGreeting(user.name)
-  //       setGreeting(msg);
+        const msg = await getAIGreeting(user.name)
+        setGreeting(msg);
 
-  //     } catch (error) {
-  //       console.log(error)
-  //     } finally {
-  //       setLoading(false)
-  //     }
-  //   }
+      } catch (error) {
+        console.log(error)
+      } finally {
+        setLoading(false)
+      }
+    }
 
-  //   fetchProjects();
-  // }, [])
+    fetchProjects();
+  }, [])
 
-  // if (loading) return (<div className="flex flex-col items-center justify-center h-screen bg-white gap-4">
-  //   <div className="animate-spin rounded-full h-16 w-16 border-t-4 border-green-600"></div>
-  //   <p className="text-gray-700 font-bold text-lg">Loading projects...</p>
-  // </div>
-  // )
+  if (loading) return (<div className="flex flex-col items-center justify-center h-screen bg-white gap-4">
+    <div className="animate-spin rounded-full h-16 w-16 border-t-4 border-green-600"></div>
+    <p className="text-gray-700 font-bold text-lg">Loading projects...</p>
+  </div>
+  )
 
   return (
     <>
       <div className="bg-white h-screen">
-        {/* {greeting && (
+        {greeting && (
           <p className="text-2xl font-bold text-black mb-4">{greeting}</p>
-        )} */}
+        )}
 
         {projects.length === 0 ? (
           <div className="text-center text-black bg-white">
@@ -97,7 +93,7 @@ const Dashboard: React.FC = () => {
                     </h2>
 
                     <div className="flex gap-2 my-1 items-center">
-                      <p>{project.status}</p>
+                      {/* <p>{project.status}</p> */}
 
                       {error.length === 0 ? (
                         <p className="size-6 rounded-full bg-gray-400">There are not errors</p>) :
