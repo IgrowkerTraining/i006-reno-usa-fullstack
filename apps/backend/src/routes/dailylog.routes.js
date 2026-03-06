@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { create, getAll, getById, remove } from "../controllers/dailyLog.controller.js";
+import { create, getAll, getById, remove } from "../controllers/dailylog.controller.js";
 
 const router = Router();
 

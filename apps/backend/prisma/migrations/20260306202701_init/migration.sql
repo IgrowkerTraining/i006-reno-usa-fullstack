@@ -10,6 +10,7 @@ CREATE TABLE "User" (
     "username" TEXT NOT NULL,
     "avatar" TEXT,
     "role" "Role" NOT NULL DEFAULT 'USER',
+    "trade" TEXT,
 
     CONSTRAINT "User_pkey" PRIMARY KEY ("id")
 );
