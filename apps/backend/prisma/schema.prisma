@@ -23,18 +23,25 @@ model User {
 }
 
 model Project {
-  id                String            @id @default(cuid())
-  code              String            @unique
-  name              String
-  location          String
-  surface_sqft      Float
-  structure_type    String
-  intervention_type String
-  userId            String
-  phases            Phase[]
-  user              User              @relation(fields: [userId], references: [id])
-  projectSnapshots  ProjectSnapshot[]
+  id                   String     @id @default(cuid())
+  code                 String     @unique
+  name                 String
+  category             String
+  initial_status       String?          // opcional
+  assigned_professional String?         // opcional
+  project_team         String[]         // lista, no opcional
+  trades               String[]         // lista, no opcional
+  project_plan_photo   String?          // opcional
+  location             String
+  surface_sqft         Float?
+  structure_type       String?
+  intervention_type    String?
+  userId               String
+  phases               Phase[]
+  user                 User             @relation(fields: [userId], references: [id])
+  projectSnapshots     ProjectSnapshot[]
 }
+
 
 model Phase {
   id                 String              @id @default(cuid())
@@ -56,14 +63,28 @@ model Trade {
 }
 
 model Task {
-  id           String         @id @default(cuid())
-  name         String
-  description  String?
-  phaseId      String
-  tradeId      String
-  ExecutedTask ExecutedTask[]
-  phase        Phase          @relation(fields: [phaseId], references: [id])
-  trade        Trade          @relation(fields: [tradeId], references: [id])
+  id            String          @id @default(cuid())
+  name          String
+  description   String?
+  phaseId       String
+  tradeId       String
+  phase         Phase           @relation(fields: [phaseId], references: [id])
+  trade         Trade           @relation(fields: [tradeId], references: [id])
+  executedTasks TaskExecution[]
+}
+
+model TaskExecution {
+  id                 String          @id @default(cuid())
+  taskId             String
+  dailyLogId         String
+  progressPercentage Float?
+  notes              String?
+  executedAt         DateTime        @default(now())
+  materialUsages     MaterialUsage[]
+  dailyLog           DailyLog        @relation(fields: [dailyLogId], references: [id])
+  task               Task            @relation(fields: [taskId], references: [id])
+
+  @@unique([taskId, dailyLogId])
 }
 
 model DailyLog {
@@ -76,9 +97,9 @@ model DailyLog {
   phaseId               String
   phase                 Phase            @relation(fields: [phaseId], references: [id])
   user                  User             @relation(fields: [userId], references: [id])
-  ExecutedTask          ExecutedTask[]
   incidents             Incident[]
   safetyMeasures        SafetyMeasure[]
+  executedTasks         TaskExecution[]
   workerCoverages       WorkerCoverage[]
 }
 
@@ -143,19 +164,10 @@ model Material {
 }
 
 model MaterialUsage {
-  id             String       @id @default(cuid())
+  id             String        @id @default(cuid())
   quantity       Float
   executedTaskId String
   materialId     String
-  executedTask   ExecutedTask @relation(fields: [executedTaskId], references: [id])
-  material       Material     @relation(fields: [materialId], references: [id])
-}
-
-model ExecutedTask {
-  id             String          @id
-  taskId         String
-  dailyLogId     String
-  DailyLog       DailyLog        @relation(fields: [dailyLogId], references: [id])
-  Task           Task            @relation(fields: [taskId], references: [id])
-  materialUsages MaterialUsage[]
+  executedTask   TaskExecution @relation(fields: [executedTaskId], references: [id])
+  material       Material      @relation(fields: [materialId], references: [id])
 }
