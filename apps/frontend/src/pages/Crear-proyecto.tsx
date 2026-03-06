@@ -320,7 +320,7 @@ const ProjectRegister: React.FC = () => {
                 value={internalCode}
                 onChange={(e) => setInternalCode(e.target.value)}
                 placeholder="CP-13252024-FX"
-                className="w-full bg-white px-3 py-2.5 rounded border-2 border-purple-400  text-[15px] focus:ring-1 focus:ring-purple-500 focus:border-purple-500 transition outline-none"
+                className="w-full bg-white px-3 py-2.5 rounded border border-gray-200  text-[15px] focus:ring-1 focus:ring-purple-500 focus:border-purple-500 transition outline-none"
               />
             </div>
           </div>
@@ -361,7 +361,7 @@ const ProjectRegister: React.FC = () => {
 
             <div ref={proDropdownRef} className="w-full relative">
               <label className="block text-[#0A1F61] text-[17px] mb-2 font-medium">
-                Professionals <span className="text-red-500 ml-1">*</span>
+                Professionals
               </label>
               
               <div 
