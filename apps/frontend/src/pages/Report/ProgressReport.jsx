@@ -5,7 +5,7 @@ import { useParams } from "react-router-dom";
 import { useProject } from "@/src/hooks/useProject";
 
 //utils
-import icons_trades_types from "../../utils/icons_trades_types";
+import icons_trades_types from "../../components/common/icons_trades_types";
 import safetyStandards from "./security_standard";
 
 //components

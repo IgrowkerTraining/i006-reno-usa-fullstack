@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import icons_trade_types from "../utils/icons_trades_types";
+import icons_trade_types from "../components/common/icons_trades_types";
 import { ButtonPlans } from '../components/common/Button_plans';
 import { ButtonDelete } from '../components/common/Button_delete';
 import { ButtonAI } from '../components/common/Button_AI';
