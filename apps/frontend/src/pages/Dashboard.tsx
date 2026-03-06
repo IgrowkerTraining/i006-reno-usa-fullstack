@@ -10,13 +10,11 @@ import { useProjects } from "../context/ProjectsContext";
 
 const Dashboard: React.FC = () => {
 
+  const { user } = useAuth();
+  const navigate = useNavigate();
   const { filteredProjects, projects, setProjects } = useProjects();
 
-  const { user } = useAuth();
-
-  const navigate = useNavigate();
-
-  const [projects, setProjects] = useState<Project[]>([]);
+  // const [projects, setProjects] = useState<Project[]>([]);
   const [loading, setLoading] = useState(true);
   const [greeting, setGreeting] = useState("");
 
