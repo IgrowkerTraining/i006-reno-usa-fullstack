@@ -111,13 +111,13 @@ const Login: React.FC = () => {
                   type="checkbox"
                   className="w-4 h-4 rounded border-slate-700 accent-blue-800 focus:ring-blue-700 focus:ring-offset-slate-900"
                 />
-                <span className="text-sm text-slate-500 my-2">Recuérdame</span>
+                <span className="text-sm text-slate-500 my-2">Remember me</span>
               </label>
               <button
                 type="button"
                 className="text-sm text-blue-400 hover:text-blue-600 font-medium transition-colors"
               >
-                Recuperar contraseña
+                Recover password
               </button>
             </div>
 
@@ -125,18 +125,18 @@ const Login: React.FC = () => {
               type="submit"
               className="w-full mt-4 bg-blue-900 hover:bg-blue-700"
               isLoading={isLoading}>
-              Acceder
+              Log In
             </Button>
           </form>
 
           <div className="mt-8 pt-6 border-t border-slate-800 text-center">
             <p className="text-slate-400 text-sm">
-              ¿No tienes una cuenta?{" "}
+              You don't have an account?{" "}
               <Link
                 to="/register"
                 className="text-blue-400 hover:text-blue-600 font-semibold transition-colors"
               >
-                Registrarse
+                Sign up
               </Link>
             </p>
           </div>

@@ -105,7 +105,7 @@ const Register: React.FC = () => {
         <div className="bg-white p-8 rounded-2xl shadow-2xl">
           <div className="flex flex-col items-center mb-10">
             <p className="text-3xl font-bold text-blue-900 mb-6">
-              Crear cuenta
+              Create your account
             </p>
             <div className="w-32 h-32 rounded-xl items-center justify-center mb-4">
               <img alt="Reno" src={RenoLogo} className="h-32 w-auto" />
@@ -260,19 +260,19 @@ const Register: React.FC = () => {
 
             <div className="md:col-span-2 mt-4">
               <Button type="submit" className="w-full mt-4 bg-blue-900 hover:bg-blue-700" isLoading={isLoading}>
-                Registrarse
+                Sign Up
               </Button>
             </div>
           </form>
 
           <div className="mt-8 pt-6 border-t border-slate-800 text-center">
             <p className="text-slate-400 text-sm">
-              ¿Ya tienes una cuenta?{" "}
+              Already have an account?{" "}
               <Link
                 to="/login"
                 className="text-blue-400 hover:text-blue-600 font-semibold transition-colors"
               >
-                Iniciar sessión
+                Log In
               </Link>
             </p>
           </div>
