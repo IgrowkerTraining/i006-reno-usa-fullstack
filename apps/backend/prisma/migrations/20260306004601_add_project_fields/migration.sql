@@ -57,15 +57,6 @@ CREATE TABLE "Task" (
 );
 
 -- CreateTable
-CREATE TABLE "ExecutedTask" (
-    "id" TEXT NOT NULL,
-    "taskId" TEXT NOT NULL,
-    "dailyLogId" TEXT NOT NULL,
-
-    CONSTRAINT "ExecutedTask_pkey" PRIMARY KEY ("id")
-);
-
--- CreateTable
 CREATE TABLE "DailyLog" (
     "id" TEXT NOT NULL,
     "notes" TEXT,
@@ -160,6 +151,15 @@ CREATE TABLE "MaterialUsage" (
     CONSTRAINT "MaterialUsage_pkey" PRIMARY KEY ("id")
 );
 
+-- CreateTable
+CREATE TABLE "ExecutedTask" (
+    "id" TEXT NOT NULL,
+    "taskId" TEXT NOT NULL,
+    "dailyLogId" TEXT NOT NULL,
+
+    CONSTRAINT "ExecutedTask_pkey" PRIMARY KEY ("id")
+);
+
 -- CreateIndex
 CREATE UNIQUE INDEX "User_email_key" ON "User"("email");
 
@@ -179,16 +179,10 @@ ALTER TABLE "Task" ADD CONSTRAINT "Task_phaseId_fkey" FOREIGN KEY ("phaseId") RE
 ALTER TABLE "Task" ADD CONSTRAINT "Task_tradeId_fkey" FOREIGN KEY ("tradeId") REFERENCES "Trade"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "ExecutedTask" ADD CONSTRAINT "ExecutedTask_taskId_fkey" FOREIGN KEY ("taskId") REFERENCES "Task"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
-
--- AddForeignKey
-ALTER TABLE "ExecutedTask" ADD CONSTRAINT "ExecutedTask_dailyLogId_fkey" FOREIGN KEY ("dailyLogId") REFERENCES "DailyLog"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "DailyLog" ADD CONSTRAINT "DailyLog_phaseId_fkey" FOREIGN KEY ("phaseId") REFERENCES "Phase"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "DailyLog" ADD CONSTRAINT "DailyLog_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
-
--- AddForeignKey
-ALTER TABLE "DailyLog" ADD CONSTRAINT "DailyLog_phaseId_fkey" FOREIGN KEY ("phaseId") REFERENCES "Phase"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "Incident" ADD CONSTRAINT "Incident_dailyLogId_fkey" FOREIGN KEY ("dailyLogId") REFERENCES "DailyLog"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
@@ -200,10 +194,10 @@ ALTER TABLE "SafetyMeasure" ADD CONSTRAINT "SafetyMeasure_dailyLogId_fkey" FOREI
 ALTER TABLE "WorkerCoverage" ADD CONSTRAINT "WorkerCoverage_dailyLogId_fkey" FOREIGN KEY ("dailyLogId") REFERENCES "DailyLog"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "TechnicalApproval" ADD CONSTRAINT "TechnicalApproval_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "TechnicalApproval" ADD CONSTRAINT "TechnicalApproval_phaseId_fkey" FOREIGN KEY ("phaseId") REFERENCES "Phase"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "TechnicalApproval" ADD CONSTRAINT "TechnicalApproval_phaseId_fkey" FOREIGN KEY ("phaseId") REFERENCES "Phase"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "TechnicalApproval" ADD CONSTRAINT "TechnicalApproval_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "ProjectSnapshot" ADD CONSTRAINT "ProjectSnapshot_projectId_fkey" FOREIGN KEY ("projectId") REFERENCES "Project"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
@@ -216,3 +210,9 @@ ALTER TABLE "MaterialUsage" ADD CONSTRAINT "MaterialUsage_executedTaskId_fkey" F
 
 -- AddForeignKey
 ALTER TABLE "MaterialUsage" ADD CONSTRAINT "MaterialUsage_materialId_fkey" FOREIGN KEY ("materialId") REFERENCES "Material"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "ExecutedTask" ADD CONSTRAINT "ExecutedTask_dailyLogId_fkey" FOREIGN KEY ("dailyLogId") REFERENCES "DailyLog"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "ExecutedTask" ADD CONSTRAINT "ExecutedTask_taskId_fkey" FOREIGN KEY ("taskId") REFERENCES "Task"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
