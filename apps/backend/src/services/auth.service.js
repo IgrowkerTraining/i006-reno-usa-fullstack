@@ -1,32 +1,11 @@
-import prisma from "../lib/prisma.js";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import config from "../config/index.js";
+import userService from "./userService.js";
 
-/* =========================
-   REGISTER
-========================= */
-export const registerUser = async ({ name, email, password, role }) => {
-  const existingUser = await prisma.user.findUnique({
-    where: { email },
-  });
+export const registerUser = async (data) => {
 
-  if (existingUser) {
-    throw new Error("User already exists");
-  }
-
-  const hashedPassword = await bcrypt.hash(password, 10);
-
-  const user = await prisma.user.create({
-    data: {
-      name,
-      email,
-      password: hashedPassword,
-      username: email.split("@")[0],
-      avatar: `https://picsum.photos/seed/${email}/200`,
-      role: role || "USER",
-    },
-  });
+  const user = await userService.createUser(data);
 
   const token = jwt.sign(
     { id: user.id, role: user.role },
@@ -34,19 +13,12 @@ export const registerUser = async ({ name, email, password, role }) => {
     { expiresIn: "7d" }
   );
 
-  // 🔐 Removemos password antes de devolver
-  const { password: _, ...safeUser } = user;
-
-  return { user: safeUser, token };
+  return { user, token };
 };
 
-/* =========================
-   LOGIN
-========================= */
 export const loginUser = async (email, password) => {
-  const user = await prisma.user.findUnique({
-    where: { email },
-  });
+
+  const user = await userService.findByEmail(email);
 
   if (!user) {
     throw new Error("Invalid credentials");
@@ -58,14 +30,13 @@ export const loginUser = async (email, password) => {
     throw new Error("Invalid credentials");
   }
 
+  const { password: _, ...safeUser } = user;
+
   const token = jwt.sign(
     { id: user.id, role: user.role },
     config.jwtSecret,
     { expiresIn: "7d" }
   );
-
-  // 🔐 Removemos password antes de devolver
-  const { password: _, ...safeUser } = user;
 
   return { user: safeUser, token };
 };

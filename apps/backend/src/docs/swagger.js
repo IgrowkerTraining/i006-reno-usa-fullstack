@@ -1,3 +1,4 @@
+// src/swagger.js
 import swaggerJsdoc from "swagger-jsdoc";
 
 const options = {
@@ -8,9 +9,7 @@ const options = {
       version: "1.0.0",
       description: "Project Management API with JWT Authentication",
     },
-    servers: [
-      { url: "http://localhost:3000" },
-    ],
+    servers: [{ url: "http://localhost:3000" }],
     components: {
       securitySchemes: {
         cookieAuth: {
@@ -25,10 +24,10 @@ const options = {
         // =========================
         ProjectInput: {
           type: "object",
-          required: ["name", "category", "location", "userId", "code"],
+          required: ["name", "category", "location", "userId", "code", "project_team", "trades"],
           properties: {
-            name: { type: "string", example: "My New Project" },
-            code: { type: "string", example: "RENO-US-2026-134" },
+            name: { type: "string", example: "Reno USA Main Project" },
+            code: { type: "string", example: "RENO-US-2026" },
             category: { type: "string", example: "Residential Renovation" },
             location: { type: "string", example: "Barcelona" },
             surface_sqft: { type: "number", example: 1200 },
@@ -45,17 +44,19 @@ const options = {
               items: { type: "string" },
               example: ["Electrician", "Plumber", "Mason"],
             },
-            project_plan_photo: { type: "string", example: "https://cdn.igrowker.com/projects/renousa/project_plan.pdf" },
+            project_plan_photo: {
+              type: "string",
+              example: "https://cdn.igrowker.com/projects/renousa/project_plan.pdf",
+            },
             userId: { type: "string", example: "cmmb72y5s00017bx0zagzffoi" },
           },
         },
-
         ProjectResponse: {
           type: "object",
           properties: {
             id: { type: "string", example: "cmmb7xdg900037bx0k4pfm2x2" },
-            code: { type: "string", example: "RENO-US-2026-134" },
-            name: { type: "string", example: "My New Project" },
+            code: { type: "string", example: "RENO-US-2026" },
+            name: { type: "string", example: "Reno USA Main Project" },
             category: { type: "string", example: "Residential Renovation" },
             location: { type: "string", example: "Barcelona" },
             surface_sqft: { type: "number", example: 1200 },
@@ -72,45 +73,14 @@ const options = {
               items: { type: "string" },
               example: ["Electrician", "Plumber", "Mason"],
             },
-            project_plan_photo: { type: "string", example: "https://cdn.igrowker.com/projects/renousa/project_plan.pdf" },
+            project_plan_photo: {
+              type: "string",
+              example: "https://cdn.igrowker.com/projects/renousa/project_plan.pdf",
+            },
             userId: { type: "string", example: "cmmb72y5s00017bx0zagzffoi" },
             phases: {
               type: "array",
-              items: {
-                type: "object",
-                properties: {
-                  id: { type: "string", example: "phase123" },
-                  name: { type: "string", example: "Planning and Design" },
-                  planned_start: { type: "string", format: "date-time", example: "2026-03-01T09:00:00Z" },
-                  planned_end: { type: "string", format: "date-time", example: "2026-03-15T18:00:00Z" },
-                  tasks: {
-                    type: "array",
-                    items: {
-                      type: "object",
-                      properties: {
-                        id: { type: "string", example: "task123" },
-                        name: { type: "string", example: "Needs definition" },
-                        description: { type: "string", example: "Define requirements" },
-                        status: { type: "string", example: "completed" },
-                        record_history: {
-                          type: "array",
-                          items: {
-                            type: "object",
-                            properties: {
-                              completed_at: { type: "string", format: "date-time", example: "2026-03-01T09:00:00Z" },
-                              completed_by: { type: "string", example: "Alice Smith" },
-                              notes: { type: "string", example: "Requirements defined" },
-                              photo_url: { type: "string", format: "uri", example: "https://cdn.igrowker.com/projects/renousa/photo1.jpg" },
-                              duration: { type: "string", example: "2h 30m" },
-                              additional_evidence: { type: "string", example: "Checked measurements and confirmed depth" },
-                            },
-                          },
-                        },
-                      },
-                    },
-                  },
-                },
-              },
+              items: { type: "object" },
             },
             projectSnapshots: {
               type: "array",
@@ -120,18 +90,40 @@ const options = {
         },
 
         // =========================
-        // TASK EXECUTION SCHEMAS
+        // TASK SCHEMAS
         // =========================
+        TaskResponse: {
+          type: "object",
+          properties: {
+            id: { type: "string" },
+            name: { type: "string" },
+            description: { type: "string" },
+            status: { type: "string" },
+            record_history: {
+              type: "array",
+              items: {
+                type: "object",
+                properties: {
+                  completed_at: { type: "string", format: "date-time" },
+                  completed_by: { type: "string" },
+                  notes: { type: "string" },
+                  photo_url: { type: "string" },
+                  duration: { type: "number" },
+                  additional_evidence: { type: "string" },
+                },
+              },
+            },
+          },
+        },
         TaskExecutionInput: {
           type: "object",
           required: ["taskId", "dailyLogId"],
           properties: {
             taskId: { type: "string", example: "task123" },
             dailyLogId: { type: "string", example: "log456" },
-            progressPercentage: { type: "number", example: 50 }
-          }
+            progressPercentage: { type: "number", example: 50 },
+          },
         },
-
         TaskExecutionResponse: {
           type: "object",
           properties: {
@@ -139,9 +131,9 @@ const options = {
             taskId: { type: "string", example: "task123" },
             dailyLogId: { type: "string", example: "log456" },
             progressPercentage: { type: "number", example: 50 },
-            task: { $ref: "#/components/schemas/ProjectResponse" }, // <-- corregido para incluir record_history
+            task: { $ref: "#/components/schemas/TaskResponse" },
             dailyLog: { type: "object" },
-          }
+          },
         },
 
         // =========================
@@ -158,7 +150,6 @@ const options = {
             avatar: { type: "string", format: "uri", example: "https://picsum.photos/seed/franco@mail.com/200" },
           },
         },
-
         LoginInput: {
           type: "object",
           required: ["email", "password"],
@@ -168,16 +159,75 @@ const options = {
           },
         },
 
+        // =========================
+        // VALIDATION ERROR SCHEMA
+        // =========================
         ValidationError: {
           type: "object",
           properties: {
-            errors: { type: "array", items: { type: "string" } },
+            errors: {
+              type: "array",
+              items: { type: "string" },
+              example: ["taskId is required", "dailyLogId is required"],
+            },
+          },
+        },
+
+        // =========================
+        // DAILY LOG SCHEMAS
+        // =========================
+        DailyLogInput: {
+          type: "object",
+          required: ["phaseId", "userId"],
+          properties: {
+            phaseId: { type: "string", example: "cmmb7xdg900037bx0k4pfm2x2" },
+            userId: { type: "string", example: "cmmb72y5s00017bx0zagzffoi" },
+            notes: { type: "string", example: "Checked progress, 50% complete." },
+            log_date: { type: "string", format: "date-time", example: "2026-03-05T10:30:00Z" },
+            completion_percentage: { type: "number", example: 50 },
+            schedule_deviation: { type: "number", example: -2 },
+          },
+        },
+        DailyLogResponse: {
+          type: "object",
+          properties: {
+            id: { type: "string", example: "cmmb7xdg900037bx0k4pfm2x2" },
+            userId: { type: "string" },
+            phaseId: { type: "string" },
+            notes: { type: "string" },
+            log_date: { type: "string", format: "date-time" },
+            completion_percentage: { type: "number" },
+            schedule_deviation: { type: "number" },
+            createdAt: { type: "string", format: "date-time" },
+            updatedAt: { type: "string", format: "date-time" },
+          },
+        },
+
+        // =========================
+        // TRADE SCHEMAS
+        // =========================
+        TradeInput: {
+          type: "object",
+          required: ["name"],
+          properties: {
+            name: { type: "string" },
+            description: { type: "string" },
+          },
+        },
+        TradeResponse: {
+          type: "object",
+          properties: {
+            id: { type: "string" },
+            name: { type: "string" },
+            description: { type: "string" },
+            createdAt: { type: "string", format: "date-time" },
+            updatedAt: { type: "string", format: "date-time" },
           },
         },
       },
     },
   },
-  apis: ["./src/routes/*.js"],
+  apis: ["./src/routes/*.js"], // donde están los endpoints documentados
 };
 
 const swaggerSpec = swaggerJsdoc(options);

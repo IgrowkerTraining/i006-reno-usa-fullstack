@@ -1,95 +1,130 @@
 import prisma from "../lib/prisma.js";
-import TaskExecution from "../models/TaskExecution.js";
+import { mapTask } from "../mappers/task.mapper.js";
 
+// ================= CREATE =================
 export const createTaskExecution = async (data) => {
-  const { taskId, dailyLogId, progressPercentage } = data;
+  try {
+    const {
+      taskId,
+      dailyLogId,
+      progressPercentage,
+      taskName,
+      taskDescription,
+      phaseId,
+      tradeId,
+      userId,
+    } = data;
 
-  // 1️⃣ Validaciones básicas
-  if (!taskId || !dailyLogId) {
-    throw new Error("taskId and dailyLogId are required");
+    // Validaciones básicas
+    if (!taskId && (!taskName || !phaseId || !tradeId)) {
+      throw new Error(
+        "taskId o los datos necesarios (taskName, phaseId, tradeId) son requeridos"
+      );
+    }
+    if (!dailyLogId && (!userId || !phaseId)) {
+      throw new Error("dailyLogId o userId y phaseId son requeridos");
+    }
+    if (
+      progressPercentage !== undefined &&
+      (progressPercentage < 0 || progressPercentage > 100)
+    ) {
+      throw new Error("progressPercentage debe estar entre 0 y 100");
+    }
+
+    // 1️⃣ Verificar o crear Task
+    let task = null;
+    if (taskId) {
+      task = await prisma.task.findUnique({ where: { id: taskId } });
+      if (!task) {
+        // TaskId dado pero no existe, creamos una temporal
+        task = await prisma.task.create({
+          data: {
+            name: taskName || "Tarea temporal",
+            description: taskDescription || "",
+            phaseId,
+            tradeId,
+          },
+        });
+      }
+    } else {
+      task = await prisma.task.create({
+        data: {
+          name: taskName,
+          description: taskDescription || "",
+          phaseId,
+          tradeId,
+        },
+      });
+    }
+
+    // 2️⃣ Verificar o crear DailyLog
+    let dailyLog = null;
+    if (dailyLogId) {
+      dailyLog = await prisma.dailyLog.findUnique({ where: { id: dailyLogId } });
+      if (!dailyLog) {
+        dailyLog = await prisma.dailyLog.create({
+          data: {
+            notes: "Registro temporal",
+            userId,
+            phaseId: task.phaseId,
+          },
+        });
+      }
+    } else {
+      dailyLog = await prisma.dailyLog.create({
+        data: {
+          notes: "Registro temporal",
+          userId,
+          phaseId: task.phaseId,
+        },
+      });
+    }
+
+    // 3️⃣ Evitar duplicados
+    const existing = await prisma.taskExecution.findFirst({
+      where: { taskId: task.id, dailyLogId: dailyLog.id },
+    });
+    if (existing) {
+      return {
+        status: 200,
+        message: "Task ya registrada en este DailyLog",
+        taskExecution: existing,
+      };
+    }
+
+    // 4️⃣ Crear TaskExecution
+    const execution = await prisma.taskExecution.create({
+      data: {
+        taskId: task.id,
+        dailyLogId: dailyLog.id,
+        progressPercentage,
+      },
+      include: {
+        task: {
+          include: {
+            executedTasks: {
+              include: { dailyLog: { include: { user: true } } },
+            },
+          },
+        },
+        dailyLog: { include: { user: true } },
+      },
+    });
+
+    // 5️⃣ Mapear task con record_history
+    const mappedTask = mapTask(execution.task);
+
+    return {
+      status: 201,
+      message: "TaskExecution creada correctamente",
+      ...execution,
+      task: mappedTask,
+    };
+  } catch (err) {
+    // Capturamos cualquier error inesperado y devolvemos 400
+    return {
+      status: 400,
+      message: err.message || "Error al crear TaskExecution",
+    };
   }
-
-  // Validar rango de progreso si viene definido
-  if (
-    progressPercentage !== undefined &&
-    (progressPercentage < 0 || progressPercentage > 100)
-  ) {
-    throw new Error("progressPercentage must be between 0 and 100");
-  }
-
-  // 2️⃣ Verificar existencia de Task
-  const task = await prisma.task.findUnique({
-    where: { id: taskId },
-  });
-
-  if (!task) {
-    throw new Error("Task not found");
-  }
-
-  // 3️⃣ Verificar existencia de DailyLog
-  const dailyLog = await prisma.dailyLog.findUnique({
-    where: { id: dailyLogId },
-  });
-
-  if (!dailyLog) {
-    throw new Error("DailyLog not found");
-  }
-
-  // 4️⃣ Regla de negocio: evitar duplicados
-  const existing = await prisma.taskExecution.findFirst({
-    where: { taskId, dailyLogId },
-  });
-
-  if (existing) {
-    throw new Error("Task already registered in this DailyLog");
-  }
-
-  // 5️⃣ Crear entidad
-  const instance = TaskExecution.create(data);
-
-  // 6️⃣ Persistir en base
-  return await prisma.taskExecution.create({
-    data: instance.toJSON(),
-    include: {
-      task: true,
-      dailyLog: true,
-    },
-  });
-};
-
-export const getTaskExecutions = async (filter = {}) => {
-  const where = {};
-
-  if (filter.taskId) where.taskId = filter.taskId;
-  if (filter.dailyLogId) where.dailyLogId = filter.dailyLogId;
-
-  return await prisma.taskExecution.findMany({
-    where,
-    include: {
-      task: true,
-      dailyLog: true,
-    },
-  });
-};
-
-export const getTaskExecutionById = async (id) => {
-  return await prisma.taskExecution.findUnique({
-    where: { id },
-    include: {
-      task: true,
-      dailyLog: true,
-    },
-  });
-};
-
-export const deleteTaskExecution = async (id) => {
-  const existing = await prisma.taskExecution.findUnique({
-    where: { id },
-  });
-
-  if (!existing) return null;
-
-  return await prisma.taskExecution.delete({
-    where: { id },
-  });
 };
