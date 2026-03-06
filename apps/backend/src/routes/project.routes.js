@@ -7,6 +7,7 @@ import {
   remove,
 } from "../controllers/projectController.js";
 import { protect } from "../middleware/auth.middleware.js";
+import { authorize } from "../middleware/authorize.middleware.js";
 
 const router = Router();
 
@@ -43,7 +44,7 @@ const router = Router();
  *       401:
  *         description: Unauthorized
  */
-router.post("/", protect, create);
+router.post("/", protect, authorize("ADMIN", "PROFESSIONAL"), create);
 
 /**
  * @swagger
@@ -65,7 +66,7 @@ router.post("/", protect, create);
  *       401:
  *         description: Unauthorized
  */
-router.get("/", protect, getAll);
+router.get("/", protect, authorize("ADMIN", "PROFESSIONAL", "USER"), getAll);
 
 /**
  * @swagger
@@ -93,7 +94,8 @@ router.get("/", protect, getAll);
  *       401:
  *         description: Unauthorized
  */
-router.get("/:id", protect, getOne);
+
+router.get("/:id", protect, authorize("ADMIN", "PROFESSIONAL", "USER"), getOne);
 
 /**
  * @swagger
@@ -118,12 +120,16 @@ router.get("/:id", protect, getOne);
  *     responses:
  *       200:
  *         description: Project updated successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/ProjectResponse'
  *       404:
  *         description: Project not found
  *       401:
  *         description: Unauthorized
  */
-router.put("/:id", protect, update);
+router.put("/:id", protect, authorize("ADMIN", "PROFESSIONAL"), update);
 
 /**
  * @swagger
@@ -142,11 +148,19 @@ router.put("/:id", protect, update);
  *     responses:
  *       200:
  *         description: Project deleted successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: Project deleted successfully
  *       404:
  *         description: Project not found
  *       401:
  *         description: Unauthorized
  */
-router.delete("/:id", protect, remove);
+router.delete("/:id", protect, authorize("ADMIN"), remove);
 
 export default router;

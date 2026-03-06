@@ -2,7 +2,9 @@ import bcrypt from "bcrypt";
 import prisma from "../lib/prisma.js";
 
 class UserService {
-  async create({ name, email, password, username, role }) {
+
+  async createUser({ name, email, password, role }) {
+
     const existingUser = await prisma.user.findUnique({
       where: { email },
     });
@@ -18,8 +20,9 @@ class UserService {
         name,
         email,
         password: hashedPassword,
-        username,
-        role: role || "user",
+        username: email.split("@")[0],
+        avatar: `https://picsum.photos/seed/${email}/200`,
+        role: role || "USER",
       },
     });
 
@@ -27,34 +30,16 @@ class UserService {
     return safeUser;
   }
 
-  async authenticate(email, password) {
-    const user = await prisma.user.findUnique({
+  async findByEmail(email) {
+    return prisma.user.findUnique({
       where: { email },
     });
-
-    if (!user) {
-      throw new Error("Invalid email or password");
-    }
-
-    const isValid = await bcrypt.compare(password, user.password);
-
-    if (!isValid) {
-      throw new Error("Invalid email or password");
-    }
-
-    const { password: _, ...safeUser } = user;
-    return safeUser;
   }
 
   async findById(id) {
-    const user = await prisma.user.findUnique({
+    return prisma.user.findUnique({
       where: { id },
     });
-
-    if (!user) return null;
-
-    const { password: _, ...safeUser } = user;
-    return safeUser;
   }
 }
 
