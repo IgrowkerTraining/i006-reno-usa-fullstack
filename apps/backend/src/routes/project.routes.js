@@ -7,6 +7,7 @@ import {
   remove,
 } from "../controllers/projectController.js";
 import { protect } from "../middleware/auth.middleware.js";
+import { authorize } from "../middleware/authorize.middleware.js";
 
 const router = Router();
 
@@ -43,7 +44,7 @@ const router = Router();
  *       401:
  *         description: Unauthorized
  */
-router.post("/", protect, create);
+router.post("/", protect, authorize("ADMIN", "PROFESSIONAL"), create);
 
 /**
  * @swagger
@@ -65,7 +66,7 @@ router.post("/", protect, create);
  *       401:
  *         description: Unauthorized
  */
-router.get("/", protect, getAll);
+router.get("/", protect, authorize("ADMIN", "PROFESSIONAL", "USER"), getAll);
 
 /**
  * @swagger
@@ -93,7 +94,8 @@ router.get("/", protect, getAll);
  *       401:
  *         description: Unauthorized
  */
-router.get("/:id", protect, getOne);
+
+router.get("/:id", protect, authorize("ADMIN", "PROFESSIONAL", "USER"), getOne);
 
 /**
  * @swagger
@@ -127,7 +129,7 @@ router.get("/:id", protect, getOne);
  *       401:
  *         description: Unauthorized
  */
-router.put("/:id", protect, update);
+router.put("/:id", protect, authorize("ADMIN", "PROFESSIONAL"), update);
 
 /**
  * @swagger
@@ -159,6 +161,6 @@ router.put("/:id", protect, update);
  *       401:
  *         description: Unauthorized
  */
-router.delete("/:id", protect, remove);
+router.delete("/:id", protect, authorize("ADMIN"), remove);
 
 export default router;

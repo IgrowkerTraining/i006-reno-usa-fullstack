@@ -9,6 +9,12 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+enum Role {
+  USER
+  PROFESSIONAL
+  ADMIN
+}
+
 model User {
   id                 String              @id @default(cuid())
   name               String
@@ -16,7 +22,7 @@ model User {
   password           String
   username           String
   avatar             String?
-  role               String
+  role               Role     @default(USER)
   dailyLogs          DailyLog[]
   projects           Project[]
   technicalApprovals TechnicalApproval[]
@@ -45,7 +51,8 @@ model Project {
 
 model Phase {
   id                 String              @id @default(cuid())
-  name               String
+  name               String   
+  description        String?
   planned_start      DateTime
   planned_end        DateTime
   projectId          String
@@ -53,6 +60,7 @@ model Phase {
   project            Project             @relation(fields: [projectId], references: [id])
   tasks              Task[]
   technicalApprovals TechnicalApproval[]
+  status             String              @default("pending")
 }
 
 model Trade {

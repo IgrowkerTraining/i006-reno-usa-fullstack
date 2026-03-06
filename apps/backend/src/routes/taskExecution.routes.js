@@ -1,11 +1,8 @@
+// src/routes/taskExecution.routes.js
 import { Router } from "express";
-import {
-  create,
-  getAll,
-  getOne,
-  remove,
-} from "../controllers/taskExecution.controller.js";
+import { create, getAll, getOne, remove } from "../controllers/taskExecution.controller.js";
 import { protect } from "../middleware/auth.middleware.js";
+import { authorize } from "../middleware/authorize.middleware.js";
 
 const router = Router();
 
@@ -21,7 +18,7 @@ const router = Router();
  * /api/task-executions:
  *   post:
  *     summary: Create a new task execution
- *     description: Links a Task with a DailyLog (both IDs are required)
+ *     description: Links a Task with a DailyLog. If taskId or dailyLogId are not provided, phaseId/tradeId and userId are required to create them.
  *     tags: [TaskExecutions]
  *     security:
  *       - cookieAuth: []
@@ -43,7 +40,7 @@ const router = Router();
  *       401:
  *         description: Unauthorized
  */
-router.post("/", protect, create);
+router.post("/", protect, authorize("ADMIN", "PROFESSIONAL"), create);
 
 /**
  * @swagger
@@ -65,7 +62,7 @@ router.post("/", protect, create);
  *       401:
  *         description: Unauthorized
  */
-router.get("/", protect, getAll);
+router.get("/", protect, authorize("ADMIN", "PROFESSIONAL", "USER"), getAll);
 
 /**
  * @swagger
@@ -93,7 +90,7 @@ router.get("/", protect, getAll);
  *       401:
  *         description: Unauthorized
  */
-router.get("/:id", protect, getOne);
+router.get("/:id", protect, authorize("ADMIN", "PROFESSIONAL", "USER"), getOne);
 
 /**
  * @swagger
@@ -117,6 +114,6 @@ router.get("/:id", protect, getOne);
  *       401:
  *         description: Unauthorized
  */
-router.delete("/:id", protect, remove);
+router.delete("/:id", protect, authorize("ADMIN"), remove);
 
 export default router;

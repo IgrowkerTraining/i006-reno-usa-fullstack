@@ -27,7 +27,7 @@ const projectFullInclude = {
 };
 
 /* =========================
-   Crear proyecto
+   Crear proyecto + fases + dailyLogs automáticos
 ========================= */
 export const createProject = async (data) => {
   const {
@@ -52,6 +52,7 @@ export const createProject = async (data) => {
 
   const projectInstance = Project.create(data);
 
+  // Crear proyecto
   const project = await prisma.project.create({
     data: {
       code: projectInstance.code,
@@ -72,7 +73,51 @@ export const createProject = async (data) => {
     include: projectFullInclude,
   });
 
-  return mapProject(project);
+  // Generar fases automáticas al crear el proyecto
+  const defaultPhases = [
+    { name: "Planning", description: "Initial planning phase" },
+    { name: "Execution", description: "Main execution phase" },
+    { name: "Closing", description: "Project closing phase" },
+  ];
+
+  const now = new Date();
+
+  await Promise.all(
+    defaultPhases.map(async (phase) => {
+      const newPhase = await prisma.phase.create({
+        data: {
+          name: phase.name,
+          description: phase.description,
+          projectId: project.id,
+          planned_start: now,
+          planned_end: new Date(now.getTime() + 7 * 24 * 60 * 60 * 1000),
+          status: "pending",
+        },
+      });
+
+      // Crear DailyLog inicial para cada fase
+      await prisma.dailyLog.create({
+        data: {
+          phaseId: newPhase.id,
+          userId,
+          notes: "DailyLog inicial generado automáticamente",
+          log_date: now,
+          completion_percentage: 0,
+          schedule_deviation: 0,
+        },
+      });
+
+      return newPhase;
+    })
+  );
+
+  // Refrescar proyecto con fases y dailyLogs
+  const projectWithPhases = await prisma.project.findUnique({
+    where: { id: project.id },
+    include: projectFullInclude,
+  });
+
+  return mapProject(projectWithPhases);
 };
 
 /* =========================
@@ -88,35 +133,25 @@ export const getProjects = async (userId) => {
 };
 
 /* =========================
-   Leer unico proyecto (solo si pertenece al usuario)
+   Leer único proyecto (solo si pertenece al usuario)
 ========================= */
 export const getProjectById = async (id, userId) => {
   const project = await prisma.project.findFirst({
-    where: {
-      id,
-      userId, // 🔒 Seguridad multi-tenant
-    },
+    where: { id, userId },
     include: projectFullInclude,
   });
 
-  if (!project) {
-    return null;
-  }
+  if (!project) return null;
 
   return mapProject(project);
 };
 
 /* =========================
-   Actualizar proyecto (solo si pertenece al usuario)
+   Actualizar proyecto
 ========================= */
 export const updateProject = async (id, userId, data) => {
-  const existing = await prisma.project.findFirst({
-    where: { id, userId },
-  });
-
-  if (!existing) {
-    return null;
-  }
+  const existing = await prisma.project.findFirst({ where: { id, userId } });
+  if (!existing) return null;
 
   const updated = await prisma.project.update({
     where: { id },
@@ -128,18 +163,11 @@ export const updateProject = async (id, userId, data) => {
 };
 
 /* =========================
-   Eliminar proyecto (solo si pertenece al usuario)
+   Eliminar proyecto
 ========================= */
 export const deleteProject = async (id, userId) => {
-  const existing = await prisma.project.findFirst({
-    where: { id, userId },
-  });
+  const existing = await prisma.project.findFirst({ where: { id, userId } });
+  if (!existing) return null;
 
-  if (!existing) {
-    return null;
-  }
-
-  return await prisma.project.delete({
-    where: { id },
-  });
+  return await prisma.project.delete({ where: { id } });
 };

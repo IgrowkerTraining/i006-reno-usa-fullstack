@@ -131,7 +131,7 @@ const Dashboard: React.FC = () => {
               ))}
             </div>
             <div className="p-2 text-center rounded-md bg-blue-900 mt-10 hover:bg-blue-600 hover:scale-95 transition-transform">
-              <button type="submit" className="text-white text-xl font-mono" onClick={() => navigate("/Vista-proyecto")}>
+              <button type="submit" className="text-white text-xl font-mono" onClick={() => navigate('/register-project')}>
                 New Project
               </button>
             </div>

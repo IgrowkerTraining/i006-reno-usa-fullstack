@@ -1,19 +1,32 @@
-import {
-  createTaskExecution,
-  getTaskExecutions,
-  getTaskExecutionById,
-  deleteTaskExecution,
-} from "../services/taskExecution.service.js";
+// src/controllers/taskExecution.controller.js
 
+import * as taskExecutionService from "../services/taskExecution.service.js";
 import { mapTask } from "../mappers/task.mapper.js";
 
+// ================= CREATE =================
 export const create = async (req, res, next) => {
+  console.log("=== LLEGÓ PETICIÓN CREATE TASK EXECUTION ===");
+  console.log("Body recibido:", req.body);
+  console.log("Headers:", req.headers);
+
   try {
-    const execution = await createTaskExecution(req.body);
+    const execution = await taskExecutionService.createTaskExecution(req.body);
+    console.log("TaskExecution creada:", execution);
+
     const taskWithHistory = mapTask(execution.task);
-    res.status(201).json(taskWithHistory);
+    console.log("Task mapeada con record_history:", taskWithHistory);
+
+    res.status(201).json({
+      id: execution.id,
+      taskId: execution.taskId,
+      dailyLogId: execution.dailyLogId,
+      progressPercentage: execution.progressPercentage,
+      task: taskWithHistory,
+      dailyLog: execution.dailyLog,
+    });
   } catch (error) {
-    // Manejar errores específicos de negocio
+    console.error("❌ ERROR EN CREATE TASK EXECUTION:", error.message);
+
     if (
       error.message === "Task not found" ||
       error.message === "DailyLog not found" ||
@@ -21,47 +34,90 @@ export const create = async (req, res, next) => {
     ) {
       return res.status(404).json({ error: error.message });
     }
-    // Para otros errores inesperados
+
     res.status(500).json({ error: "Internal Server Error" });
   }
 };
 
+// ================= GET ALL =================
 export const getAll = async (req, res, next) => {
+  console.log("=== LLEGÓ PETICIÓN GET ALL TASK EXECUTIONS ===");
+  console.log("Query params:", req.query);
+
   try {
     const filter = {};
-    if (req.query.taskId) filter.taskId = req.query.taskId;
-    if (req.query.dailyLogId) filter.dailyLogId = req.query.dailyLogId;
+    if (req.query.taskId) filter.taskId = parseInt(req.query.taskId);
+    if (req.query.dailyLogId) filter.dailyLogId = parseInt(req.query.dailyLogId);
 
-    const list = await getTaskExecutions(filter);
-    // Mapear todas las tasks para incluir record_history
-    const mappedList = list.map((exec) => mapTask(exec.task));
+    const list = await taskExecutionService.getTaskExecutions(filter);
+    console.log("TaskExecutions obtenidas:", list);
+
+    const mappedList = list.map((exec) => ({
+      id: exec.id,
+      taskId: exec.taskId,
+      dailyLogId: exec.dailyLogId,
+      progressPercentage: exec.progressPercentage,
+      task: mapTask(exec.task),
+      dailyLog: exec.dailyLog,
+    }));
+
+    console.log("TaskExecutions mapeadas:", mappedList);
     res.json(mappedList);
   } catch (error) {
+    console.error("❌ ERROR EN GET ALL TASK EXECUTIONS:", error);
     next(error);
   }
 };
 
+// ================= GET ONE =================
 export const getOne = async (req, res, next) => {
+  console.log("=== LLEGÓ PETICIÓN GET ONE TASK EXECUTION ===");
+  console.log("Params recibidos:", req.params);
+
   try {
-    const execution = await getTaskExecutionById(req.params.id);
+    const execution = await taskExecutionService.getTaskExecutionById(
+      parseInt(req.params.id)
+    );
+    console.log("TaskExecution encontrada:", execution);
+
     if (!execution) {
+      console.log("❌ TaskExecution no encontrada, devuelvo 404");
       return res.status(404).json({ message: "TaskExecution not found" });
     }
-    const taskWithHistory = mapTask(execution.task);
-    res.json(taskWithHistory);
+
+    res.json({
+      id: execution.id,
+      taskId: execution.taskId,
+      dailyLogId: execution.dailyLogId,
+      progressPercentage: execution.progressPercentage,
+      task: mapTask(execution.task),
+      dailyLog: execution.dailyLog,
+    });
   } catch (error) {
+    console.error("❌ ERROR EN GET ONE TASK EXECUTION:", error);
     next(error);
   }
 };
 
+// ================= DELETE =================
 export const remove = async (req, res, next) => {
+  console.log("=== LLEGÓ PETICIÓN DELETE TASK EXECUTION ===");
+  console.log("Params recibidos:", req.params);
+
   try {
-    const deleted = await deleteTaskExecution(req.params.id);
+    const deleted = await taskExecutionService.deleteTaskExecution(
+      parseInt(req.params.id)
+    );
+    console.log("Resultado delete:", deleted);
+
     if (!deleted) {
+      console.log("❌ TaskExecution no encontrada para borrar, devuelvo 404");
       return res.status(404).json({ message: "TaskExecution not found" });
     }
+
     res.json({ message: "TaskExecution deleted successfully" });
   } catch (error) {
+    console.error("❌ ERROR EN DELETE TASK EXECUTION:", error);
     next(error);
   }
 };
