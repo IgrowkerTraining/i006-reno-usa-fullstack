@@ -21,7 +21,29 @@ const router = Router();
  *       content:
  *         application/json:
  *           schema:
- *             $ref: '#/components/schemas/RegisterInput'
+ *             type: object
+ *             required: ["name", "email", "password", "role"]
+ *             properties:
+ *               name:
+ *                 type: string
+ *                 example: "Franco Lopez"
+ *               email:
+ *                 type: string
+ *                 example: "franco@mail.com"
+ *               password:
+ *                 type: string
+ *                 example: "12345678"
+ *               role:
+ *                 type: string
+ *                 example: "user"
+ *               avatar:
+ *                 type: string
+ *                 format: uri
+ *                 example: "https://picsum.photos/seed/franco@mail.com/200"
+ *               trade:
+ *                 type: string
+ *                 nullable: true
+ *                 example: "plumbing"
  *     responses:
  *       201:
  *         description: User registered successfully
@@ -32,6 +54,7 @@ const router = Router();
  *               properties:
  *                 message:
  *                   type: string
+ *                   example: "User created"
  *                 user:
  *                   type: object
  *                   properties:
@@ -45,6 +68,10 @@ const router = Router();
  *                       type: string
  *                     role:
  *                       type: string
+ *                     trade:
+ *                       type: string
+ *                       nullable: true
+ *                       example: "plumbing"
  *                 token:
  *                   type: string
  *       400:
@@ -78,6 +105,7 @@ router.post("/register", register);
  *               properties:
  *                 message:
  *                   type: string
+ *                   example: "Login successful"
  *                 user:
  *                   type: object
  *                   properties:
@@ -91,14 +119,14 @@ router.post("/register", register);
  *                       type: string
  *                     role:
  *                       type: string
+ *                     trade:
+ *                       type: string
+ *                       nullable: true
+ *                       example: "plumbing"
  *                 token:
  *                   type: string
  *       400:
  *         description: Validation error
- *         content:
- *           application/json:
- *             schema:
- *               $ref: '#/components/schemas/ValidationError'
  *       401:
  *         description: Invalid credentials
  */

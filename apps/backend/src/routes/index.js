@@ -7,6 +7,9 @@ import technicalApprovalRoutes from './technicalApproval.routes.js';
 import safetyMeasureRoutes from './safetyMeasure.routes.js';
 import workerCoverageRoutes from './workerCoverage.routes.js';
 import taskExecutionRoutes from './taskExecution.routes.js';
+import phaseRoutes from "./phase.routes.js";
+import dailyLogRoutes from "./dailylog.routes.js";
+import taskRoutes from "./task.routes.js";
 
 const router = express.Router();
 
@@ -19,5 +22,8 @@ router.use('/technical-approvals', technicalApprovalRoutes);
 router.use('/safety-measures', safetyMeasureRoutes);
 router.use('/worker-coverages', workerCoverageRoutes);
 router.use('/task-executions', taskExecutionRoutes);
+router.use('/phases', phaseRoutes);
+router.use('/daily-logs', dailyLogRoutes);
+router.use('/tasks', taskRoutes);
 
 export default router;

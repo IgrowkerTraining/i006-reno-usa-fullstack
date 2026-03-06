@@ -16,7 +16,8 @@ model User {
   password           String
   username           String
   avatar             String?
-  role               Role                @default(USER)
+  role               Role     @default(USER)
+  trade              String?  
   dailyLogs          DailyLog[]
   projects           Project[]
   technicalApprovals TechnicalApproval[]
