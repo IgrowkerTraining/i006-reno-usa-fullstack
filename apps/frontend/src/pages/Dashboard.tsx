@@ -10,7 +10,7 @@ import { useProjects } from "../context/ProjectsContext";
 
 const Dashboard: React.FC = () => {
 
-  const { filteredProjects } = useProjects();
+  const { filteredProjects, projects, setProjects } = useProjects();
 
   const { user } = useAuth();
 
@@ -20,9 +20,9 @@ const Dashboard: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [greeting, setGreeting] = useState("");
 
-  const projects = [
-    { id: "1", name: "project alpha", status: "progress" }
-  ]
+  // const projects = [
+  //   { id: "1", name: "project alpha", status: "progress" }
+  // ]
 
   localStorage.setItem("projects", JSON.stringify(projects));
 
@@ -32,36 +32,37 @@ const Dashboard: React.FC = () => {
     { id: "3", name: "ERROR-03", icon: error_icons["ERROR-03"] }
 
   ]
-  // useEffect(() => {
 
-  //   if (!user) {
-  //     navigate("/login")
-  //     return;
-  //   }
+  useEffect(() => {
+    if (!user) {
+      navigate("/login")
+      return;
+    }
 
-  //   const fetchProjects = async () => {
-  //     try {
-  //       const data = await projectService.getAll()
-  //       setProjects(data)
+    const fetchProjects = async () => {
+      try {
+        const data = await projectService.getAll()
+        setProjects(data);
+        localStorage.setItem("projects", JSON.stringify(data)); // <-- aquí
 
-  //       const msg = await getAIGreeting(user.name)
-  //       setGreeting(msg);
+        const msg = await getAIGreeting(user.name)
+        setGreeting(msg);
 
-  //     } catch (error) {
-  //       console.log(error)
-  //     } finally {
-  //       setLoading(false)
-  //     }
-  //   }
+      } catch (error) {
+        console.log(error)
+      } finally {
+        setLoading(false)
+      }
+    }
 
-  //   fetchProjects();
-  // }, [])
+    fetchProjects();
+  }, [])
 
-  // if (loading) return (<div className="flex flex-col items-center justify-center h-screen bg-white gap-4">
-  //   <div className="animate-spin rounded-full h-16 w-16 border-t-4 border-green-600"></div>
-  //   <p className="text-gray-700 font-bold text-lg">Loading projects...</p>
-  // </div>
-  // )
+  if (loading) return (<div className="flex flex-col items-center justify-center h-screen bg-white gap-4">
+    <div className="animate-spin rounded-full h-16 w-16 border-t-4 border-green-600"></div>
+    <p className="text-gray-700 font-bold text-lg">Loading projects...</p>
+  </div>
+  )
 
   return (
     <>
@@ -97,7 +98,7 @@ const Dashboard: React.FC = () => {
                     </h2>
 
                     <div className="flex gap-2 my-1 items-center">
-                      <p>{project.status}</p>
+                      {/* <p>{project.status}</p> */}
 
                       {error.length === 0 ? (
                         <p className="size-6 rounded-full bg-gray-400">There are not errors</p>) :

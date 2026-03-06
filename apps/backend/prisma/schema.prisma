@@ -171,3 +171,4 @@ model MaterialUsage {
   executedTask   TaskExecution @relation(fields: [executedTaskId], references: [id])
   material       Material      @relation(fields: [materialId], references: [id])
 }
+

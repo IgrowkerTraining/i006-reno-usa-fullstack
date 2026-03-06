@@ -13,14 +13,13 @@ export const ProjectsProvider = ({ children }) => {
     setProjects(stored);
   }, []);
 
-  // Will filter the projects by title
   const filteredProjects = projects.filter((project) =>
     project.name.toLowerCase().includes(search.toLowerCase())
   );
 
   return (
     <ProjectsContext.Provider
-      value={{ projects, filteredProjects, search, setSearch, filter, setFilter }}
+      value={{ projects, setProjects, filteredProjects, search, setSearch, filter, setFilter }}
     >
       {children}
     </ProjectsContext.Provider>
