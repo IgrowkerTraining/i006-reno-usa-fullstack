@@ -117,10 +117,15 @@ const options = {
         },
         TaskExecutionInput: {
           type: "object",
-          required: ["taskId", "dailyLogId"],
+          required: [],
           properties: {
             taskId: { type: "string", example: "task123" },
             dailyLogId: { type: "string", example: "log456" },
+            taskName: { type: "string", example: "Instalar ventanas" },
+            taskDescription: { type: "string", example: "Instalación de ventanas de aluminio" },
+            phaseId: { type: "string", example: "phase789" },
+            tradeId: { type: "string", example: "trade321" },
+            userId: { type: "string", example: "user456" },
             progressPercentage: { type: "number", example: 50 },
           },
         },

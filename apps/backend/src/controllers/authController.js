@@ -12,13 +12,15 @@ export const register = async (req, res) => {
       return res.status(400).json({ errors });
     }
 
-    const { name, email, password, role } = req.body;
+    const { name, email, password, role, trade, avatar } = req.body;
 
     const { user, token } = await registerUser({
       name,
       email,
       password,
       role,
+      trade: trade || null,
+      avatar,
     });
 
     return res
@@ -30,10 +32,9 @@ export const register = async (req, res) => {
       .status(201)
       .json({
         message: "User created",
-        user, // 👈 devolvemos el safeUser completo
+        user, // 👈 devuelve safeUser con trade
         token,
       });
-
   } catch (error) {
     return res.status(400).json({ error: error.message });
   }
@@ -62,10 +63,9 @@ export const login = async (req, res) => {
       })
       .json({
         message: "Login successful",
-        user, // 👈 devolvemos el safeUser completo
+        user, // 👈 devuelve safeUser con trade
         token,
       });
-
   } catch (error) {
     return res.status(401).json({ error: error.message });
   }
