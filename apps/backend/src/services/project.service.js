@@ -3,6 +3,12 @@ import Project from "../models/Project.js";
 import { mapProject } from "../mappers/project.mapper.js";
 
 const projectFullInclude = {
+  assignedProfessional: true,
+  projectTeam: {
+    include: {
+      user: true,
+    },
+  },
   phases: {
     include: {
       tasks: {
@@ -22,6 +28,26 @@ const projectFullInclude = {
   },
   projectSnapshots: true,
 };
+// const projectFullInclude = {
+//   phases: {
+//     include: {
+//       tasks: {
+//         include: {
+//           executedTasks: {
+//             include: {
+//               dailyLog: {
+//                 include: {
+//                   user: true,
+//                 },
+//               },
+//             },
+//           },
+//         },
+//       },
+//     },
+//   },
+//   projectSnapshots: true,
+// };
 
 export const createProject = async (data) => {
   const { name, location, surface_sqft, structure_type, intervention_type, internal_code, category, initial_status, assigned_professional, project_team, trades, project_plan_photo, userId } = data;
@@ -32,23 +58,57 @@ export const createProject = async (data) => {
 
   const projectInstance = Project.create(data);
   const project = await prisma.project.create({
-    data: {
-      code: projectInstance.code,
-      internal_code,
-      name,
-      category,
-      location,
-      surface_sqft,
-      structure_type,
-      intervention_type,
-      initial_status,
-      assigned_professional,
-      project_team: project_team || [],
-      trades: trades || [],
-      project_plan_photo,
-      userId,
+  data: {
+    code: projectInstance.code,
+    name,
+    category,
+    location,
+    surface_sqft,
+    structure_type,
+    intervention_type,
+    initial_status,
+    project_plan_photo,
+    trades: trades || [],
+
+    user: {
+      connect: { id: userId }
     },
-  });
+
+    assignedProfessional: assigned_professional
+      ? {
+          connect: { id: assigned_professional }
+        }
+      : undefined,
+
+    projectTeam: project_team?.length
+      ? {
+          create: project_team.map((userId) => ({
+            user: {
+              connect: { id: userId }
+            }
+          }))
+        }
+      : undefined
+  }
+});
+  // const project = await prisma.project.create({
+  //   data: {
+  //     code: projectInstance.code,
+  //     internal_code,
+  //     name,
+  //     category,
+  //     location,
+  //     surface_sqft,
+  //     structure_type,
+  //     intervention_type,
+  //     initial_status,
+  //     assigned_professional,
+  //     project_team: project_team || [],
+  //     trades: trades || [],
+  //     project_plan_photo,
+  //     userId,
+  //   },
+  // });
 
   const defaultPhases = [
     {

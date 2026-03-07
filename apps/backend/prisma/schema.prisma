@@ -22,37 +22,53 @@ model User {
   password           String
   username           String
   avatar             String?
-  role               Role     @default(USER)
-  trade              String?  
+  role               Role                @default(USER)
+  trade              String?
   dailyLogs          DailyLog[]
   projects           Project[]
   technicalApprovals TechnicalApproval[]
+  assignedProjects   Project[]           @relation("AssignedProfessional")
+  projectTeamMembers ProjectTeamMember[]
+}
+
+model ProjectTeamMember {
+  id        String @id @default(cuid())
+  projectId String
+  userId    String
+
+  project Project @relation(fields: [projectId], references: [id])
+  user    User    @relation(fields: [userId], references: [id])
 }
 
 model Project {
-  id                   String     @id @default(cuid())
-  code                 String     @unique
-  name                 String
-  category             String
-  initial_status       String?          // opcional
-  assigned_professional String?         // opcional
-  project_team         String[]         // lista, no opcional
-  trades               String[]         // lista, no opcional
-  project_plan_photo   String?          // opcional
-  location             String
-  surface_sqft         Float?
-  structure_type       String?
-  intervention_type    String?
-  userId               String
-  phases               Phase[]
-  user                 User             @relation(fields: [userId], references: [id])
-  projectSnapshots     ProjectSnapshot[]
-}
+  id             String  @id @default(cuid())
+  code           String  @unique
+  name           String
+  category       String
+  initial_status String? // opcional
 
+  // assigned_professional String?         // opcional
+  // project_team         String[]         // lista, no opcional
+  assignedProfessionalId String?
+  assignedProfessional   User?   @relation("AssignedProfessional", fields: [assignedProfessionalId], references: [id])
+
+  projectTeam ProjectTeamMember[]
+
+  trades             String[] // lista, no opcional
+  project_plan_photo String? // opcional
+  location           String
+  surface_sqft       Float?
+  structure_type     String?
+  intervention_type  String?
+  userId             String
+  phases             Phase[]
+  user               User              @relation(fields: [userId], references: [id])
+  projectSnapshots   ProjectSnapshot[]
+}
 
 model Phase {
   id                 String              @id @default(cuid())
-  name               String   
+  name               String
   description        String?
   planned_start      DateTime
   planned_end        DateTime
@@ -78,7 +94,7 @@ model Task {
   phaseId       String
   tradeId       String?
   phase         Phase           @relation(fields: [phaseId], references: [id])
-  trade         Trade?           @relation(fields: [tradeId], references: [id])
+  trade         Trade?          @relation(fields: [tradeId], references: [id])
   executedTasks TaskExecution[]
 }
 
