@@ -76,9 +76,9 @@ model Task {
   name          String
   description   String?
   phaseId       String
-  tradeId       String
+  tradeId       String?
   phase         Phase           @relation(fields: [phaseId], references: [id])
-  trade         Trade           @relation(fields: [tradeId], references: [id])
+  trade         Trade?           @relation(fields: [tradeId], references: [id])
   executedTasks TaskExecution[]
 }
 
