@@ -6,7 +6,7 @@ export const DonutChart = ({ progress }) => {
     const strokeDashoffset = circumference - (progress / 100) * circumference;
 
     return (
-        <svg height={radius * 4} width={radius * 4}>
+        <svg height={radius * 2} width={radius * 4}>
             {/* Gradient definition */}
             <defs>
                 <linearGradient id="progressGradient" x1="0%" y1="0%" x2="100%" y2="0%">
