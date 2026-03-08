@@ -35,7 +35,8 @@ export const logProgress = async (req, res) => {
       where: { id: { in: taskIds } },
       data: {
         status: 'completed',
-        is_incidence: false // Si la completaron, ya no es incidencia
+        is_incidence: false, // Si la completaron, ya no es incidencia
+        completedAt: new Date()
       }
     });
 
@@ -101,13 +102,32 @@ export const getMyPendingTasks = async (req, res) => {
       });
     }
 
-    // 3. Buscamos las tareas pendientes de ese proyecto que coincidan con su oficio
+    // --- 3. NUEVO: BUSCAMOS LA FASE ACTIVA DEL PROYECTO ---
+    // (La primera fase cronológica que tenga al menos una tarea sin terminar)
+    const activePhase = await prisma.phase.findFirst({
+      where: {
+        projectId: projectId,
+        tasks: {
+          some: { status: { not: 'completed' } }
+        }
+      },
+      orderBy: { planned_start: 'asc' }
+    });
+
+    // Si no encontramos una fase activa, significa que todo el proyecto está terminado
+    if (!activePhase) {
+      return res.status(200).json({
+        message: "El proyecto no tiene fases activas o ya está 100% completado.",
+        count: 0,
+        data: []
+      });
+    }
+
+    // --- 4. MODIFICADO: BUSCAMOS TAREAS SOLO DE ESA FASE ---
     const tasks = await prisma.task.findMany({
       where: {
-        status: { in: ['pending', 'in_progress'] }, // Que no estén completadas
-        phase: {
-          projectId: projectId // Que pertenezcan a este proyecto
-        },
+        status: { in: ['pending', 'in_progress'] },
+        phaseId: activePhase.id, 
         trade: {
           name: {
               equals: user.trade,
@@ -117,17 +137,15 @@ export const getMyPendingTasks = async (req, res) => {
       },
       include: {
         phase: {
-          select: { name: true } // Nos traemos el nombre de la fase por si el front lo quiere mostrar
+          select: { name: true } 
         }
       },
-      orderBy: [
-        { phase: { planned_start: 'asc' } }, // Ordenamos por fase
-        { order: 'asc' } // Y luego por el orden que inventamos antes
-      ]
+      // Como ahora solo traemos tareas de UNA fase, nos alcanza con ordenar por el campo 'order'
+      orderBy: { order: 'asc' } 
     });
 
     res.status(200).json({
-      message: `Tareas pendientes para el oficio: ${user.trade}`,
+      message: `Tareas pendientes para el oficio: ${user.trade} (Fase actual: ${activePhase.name})`,
       count: tasks.length,
       data: tasks
     });
