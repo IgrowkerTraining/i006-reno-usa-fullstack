@@ -8,17 +8,25 @@ const router = Router();
 /**
  * @swagger
  * /api/ai/analyze/{projectId}:
- * post:
- * summary: Genera un reporte de IA basado en el estado actual del proyecto
- * tags: [AI Analysis]
- * security:
- * - cookieAuth: []
- * parameters:
- * - in: path
- * name: projectId
- * required: true
- * schema:
- * type: string
+ *   post:
+ *     summary: Generar análisis de IA para un proyecto
+ *     description: Recopila los datos del proyecto, genera el Snapshot y llama al servicio de Python para obtener un reporte.
+ *     tags:
+ *       - AI Analysis
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: projectId
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: ID único del proyecto
+ *     responses:
+ *       '201':
+ *         description: Análisis generado y guardado exitosamente.
+ *       '400':
+ *         description: Error en la generación del reporte.
  */
 router.post("/analyze/:projectId", protect, authorize("ADMIN", "PROFESSIONAL"), generateReport);
 

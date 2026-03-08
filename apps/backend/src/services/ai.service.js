@@ -1,60 +1,54 @@
 import prisma from '../lib/prisma.js';
 
-const AI_BACKEND_URL = process.env.AI_BACKEND_URL || "http://localhost:8000/api/v1";
+const AI_BACKEND_URL = process.env.AI_BACKEND_URL || "http://host.docker.internal:8000/api/v1";
 
 export const generateAndSaveReport = async (projectId) => {
-  const latestLog = await prisma.dailyLog.findFirst({
-    where: { phase: { projectId: projectId } },
-    orderBy: { log_date: 'desc' },
+  // 1. Buscamos el proyecto con toda su estructura anidada
+  const project = await prisma.project.findUnique({
+    where: { id: projectId },
     include: {
-      phase: {
+      assignedProfessional: true,
+      phases: {
         include: {
-          project: true,
-          technicalApprovals: { orderBy: { approval_date: 'desc' }, take: 1, include: { user: true } }
+          tasks: true // Traemos las tareas para calcular avances
         }
-      },
-      user: true,
-      executedTasks: { include: { task: { include: { trade: true } } } },
-      incidents: true,
-      safetyMeasures: true,
-      workerCoverages: { take: 1 }
+      }
     }
   });
 
-  if (!latestLog) {
-    throw new Error("No hay reportes diarios (DailyLogs) para este proyecto. No se puede generar el snapshot.");
+  if (!project) {
+    throw new Error("Proyecto no encontrado en la base de datos.");
   }
 
-  //DTO
-  const project = latestLog.phase.project;
-  const techApproval = latestLog.phase.technicalApprovals[0];
-  const workerCoverage = latestLog.workerCoverages[0];
+// Lógica para detectar la fase actual
+  const currentPhase = project.phases.find(p => p.status === 'in_progress') 
+                    || project.phases.find(p => p.status === 'pending') 
+                    || project.phases[0];
 
+  const totalTasks = currentPhase ? currentPhase.tasks.length : 0;
+  const completedTasks = currentPhase ? currentPhase.tasks.filter(t => t.status === 'completed') : [];
+  const inProgressTasks = currentPhase ? currentPhase.tasks.filter(t => t.status === 'in_progress') : [];
+  
+  const percentage = totalTasks === 0 ? 0 : Math.round((completedTasks.length / totalTasks) * 100);
+
+  // Armamos el DTO con la lista COMPLETA de tareas y sus estados
   const snapshotDTO = {
     project_code: project.code,
     project_name: project.name,
-    location: project.location,
-    current_phase: latestLog.phase.name,
-    phase_completion_percentage: latestLog.completion_percentage || 0,
-    schedule_deviation_days: latestLog.schedule_deviation || 0,
-    tasks_performed: latestLog.executedTasks.map(et => et.task.name),
-    trades_on_site: [...new Set(latestLog.executedTasks.map(et => et.task.trade.name))],
-    safety_measures: latestLog.safetyMeasures.map(sm => sm.description),
-    worker_coverage: workerCoverage ? {
-      status: workerCoverage.coverage_status,
-      coverage_type: workerCoverage.coverage_type,
-      policy_reference: workerCoverage.policy_reference
-    } : { status: "Unknown", coverage_type: "Not Specified", policy_reference: "N/A" },
-    technical_approval: techApproval ? {
-      approval_date: techApproval.approval_date.toISOString().split('T')[0],
-      approval_status: techApproval.status,
-      licensed_professional: techApproval.user.name
-    } : { approval_date: new Date().toISOString().split('T')[0], approval_status: "Pending", licensed_professional: "TBD" },
-    supervisor_notes: latestLog.notes || "Sin observaciones.",
-    incidents_reported: latestLog.incidents.length
+    current_phase: currentPhase ? currentPhase.name : "N/A",
+    phase_progress_percentage: percentage,
+    total_tasks_count: totalTasks,
+    // Mandamos las tareas activas para el recuadro "In Process"
+    in_process_tasks: inProgressTasks.map(t => t.name),
+    // Mandamos el historial secuencial para que la IA detecte incidencias
+    tasks_sequence: currentPhase ? currentPhase.tasks.map((t, index) => ({
+      sequence_number: index + 1,
+      name: t.name,
+      status: t.status
+    })) : []
   };
 
-  //LLAMADA A LA IA
+  // 5. Llamada al Microservicio de IA (Python)
   const response = await fetch(`${AI_BACKEND_URL}/reportes/`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
@@ -68,14 +62,14 @@ export const generateAndSaveReport = async (projectId) => {
 
   const aiData = await response.json();
 
-  //PERSISTENCIA
+  // 6. Persistencia del reporte en la base de datos local
   const newSnapshot = await prisma.projectSnapshot.create({
     data: {
       projectId: projectId,
-      period_label: "Reporte Generado por IA",
+      period_label: `Análisis de Fase: ${snapshotDTO.current_phase}`,
       aiReports: {
         create: {
-          summary: JSON.stringify(aiData.analisis)
+          summary: JSON.stringify(aiData.analisis) // Asumiendo que Python devuelve { "analisis": "texto..." }
         }
       }
     },

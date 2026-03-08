@@ -110,133 +110,153 @@ export const createProject = async (data) => {
   //   },
   // });
 
-  const defaultPhases = [
+const defaultPhases = [
     {
       name: "Planning and Design",
       tasks: [
-        "Define requirements",
-        "Preliminary design",
-        "Architectural plans",
-        "Structural and installations plans",
-        "Estimated budget",
-        "Municipal permits"
+        { name: "Define requirements", category: "CORRECTION", tradeName: "Masonry" },
+        { name: "Preliminary design", category: "CORRECTION", tradeName: "Masonry" },
+        { name: "Architectural plans", category: "CORRECTION", tradeName: "Masonry" },
+        { name: "Structural and installations plans", category: "CORRECTION", tradeName: "Masonry" },
+        { name: "Estimated budget", category: "CORRECTION", tradeName: "Masonry" },
+        { name: "Municipal permits", category: "CORRECTION", tradeName: "Masonry" }
       ]
     },
     {
       name: "Site Preparation",
       tasks: [
-        "Clearing and cleaning",
-        "Leveling",
-        "Soil study",
-        "Layout marking"
+        { name: "Clearing and cleaning", category: "SAFETY", tradeName: "Masonry" }, 
+        { name: "Leveling", category: "CORRECTION", tradeName: "Masonry" },
+        { name: "Soil study", category: "SAFETY", tradeName: "Masonry" }, 
+        { name: "Layout marking", category: "CORRECTION", tradeName: "Masonry" }
       ]
     },
     {
       name: "Foundation",
       tasks: [
-        "Excavation",
-        "Footings and bases",
-        "Foundation slab",
-        "Waterproofing"
+        { name: "Excavation", category: "SAFETY", tradeName: "Masonry" }, 
+        { name: "Footings and bases", category: "SAFETY", tradeName: "Masonry" },
+        { name: "Foundation slab", category: "CORRECTION", tradeName: "Masonry" },
+        { name: "Waterproofing", category: "CORRECTION", tradeName: "Masonry" }
       ]
     },
     {
       name: "Structure",
       tasks: [
-        "Columns and beams",
-        "Slab construction",
-        "Load-bearing walls",
-        "Roof structure"
+        { name: "Columns and beams", category: "SAFETY", tradeName: "Masonry" }, 
+        { name: "Slab construction", category: "SAFETY", tradeName: "Masonry" },
+        { name: "Load-bearing walls", category: "SAFETY", tradeName: "Masonry" },
+        { name: "Roof structure", category: "SAFETY", tradeName: "Masonry" } 
       ]
     },
     {
       name: "Installations",
       tasks: [
-        "Electrical installation",
-        "Plumbing installation",
-        "Gas installation",
-        "Drainage",
-        "Rainwater system"
+        { name: "Electrical installation", category: "ELECTRICAL", tradeName: "Electrician" },
+        { name: "Plumbing installation", category: "CORRECTION", tradeName: "Plumbing" },
+        { name: "Gas installation", category: "SAFETY", tradeName: "Plumbing" }, 
+        { name: "Drainage", category: "CORRECTION", tradeName: "Plumbing" },
+        { name: "Rainwater system", category: "CORRECTION", tradeName: "Plumbing" }
       ]
     },
     {
       name: "Masonry and Enclosures",
       tasks: [
-        "Wall construction",
-        "Window and door installation",
-        "Rough plaster",
-        "Fine plaster"
+        { name: "Wall construction", category: "CORRECTION", tradeName: "Masonry" },
+        { name: "Window and door installation", category: "CORRECTION", tradeName: "Masonry" },
+        { name: "Rough plaster", category: "CORRECTION", tradeName: "Masonry" },
+        { name: "Fine plaster", category: "CORRECTION", tradeName: "Masonry" }
       ]
     },
     {
       name: "Roofing and Insulation",
       tasks: [
-        "Roof covering installation",
-        "Thermal insulation",
-        "Waterproof insulation"
+        { name: "Roof covering installation", category: "SAFETY", tradeName: "Masonry" }, 
+        { name: "Thermal insulation", category: "CORRECTION", tradeName: "Masonry" },
+        { name: "Waterproof insulation", category: "CORRECTION", tradeName: "Masonry" }
       ]
     },
     {
       name: "Finishes",
       tasks: [
-        "Flooring and wall coverings",
-        "Painting",
-        "Interior carpentry",
-        "Fixture installation",
-        "Sanitary fittings"
+        { name: "Flooring and wall coverings", category: "CORRECTION", tradeName: "Masonry" },
+        { name: "Painting", category: "CORRECTION", tradeName: "Masonry" },
+        { name: "Interior carpentry", category: "CORRECTION", tradeName: "Masonry" },
+        { name: "Fixture installation", category: "CORRECTION", tradeName: "Electrician" },
+        { name: "Sanitary fittings", category: "CORRECTION", tradeName: "Plumbing" }
       ]
     },
     {
       name: "Inspection and Final Details",
       tasks: [
-        "Quality control",
-        "Fixing defects",
-        "Final cleaning"
+        { name: "Quality control", category: "CORRECTION", tradeName: "Masonry" },
+        { name: "Fixing defects", category: "CORRECTION", tradeName: "Masonry" },
+        { name: "Final cleaning", category: "CORRECTION", tradeName: "Masonry" }
       ]
     }
   ];
 
-  const now = new Date();
+const now = new Date();
 
-  for (const phaseData of defaultPhases) {
-    const phase = await prisma.phase.create({
-      data: {
-        name: phaseData.name,
-        projectId: project.id,
-        planned_start: now,
-        planned_end: new Date(now.getTime() + 7 * 86400000),
-        status: "pending"
-      }
-    });
+for (const phaseData of defaultPhases) {
+  const phase = await prisma.phase.create({
+    data: {
+      name: phaseData.name,
+      projectId: project.id,
+      planned_start: now,
+      planned_end: new Date(now.getTime() + 7 * 86400000),
+      status: "pending"
+    }
+  });
 
-    for (const taskName of phaseData.tasks) {
-      await prisma.task.create({
-        data: {
-          name: taskName,
-          phaseId: phase.id,
-          tradeId: null
-        }
+  for (const [index, taskData] of phaseData.tasks.entries()) {
+    let assignedTradeId = null;
+    
+    if (taskData.tradeName) {
+      let tradeRecord = await prisma.trade.findFirst({
+        where: { name: taskData.tradeName }
       });
+      
+      if (!tradeRecord) {
+        tradeRecord = await prisma.trade.create({
+          data: { name: taskData.tradeName }
+        });
+      }
+      
+      assignedTradeId = tradeRecord.id; 
     }
 
-    await prisma.dailyLog.create({
+    await prisma.task.create({
       data: {
+        name: taskData.name,
+        category: taskData.category, 
+        order: index + 1,       
+        is_incidence: false,     
         phaseId: phase.id,
-        userId,
-        notes: "DailyLog inicial generado automáticamente",
-        log_date: now,
-        completion_percentage: 0,
-        schedule_deviation: 0,
-      },
+        tradeId: assignedTradeId 
+      }
     });
   }
 
-  const projectWithPhases = await prisma.project.findUnique({
-    where: { id: project.id },
-    include: projectFullInclude,
+  // (Esto posiblemente se vaya pronto)
+  await prisma.dailyLog.create({
+    data: {
+      phaseId: phase.id,
+      userId,
+      notes: "DailyLog inicial generado automáticamente",
+      log_date: now,
+      completion_percentage: 0,
+      schedule_deviation: 0,
+    },
   });
+}
 
-  return mapProject(projectWithPhases);
+const projectWithPhases = await prisma.project.findUnique({
+  where: { id: project.id },
+  include: projectFullInclude,
+});
+
+return mapProject(projectWithPhases);
 }
 
 export const getProjects = async (userId) => {
