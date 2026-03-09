@@ -82,14 +82,19 @@ model Trade {
 }
 
 model Task {
-  id            String          @id @default(cuid())
-  name          String
-  description   String?
-  phaseId       String
-  tradeId       String?
-  phase         Phase           @relation(fields: [phaseId], references: [id])
-  trade         Trade?          @relation(fields: [tradeId], references: [id])
-  executedTasks TaskExecution[]
+  id             String          @id @default(cuid())
+  name           String
+  description    String?
+  status         String          @default("pending")
+  category       String          @default("CORRECTION")
+  order          Int             @default(0) 
+  is_incidence   Boolean         @default(false)
+  completedAt    DateTime?
+  phaseId        String
+  tradeId        String?
+  phase          Phase           @relation(fields: [phaseId], references: [id])
+  trade          Trade?          @relation(fields: [tradeId], references: [id])
+  executedTasks  TaskExecution[]
 }
 
 model TaskExecution {
