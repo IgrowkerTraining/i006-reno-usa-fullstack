@@ -1,4 +1,4 @@
-import { Project, ProjectInput } from '../types';
+import { Project, ProjectHistoryItem, ProjectInput, ProjectMetrics, ProjectPhase } from '../types';
 import { API_ENDPOINTS } from '../constants/routes';
 
 const API_URL = `${API_ENDPOINTS.BASE}/api/projects`;
@@ -54,6 +54,37 @@ export const projectService = {
       credentials: 'include',
     });
     if (!response.ok) throw new Error('Error al eliminar proyecto');
+    return response.json();
+  },
+
+  // --- REGISTRO DE AVANCE ---
+  getMetrics: async (id: string): Promise<ProjectMetrics> => {
+    const response = await fetch(`${API_URL}/${id}/metrics`, {
+      method: 'GET',
+      headers: { 'Content-Type': 'application/json' },
+      credentials: 'include',
+    });
+    if (!response.ok) throw new Error('Error al obtener métricas del proyecto');
+    return response.json();
+  },
+
+  getPhases: async (id: string): Promise<ProjectPhase[]> => {
+    const response = await fetch(`${API_URL}/${id}/phases`, {
+      method: 'GET',
+      headers: { 'Content-Type': 'application/json' },
+      credentials: 'include',
+    });
+    if (!response.ok) throw new Error('Error al obtener fases del proyecto');
+    return response.json();
+  },
+
+  getHistory: async (id: string): Promise<ProjectHistoryItem[]> => {
+    const response = await fetch(`${API_URL}/${id}/history`, {
+      method: 'GET',
+      headers: { 'Content-Type': 'application/json' },
+      credentials: 'include',
+    });
+    if (!response.ok) throw new Error('Error al obtener historial de tareas del proyecto');
     return response.json();
   },
 };
