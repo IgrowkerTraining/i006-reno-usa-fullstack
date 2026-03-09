@@ -42,7 +42,7 @@ export const logProgress = async (req, res) => {
 
     for (const phaseId of uniquePhaseIds) {
       
-      // Buscamos cuál es la tarea completada con el ORDEN MÁS ALTO en esta fase
+      // 1. Lógica de Incidencias (ya la tenías, la mantenemos igual)
       const maxCompletedTask = await prisma.task.findFirst({
         where: { phaseId: phaseId, status: 'completed' },
         orderBy: { order: 'desc' }
@@ -50,18 +50,32 @@ export const logProgress = async (req, res) => {
 
       if (maxCompletedTask) {
         const maxOrder = maxCompletedTask.order;
-
-        // A todas las tareas con un orden MENOR que sigan pendientes, les prendemos la alarma
         await prisma.task.updateMany({
           where: {
             phaseId: phaseId,
             order: { lt: maxOrder }, 
             status: { not: 'completed' }
           },
-          data: {
-            is_incidence: true
-          }
+          data: { is_incidence: true }
         });
+      }
+
+      // --- 2. CHECK DE CIERRE DE FASE ---
+      // Contamos si queda CUALQUIER tarea que no esté completada en esta fase
+      const pendingTasksInPhase = await prisma.task.count({
+        where: {
+          phaseId: phaseId,
+          status: { not: 'completed' } 
+        }
+      });
+
+      if (pendingTasksInPhase === 0) {
+        // Si no queda NADA pendiente, cerramos la fase
+        await prisma.phase.update({
+          where: { id: phaseId },
+          data: { status: 'completed' }
+        });
+        console.log(`✨ [AUTO-FINISH] Fase ${phaseId} completada al 100%.`);
       }
     }
 
@@ -102,17 +116,14 @@ export const getMyPendingTasks = async (req, res) => {
       });
     }
 
-    // --- 3. NUEVO: BUSCAMOS LA FASE ACTIVA DEL PROYECTO ---
-    // (La primera fase cronológica que tenga al menos una tarea sin terminar)
-    const activePhase = await prisma.phase.findFirst({
-      where: {
-        projectId: projectId,
-        tasks: {
-          some: { status: { not: 'completed' } }
-        }
-      },
-      orderBy: { planned_start: 'asc' }
-    });
+    // --- 3. BUSCAMOS LA FASE ACTIVA POR SU PROPIO ESTADO ---
+const activePhase = await prisma.phase.findFirst({
+  where: {
+    projectId: projectId,
+    status: { not: 'completed' } // Buscamos la primera que no esté cerrada
+  },
+  orderBy: { planned_start: 'asc' } // Respetamos el orden cronológico
+});
 
     // Si no encontramos una fase activa, significa que todo el proyecto está terminado
     if (!activePhase) {
@@ -123,7 +134,7 @@ export const getMyPendingTasks = async (req, res) => {
       });
     }
 
-    // --- 4. MODIFICADO: BUSCAMOS TAREAS SOLO DE ESA FASE ---
+    // --- 4. BUSCAMOS TAREAS SOLO DE ESA FASE ---
     const tasks = await prisma.task.findMany({
       where: {
         status: { in: ['pending', 'in_progress'] },

@@ -2,15 +2,22 @@ import prisma from '../lib/prisma.js';
 
 const AI_BACKEND_URL = process.env.AI_BACKEND_URL || "http://host.docker.internal:8000/api/v1";
 
-export const generateAndSaveReport = async (projectId) => {
-  // 1. Buscamos el proyecto con toda su estructura anidada
+export const getAiProjectAnalysis = async (projectId) => {
+  // 1. Buscamos el proyecto con todas sus fases ordenadas y tareas
   const project = await prisma.project.findUnique({
     where: { id: projectId },
     include: {
-      assignedProfessional: true,
       phases: {
+        orderBy: { planned_start: 'asc' }, // Orden cronológico
         include: {
-          tasks: true // Traemos las tareas para calcular avances
+          tasks: {
+            select: { 
+              name: true, 
+              status: true, 
+              is_incidence: true, 
+              category: true 
+            }
+          }
         }
       }
     }
@@ -20,32 +27,32 @@ export const generateAndSaveReport = async (projectId) => {
     throw new Error("Proyecto no encontrado en la base de datos.");
   }
 
-// Lógica para detectar la fase actual
-  const currentPhase = project.phases.find(p => p.status === 'in_progress') 
-                    || project.phases.find(p => p.status === 'pending') 
-                    || project.phases[0];
+  // 2. Detectamos la fase activa
+  const currentPhase = project.phases.find(phase => 
+    phase.tasks.some(task => task.status !== 'completed')
+  );
+  const activePhaseName = currentPhase ? currentPhase.name : "Proyecto Finalizado";
 
-  const totalTasks = currentPhase ? currentPhase.tasks.length : 0;
-  const completedTasks = currentPhase ? currentPhase.tasks.filter(t => t.status === 'completed') : [];
-  const inProgressTasks = currentPhase ? currentPhase.tasks.filter(t => t.status === 'in_progress') : [];
-  
-  const percentage = totalTasks === 0 ? 0 : Math.round((completedTasks.length / totalTasks) * 100);
+  // 3. Aplanamos la lista de tareas
+  const allTasksClean = [];
+  project.phases.forEach(phase => {
+    phase.tasks.forEach(task => {
+      allTasksClean.push({
+        name: task.name,
+        phase: phase.name,
+        status: task.status,
+        is_incidence: task.is_incidence,
+        category: task.category
+      });
+    });
+  });
 
-  // Armamos el DTO con la lista COMPLETA de tareas y sus estados
+  // 4. Armamos el DTO (El "Snapshot" crudo)
   const snapshotDTO = {
-    project_code: project.code,
+    project_id: project.id,
     project_name: project.name,
-    current_phase: currentPhase ? currentPhase.name : "N/A",
-    phase_progress_percentage: percentage,
-    total_tasks_count: totalTasks,
-    // Mandamos las tareas activas para el recuadro "In Process"
-    in_process_tasks: inProgressTasks.map(t => t.name),
-    // Mandamos el historial secuencial para que la IA detecte incidencias
-    tasks_sequence: currentPhase ? currentPhase.tasks.map((t, index) => ({
-      sequence_number: index + 1,
-      name: t.name,
-      status: t.status
-    })) : []
+    active_phase: activePhaseName,
+    tasks_snapshot: allTasksClean
   };
 
   // 5. Llamada al Microservicio de IA (Python)
@@ -60,21 +67,9 @@ export const generateAndSaveReport = async (projectId) => {
     throw new Error(`Error del servicio de IA: ${JSON.stringify(errorData)}`);
   }
 
+  // Obtenemos la respuesta
   const aiData = await response.json();
 
-  // 6. Persistencia del reporte en la base de datos local
-  const newSnapshot = await prisma.projectSnapshot.create({
-    data: {
-      projectId: projectId,
-      period_label: `Análisis de Fase: ${snapshotDTO.current_phase}`,
-      aiReports: {
-        create: {
-          summary: JSON.stringify(aiData.analisis) // Asumiendo que Python devuelve { "analisis": "texto..." }
-        }
-      }
-    },
-    include: { aiReports: true }
-  });
-
-  return newSnapshot;
+  // 6. Retornamos la respuesta directo al Frontend 
+  return aiData.analisis; 
 };
