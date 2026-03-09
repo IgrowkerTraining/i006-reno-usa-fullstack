@@ -1,6 +1,8 @@
 // src/services/auth.service.js
 import bcrypt from "bcrypt";
+import jwt from "jsonwebtoken";
 import prisma from "../lib/prisma.js";
+import config from "../config/index.js";
 
 class UserService {
 
@@ -42,8 +44,7 @@ export const registerUser = async ({ name, email, password, role, trade }) => {
   const user = await userService.createUser({ name, email, password, role, trade });
   
   // generar token JWT aquí (ejemplo)
-  const jwt = (await import("jsonwebtoken")).default;
-  const token = jwt.sign({ id: user.id, role: user.role }, process.env.JWT_SECRET, { expiresIn: "7d" });
+  const token = jwt.sign({ id: user.id, role: user.role }, config.jwtSecret, { expiresIn: "7d" });
   
   return { user, token };
 };
@@ -55,8 +56,7 @@ export const loginUser = async (email, password) => {
   const match = await bcrypt.compare(password, user.password);
   if (!match) throw new Error("Invalid credentials");
 
-  const jwt = (await import("jsonwebtoken")).default;
-  const token = jwt.sign({ id: user.id, role: user.role }, process.env.JWT_SECRET, { expiresIn: "7d" });
+  const token = jwt.sign({ id: user.id, role: user.role }, config.jwtSecret, { expiresIn: "7d" });
 
   const { password: _, ...safeUser } = user;
   return { user: safeUser, token };

@@ -3,6 +3,12 @@ import Project from "../models/Project.js";
 import { mapProject } from "../mappers/project.mapper.js";
 
 const projectFullInclude = {
+  assignedProfessional: true,
+  projectTeam: {
+    include: {
+      user: true,
+    },
+  },
   phases: {
     include: {
       tasks: {
@@ -22,6 +28,26 @@ const projectFullInclude = {
   },
   projectSnapshots: true,
 };
+// const projectFullInclude = {
+//   phases: {
+//     include: {
+//       tasks: {
+//         include: {
+//           executedTasks: {
+//             include: {
+//               dailyLog: {
+//                 include: {
+//                   user: true,
+//                 },
+//               },
+//             },
+//           },
+//         },
+//       },
+//     },
+//   },
+//   projectSnapshots: true,
+// };
 
 export const createProject = async (data) => {
   const { name, location, surface_sqft, structure_type, intervention_type, internal_code, category, initial_status, assigned_professional, project_team, trades, project_plan_photo, userId } = data;
@@ -32,47 +58,170 @@ export const createProject = async (data) => {
 
   const projectInstance = Project.create(data);
   const project = await prisma.project.create({
-    data: {
-      code: projectInstance.code,
-      internal_code,
-      name,
-      category,
-      location,
-      surface_sqft,
-      structure_type,
-      intervention_type,
-      initial_status,
-      assigned_professional,
-      project_team: project_team || [],
-      trades: trades || [],
-      project_plan_photo,
-      userId,
+  data: {
+    code: projectInstance.code,
+    name,
+    category,
+    location,
+    surface_sqft,
+    structure_type,
+    intervention_type,
+    initial_status,
+    project_plan_photo,
+    trades: trades || [],
+
+    user: {
+      connect: { id: userId }
     },
-  });
+
+    assignedProfessional: assigned_professional
+      ? {
+          connect: { id: assigned_professional }
+        }
+      : undefined,
+
+    projectTeam: project_team?.length
+      ? {
+          create: project_team.map((userId) => ({
+            user: {
+              connect: { id: userId }
+            }
+          }))
+        }
+      : undefined
+  }
+});
+  // const project = await prisma.project.create({
+  //   data: {
+  //     code: projectInstance.code,
+  //     internal_code,
+  //     name,
+  //     category,
+  //     location,
+  //     surface_sqft,
+  //     structure_type,
+  //     intervention_type,
+  //     initial_status,
+  //     assigned_professional,
+  //     project_team: project_team || [],
+  //     trades: trades || [],
+  //     project_plan_photo,
+  //     userId,
+  //   },
+  // });
 
   const defaultPhases = [
-    { name: "Planning", description: "Initial planning phase" },
-    { name: "Execution", description: "Main execution phase" },
-    { name: "Closing", description: "Project closing phase" },
+    {
+      name: "Planning and Design",
+      tasks: [
+        "Define requirements",
+        "Preliminary design",
+        "Architectural plans",
+        "Structural and installations plans",
+        "Estimated budget",
+        "Municipal permits"
+      ]
+    },
+    {
+      name: "Site Preparation",
+      tasks: [
+        "Clearing and cleaning",
+        "Leveling",
+        "Soil study",
+        "Layout marking"
+      ]
+    },
+    {
+      name: "Foundation",
+      tasks: [
+        "Excavation",
+        "Footings and bases",
+        "Foundation slab",
+        "Waterproofing"
+      ]
+    },
+    {
+      name: "Structure",
+      tasks: [
+        "Columns and beams",
+        "Slab construction",
+        "Load-bearing walls",
+        "Roof structure"
+      ]
+    },
+    {
+      name: "Installations",
+      tasks: [
+        "Electrical installation",
+        "Plumbing installation",
+        "Gas installation",
+        "Drainage",
+        "Rainwater system"
+      ]
+    },
+    {
+      name: "Masonry and Enclosures",
+      tasks: [
+        "Wall construction",
+        "Window and door installation",
+        "Rough plaster",
+        "Fine plaster"
+      ]
+    },
+    {
+      name: "Roofing and Insulation",
+      tasks: [
+        "Roof covering installation",
+        "Thermal insulation",
+        "Waterproof insulation"
+      ]
+    },
+    {
+      name: "Finishes",
+      tasks: [
+        "Flooring and wall coverings",
+        "Painting",
+        "Interior carpentry",
+        "Fixture installation",
+        "Sanitary fittings"
+      ]
+    },
+    {
+      name: "Inspection and Final Details",
+      tasks: [
+        "Quality control",
+        "Fixing defects",
+        "Final cleaning"
+      ]
+    }
   ];
 
   const now = new Date();
 
-  for (const phase of defaultPhases) {
-    const newPhase = await prisma.phase.create({
+  for (const phaseData of defaultPhases) {
+    const phase = await prisma.phase.create({
       data: {
-        name: phase.name,
-        description: phase.description,
+        name: phaseData.name,
         projectId: project.id,
         planned_start: now,
-        planned_end: new Date(now.getTime() + 7 * 24 * 60 * 60 * 1000),
-        status: "pending",
-      },
+        planned_end: new Date(now.getTime() + 7 * 86400000),
+        status: "pending"
+      }
     });
+
+    for (const taskName of phaseData.tasks) {
+      await prisma.task.create({
+        data: {
+          name: taskName,
+          phaseId: phase.id,
+          tradeId: null
+        }
+      });
+    }
 
     await prisma.dailyLog.create({
       data: {
-        phaseId: newPhase.id,
+        phaseId: phase.id,
         userId,
         notes: "DailyLog inicial generado automáticamente",
         log_date: now,
@@ -88,7 +237,7 @@ export const createProject = async (data) => {
   });
 
   return mapProject(projectWithPhases);
-};
+}
 
 export const getProjects = async (userId) => {
   const projects = await prisma.project.findMany({
