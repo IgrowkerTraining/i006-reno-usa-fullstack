@@ -82,9 +82,9 @@ export const createProject = async (data) => {
 
     projectTeam: project_team?.length
       ? {
-          create: project_team.map((userId) => ({
+          create: project_team.map((memberId) => ({
             user: {
-              connect: { id: userId }
+              connect: { id: memberId }
             }
           }))
         }
@@ -260,9 +260,21 @@ return mapProject(projectWithPhases);
 }
 
 export const getProjects = async (userId) => {
-  // 1. Buscamos los proyectos, ordenando sus fases por fecha de inicio
+  // 1. Buscamos los proyectos donde el usuario participe de CUALQUIER forma
   const projects = await prisma.project.findMany({
-    where: { userId: userId },
+    where: {
+      OR: [
+        { userId: userId },
+        { assignedProfessionalId: userId }, 
+        {
+          projectTeam: {
+            some: {
+              userId: userId 
+            }
+          }
+        }
+      ]
+    },
     include: {
       phases: {
         orderBy: { planned_start: 'asc' },
@@ -289,21 +301,20 @@ export const getProjects = async (userId) => {
     if (totalPhases > 0) {
       // Buscamos cuál es la PRIMERA fase que todavía tiene tareas sin terminar
       const currentPhaseIndex = project.phases.findIndex(phase => 
-        phase.tasks.some(task => task.status !== 'completed')
+        phase.status !== 'completed'
       );
 
-      // Lógica de la Máquina de Estados
       if (currentPhaseIndex === -1) {
-        // -1 significa que no encontró tareas sin terminar en NINGUNA fase.
+
         projectStatus = "Completed"; 
       } else if (currentPhaseIndex === 0) {
-        // Sigue trabado en la primera fase de la lista
+  
         projectStatus = "In planning";
       } else if (currentPhaseIndex === totalPhases - 1) {
-        // Llegó a la última fase de la lista
+  
         projectStatus = "Closing";
       } else {
-        // Está en cualquier fase del medio
+  
         projectStatus = "In execution";
       }
     }
@@ -437,7 +448,7 @@ export const getDashboardMetrics = async (projectId) => {
       totalTasks,
       completedTasks
     },
-    activeTrades: associatedTrades
+    activeTrades
   };
 };
 
@@ -462,12 +473,29 @@ export const getProjectPhases = async (projectId) => {
   return phases;
 };
 
-export const getProjectHistory = async (projectId) => {
-  // 1. Buscamos la fase activa del proyecto
+export const getProjectHistory = async (projectId, userId) => {
+  // 0. Buscamos quién está pidiendo el historial y el proyecto
+  const user = await prisma.user.findUnique({
+    where: { id: userId },
+    select: { trade: true }
+  });
+
+  const project = await prisma.project.findUnique({
+    where: { id: projectId },
+    select: { userId: true, assignedProfessionalId: true }
+  });
+
+  if (!project) return []; // Por si las dudas
+
+  // Ahora SOLO el profesional a cargo tiene la vista global
+  console.log("userId:", userId, "assignedProfessionalId:", project.assignedProfessionalId);
+  const isLeader = project.assignedProfessionalId === userId;
+
+  // 1. Buscamos la fase activa del proyecto (¡Actualizado con la lógica de status!)
   const activePhase = await prisma.phase.findFirst({
     where: {
       projectId: projectId,
-      tasks: { some: { status: { not: 'completed' } } }
+      status: { not: 'completed' } 
     },
     orderBy: { planned_start: 'asc' }
   });
@@ -476,28 +504,36 @@ export const getProjectHistory = async (projectId) => {
   let targetPhaseId = null;
 
   if (activePhase) {
-    // Si la obra está en curso, mostramos el historial de la fase actual
     targetPhaseId = activePhase.id;
   } else {
-    // Si la obra ya terminó (no hay fase activa), buscamos la ÚLTIMA fase cronológica
     const lastPhase = await prisma.phase.findFirst({
       where: { projectId: projectId },
       orderBy: { planned_start: 'desc' }
     });
-    
     if (lastPhase) targetPhaseId = lastPhase.id;
   }
 
-  // Si por algún motivo la obra no tiene fases cargadas, atajamos el error
   if (!targetPhaseId) return [];
 
-  // 3. Traemos las tareas completadas SOLO de esa fase objetivo
+  // 3. Armamos el filtro dinámico para Prisma
+  const taskFilter = {
+    phaseId: targetPhaseId,
+    status: 'completed',
+    completedAt: { not: null }
+  };
+
+  if (!isLeader && user?.trade) {
+    taskFilter.trade = {
+      name: {
+        equals: user.trade,
+        mode: 'insensitive'
+      }
+    };
+  }
+
+  // 4. Traemos las tareas completadas
   const history = await prisma.task.findMany({
-    where: {
-      phaseId: targetPhaseId,
-      status: 'completed',
-      completedAt: { not: null }
-    },
+    where: taskFilter,
     orderBy: {
       completedAt: 'desc'
     },

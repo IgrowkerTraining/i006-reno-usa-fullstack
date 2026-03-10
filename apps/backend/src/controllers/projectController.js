@@ -98,7 +98,7 @@ export const getHistory = async (req, res, next) => {
   try {
     const { id: projectId } = req.params;
     
-    const history = await getProjectHistory(projectId);
+    const history = await getProjectHistory(projectId, req.user.id);
     
     res.status(200).json({
       status: "success",
