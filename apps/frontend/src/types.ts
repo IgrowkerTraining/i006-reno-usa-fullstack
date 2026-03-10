@@ -74,3 +74,7 @@ export interface ProjectHistoryItem {
   completedBy: string;  // nombre del usuario
   phase: string;        // nombre de la fase
 }
+
+export interface ProjectTaskStatusUpdate {
+  tasksId: string[]; //debe de ser un array de string
+}

@@ -1,4 +1,4 @@
-import { Project, ProjectHistoryItem, ProjectInput, ProjectMetrics, ProjectPhase } from '../types';
+import { Project, ProjectHistoryItem, ProjectInput, ProjectMetrics, ProjectPhase, ProjectTaskStatusUpdate } from '../types';
 import { API_ENDPOINTS } from '../constants/routes';
 
 const API_URL = `${API_ENDPOINTS.BASE}/api/projects`;
@@ -64,7 +64,7 @@ export const projectService = {
       headers: { 'Content-Type': 'application/json' },
       credentials: 'include',
     });
-    if (!response.ok) throw new Error('Error al obtener métricas del proyecto');
+    if (!response.ok) throw new Error('Error to obtain the project metrics');
     return response.json();
   },
 
@@ -74,7 +74,7 @@ export const projectService = {
       headers: { 'Content-Type': 'application/json' },
       credentials: 'include',
     });
-    if (!response.ok) throw new Error('Error al obtener fases del proyecto');
+    if (!response.ok) throw new Error('Error to obtain the project phases');
     return response.json();
   },
 
@@ -84,7 +84,18 @@ export const projectService = {
       headers: { 'Content-Type': 'application/json' },
       credentials: 'include',
     });
-    if (!response.ok) throw new Error('Error al obtener historial de tareas del proyecto');
+    if (!response.ok) throw new Error('Error to obtain the tasks history');
+    return response.json();
+  },
+
+  updateTaskStatus: async (tasksId: string[]) => {
+    const response = await fetch(`${API_URL}/tasks/log-progress`, {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      credentials: 'include',
+      body: JSON.stringify({ tasksId }),
+    });
+    if (!response.ok) throw new Error('Error to update the tasks status');
     return response.json();
   },
 };

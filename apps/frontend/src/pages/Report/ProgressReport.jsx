@@ -12,6 +12,7 @@ import safetyStandards from "./security_standard";
 import { DonutChart } from "./DonutChart";
 import { PhaseIcons } from "./phase_icons";
 import { projectService } from "@/src/services/project.service";
+import { taskService } from "@/src/services/taskServices";
 
 export const ProgressReport = () => {
 
@@ -83,24 +84,25 @@ export const ProgressReport = () => {
 
     const handleUpdate = async () => {
         try {
-            // Update local phases status based on completed tasks
-            const updatedPhases = phases.map(phase => {
-                const allTasksCompleted = phase.tasks.every(task => task.status === "completed");
-                return {
-                    ...phase,
-                    status: allTasksCompleted ? "completed" : "pending"
-                };
-            });
+            // Obtener todas las tareas que están marcadas como completed en el frontend
+            const completedTaskIds = phases
+                .flatMap(phase => phase.tasks)
+                .filter(task => task.status === "completed")
+                .map(task => task.id);
 
-            setPhases(updatedPhases);
+            if (!completedTaskIds.length) {
+                console.log("No tasks to update");
+                return;
+            }
 
-            // Prepare payload for backend
-            const payload = { phases: updatedPhases };
+            console.log(completedTaskIds);
 
-            // Call existing projectService.update
-            await projectService.update(project.id, payload);
+            // Llamar al endpoint existente del backend
+            await taskService.updateTaskStatus({ tasksIds: completedTaskIds });
 
-            console.log("Project tasks updated successfully");
+            console.log("Tasks updated successfully");
+
+            // Refetch project data
             refetch();
         } catch (err) {
             console.error(err);
