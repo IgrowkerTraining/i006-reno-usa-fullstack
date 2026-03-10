@@ -10,9 +10,8 @@ datasource db {
 }
 
 enum Role {
-  USER
-  PROFESSIONAL
-  ADMIN
+  user
+  professional
 }
 
 model User {
@@ -22,7 +21,7 @@ model User {
   password           String
   username           String
   avatar             String?
-  role               Role                @default(USER)
+  role               Role                @default(user)
   trade              String?
   dailyLogs          DailyLog[]
   projects           Project[]
