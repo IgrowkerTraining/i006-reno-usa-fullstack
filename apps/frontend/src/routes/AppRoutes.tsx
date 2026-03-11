@@ -54,7 +54,7 @@ export const AppRoutes: React.FC = () => {
         }
       />
       <Route
-        path="/control-project"
+        path="/control-project/:id"
         element={
           <ProtectedRoute>
             <ControlAvance />
