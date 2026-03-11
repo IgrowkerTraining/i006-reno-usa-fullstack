@@ -321,6 +321,7 @@ export const getProjects = async (userId) => {
       id: project.id,
       name: project.name,
       status: projectStatus,
+      initial_status: project.initial_status,
       activeIncidences: Array.from(activeIncidenceCategories)
     };
   });

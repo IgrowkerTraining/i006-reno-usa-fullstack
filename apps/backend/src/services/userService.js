@@ -40,3 +40,20 @@ class UserService {
 }
 
 export default new UserService();
+
+
+export const getUsers = async () => {
+  const users = await prisma.user.findMany({
+    select: {
+      id: true,
+      name: true,
+      email: true,
+      username: true,
+      role: true,
+      trade: true,
+      avatar: true
+    }
+  });
+
+  return users;
+};

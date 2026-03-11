@@ -1,0 +1,6 @@
+-- AlterTable
+ALTER TABLE "Task" ADD COLUMN     "category" TEXT NOT NULL DEFAULT 'CORRECTION',
+ADD COLUMN     "completedAt" TIMESTAMP(3),
+ADD COLUMN     "is_incidence" BOOLEAN NOT NULL DEFAULT false,
+ADD COLUMN     "order" INTEGER NOT NULL DEFAULT 0,
+ADD COLUMN     "status" TEXT NOT NULL DEFAULT 'pending';

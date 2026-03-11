@@ -1,5 +1,6 @@
 import { Router } from "express";
 import { register, login } from "../controllers/authController.js";
+import { getAllUsers } from "../controllers/userController.js";
 
 const router = Router();
 
@@ -131,5 +132,48 @@ router.post("/register", register);
  *         description: Invalid credentials
  */
 router.post("/login", login);
+
+/**
+ * @swagger
+ * /api/auth/users:
+ *   get:
+ *     summary: Get all registered users
+ *     tags: [Auth]
+ *     responses:
+ *       200:
+ *         description: List of all registered users
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 count:
+ *                   type: number
+ *                   example: 5
+ *                 users:
+ *                   type: array
+ *                   items:
+ *                     type: object
+ *                     properties:
+ *                       id:
+ *                         type: string
+ *                       name:
+ *                         type: string
+ *                       email:
+ *                         type: string
+ *                       username:
+ *                         type: string
+ *                       avatar:
+ *                         type: string
+ *                         nullable: true
+ *                       role:
+ *                         type: string
+ *                       trade:
+ *                         type: string
+ *                         nullable: true
+ *       500:
+ *         description: Server error
+ */
+router.get("/users", getAllUsers);
 
 export default router;

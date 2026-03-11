@@ -47,7 +47,7 @@ const router = Router();
  *       401:
  *         description: Unauthorized
  */
-router.post("/", protect, authorize("ADMIN", "PROFESSIONAL"), create);
+router.post("/", protect, authorize("PROFESSIONAL"), create);
 
 /**
  * @swagger
@@ -69,7 +69,7 @@ router.post("/", protect, authorize("ADMIN", "PROFESSIONAL"), create);
  *       401:
  *         description: Unauthorized
  */
-router.get("/", protect, authorize("ADMIN", "PROFESSIONAL", "USER"), getAll);
+router.get("/", protect, authorize("PROFESSIONAL"), getAll);
 
 /**
  * @swagger
@@ -93,7 +93,7 @@ router.get("/", protect, authorize("ADMIN", "PROFESSIONAL", "USER"), getAll);
  *       401:
  *         description: Unauthorized
  */
-router.get("/:id/metrics", protect, authorize("ADMIN", "PROFESSIONAL", "USER"), getProjectDashboardMetrics);
+router.get("/:id/metrics", protect, authorize("PROFESSIONAL"), getProjectDashboardMetrics);
 
 /**
  * @swagger
@@ -113,7 +113,7 @@ router.get("/:id/metrics", protect, authorize("ADMIN", "PROFESSIONAL", "USER"), 
  *       200:
  *         description: Project phases retrieved successfully
  */
-router.get("/:id/phases", protect, authorize("ADMIN", "PROFESSIONAL", "USER"), getPhases);
+router.get("/:id/phases", protect, authorize("PROFESSIONAL"), getPhases);
 
 /**
  * @swagger
@@ -133,7 +133,7 @@ router.get("/:id/phases", protect, authorize("ADMIN", "PROFESSIONAL", "USER"), g
  *       200:
  *         description: Project history retrieved successfully
  */
-router.get("/:id/history", protect, authorize("ADMIN", "PROFESSIONAL", "USER"), getHistory);
+router.get("/:id/history", protect, authorize("PROFESSIONAL"), getHistory);
 
 /**
  * @swagger
@@ -162,7 +162,7 @@ router.get("/:id/history", protect, authorize("ADMIN", "PROFESSIONAL", "USER"), 
  *         description: Unauthorized
  */
 
-router.get("/:id", protect, authorize("ADMIN", "PROFESSIONAL", "USER"), getOne);
+router.get("/:id", protect, authorize("PROFESSIONAL"), getOne);
 
 /**
  * @swagger
@@ -196,7 +196,7 @@ router.get("/:id", protect, authorize("ADMIN", "PROFESSIONAL", "USER"), getOne);
  *       401:
  *         description: Unauthorized
  */
-router.put("/:id", protect, authorize("ADMIN", "PROFESSIONAL"), update);
+router.put("/:id", protect, authorize("PROFESSIONAL"), update);
 
 /**
  * @swagger
@@ -228,6 +228,6 @@ router.put("/:id", protect, authorize("ADMIN", "PROFESSIONAL"), update);
  *       401:
  *         description: Unauthorized
  */
-router.delete("/:id", protect, authorize("ADMIN"), remove);
+router.delete("/:id", protect, authorize("PROFESSIONAL"), remove);
 
 export default router;
