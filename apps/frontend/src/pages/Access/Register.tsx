@@ -165,7 +165,6 @@ const Register: React.FC = () => {
                 </div>
                 <select
                   name="trade"
-                  required
                   disabled={isLoading}
                   value={formData.trade}
                   className="bg_inputs text-zinc-600 placeholder:text-zinc-300 my-2 w-48 p-2 border-2 border-slate-300 rounded-md"

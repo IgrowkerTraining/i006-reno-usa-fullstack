@@ -37,3 +37,44 @@ export interface ProjectInput {
   structure_type: string;
   intervention_type: string;
 }
+
+// --- Fases del proyecto ---
+export interface ProjectPhase {
+  id: string;
+  name: string;
+  description?: string;
+  planned_start: string; // ISO date
+  planned_end: string;   // ISO date
+  status: string;
+  tasks: ProjectTask[];
+}
+
+// --- Tareas de cada fase ---
+export interface ProjectTask {
+  id: string;
+  name: string;
+  status: string;
+  category: string;
+  completedAt?: string;
+  trade?: string;
+}
+
+// --- Métricas del proyecto ---
+export interface ProjectMetrics {
+  progress: number;           // porcentaje completado
+  duration_days: number;      // duración estimada en días
+  active_trades: string[];    // trades activos
+}
+
+// --- Historial de tareas completadas ---
+export interface ProjectHistoryItem {
+  taskId: string;
+  taskName: string;
+  completedAt: string;   // ISO date
+  completedBy: string;  // nombre del usuario
+  phase: string;        // nombre de la fase
+}
+
+export interface ProjectTaskStatusUpdate {
+  tasksId: string[]; //debe de ser un array de string
+}

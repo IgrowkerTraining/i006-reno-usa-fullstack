@@ -68,7 +68,7 @@ const Dashboard: React.FC = () => {
           <div className="text-center text-black bg-white">
             <p className="text-xl font-extrabold pt-10">There are no active projects</p>
             <div className="p-2 mx-4 text-center rounded-md bg-blue-900 mt-10">
-              <button type="submit" className="text-white text-xl font-mono hover:bg-blue-600 hover:scale-95 transition-transform" onClick={() => navigate("#")}>
+              <button type="submit" className="text-white text-xl font-mono hover:bg-blue-600 hover:scale-95 transition-transform" onClick={() => navigate("/register-project")}>
                 New Project
               </button>
             </div>

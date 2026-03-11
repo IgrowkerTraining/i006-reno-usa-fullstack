@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 
 //hooks
@@ -11,25 +11,45 @@ import safetyStandards from "./security_standard";
 //components
 import { DonutChart } from "../../components/common/DonutChart";
 import { PhaseIcons } from "./phase_icons";
+import { projectService } from "@/src/services/project.service";
+import { taskService } from "@/src/services/taskServices";
 
 export const ProgressReport = () => {
 
     const { id } = useParams();
     const { project, loading, error, refetch } = useProject(id);
-    const [phases, setPhases] = useState(safetyStandards);
+    const [phases, setPhases] = useState([]);
+
+    const normalizedTrades = project?.trades?.map(t => t.toLowerCase()) || [];
+
+    useEffect(() => {
+        if (project?.phases) {
+            setPhases(project.phases);
+        }
+    }, [project]);
 
     const getPendingTasks = (phases) => {
-        // search for the first phase not completed
+        if (!phases.length) return [];
         const currentPhase = phases.find(phase => phase.status !== "completed");
-        if (!currentPhase) return <p>"All tasks are completed."</p>; //if all phases are completed
-        //return all task from said phase, if all completed will move to next phase
-        return currentPhase.tasks
+        return currentPhase?.tasks || [];
     };
 
-    const tasks = project?.phases?.flatMap(phase => phase.tasks) || [];
-    const testTasks = getPendingTasks(phases);
-
     const completedTasks = phases.flatMap(phase => phase.tasks).filter(task => task.status === "completed");
+
+    const calculateProgress = (phases) => {
+        if (!phases.length) return 0;
+        let total = 0, completed = 0;
+        phases.forEach(phase => phase.tasks.forEach(task => {
+            total++;
+            if (task.status === "completed") completed++;
+        }));
+        return total === 0 ? 0 : Math.round((completed / total) * 100);
+    };
+
+    const progress = calculateProgress(phases);
+
+    // const tasks = project?.phases?.flatMap(phase => phase.tasks) || [];
+    // const testTasks = getPendingTasks(phases);
 
     const formatDate = (isoString) => {
         if (!isoString) return "";
@@ -43,63 +63,55 @@ export const ProgressReport = () => {
     };
 
     const handleCheckboxChange = (taskId) => {
-        setPhases(prevPhases =>
-            prevPhases.map(phase => ({
-                ...phase,
-                tasks: phase.tasks.map(task => {
-                    if (task.id !== taskId) return task;
+        const updatedPhases = phases.map(phase => ({
+            ...phase,
+            tasks: phase.tasks.map(task => {
+                if (task.id !== taskId) return task;
 
-                    const isCompleted = task.status === "completed";
+                const isCompleted = task.completedAt != null;
 
-                    return {
-                        ...task,
-                        status: isCompleted ? "pending" : "completed",
-                        completedAt: isCompleted ? null : new Date().toISOString(),
-                        completedBy: isCompleted ? null : "currentUser"
-                    };
-                })
-            }))
-        );
-    };
-
-    const handleUpdate = () => {
-        //add backend call here
-        console.log("Saving changes:", phases);
-        //will change status of the phase to completed if all tasks are completed, otherwise pending
-        setPhases(prevPhases =>
-            prevPhases.map(phase => {
-                const allTasksCompleted = phase.tasks.every(task => task.status === "completed");
                 return {
-                    ...phase,
-                    status: allTasksCompleted ? "completed" : "pending"
+                    ...task,
+                    status: isCompleted ? "pending" : "completed",
+                    completedAt: isCompleted ? null : new Date().toISOString(),
+                    completedBy: isCompleted ? null : "currentUser"
                 };
             })
-        );
-        refetch();
+        }));
+
+        setPhases(updatedPhases);
+    };
+
+    const handleUpdate = async () => {
+        try {
+            // Obtener todas las tareas que están marcadas como completed en el frontend
+            const completedTaskIds = phases
+                .flatMap(phase => phase.tasks)
+                .filter(task => task.status === "completed")
+                .map(task => task.id);
+
+            if (!completedTaskIds.length) {
+                console.log("No tasks to update");
+                return;
+            }
+
+            console.log(completedTaskIds);
+
+            // Llamar al endpoint existente del backend
+            await taskService.updateTaskStatus({ tasksIds: completedTaskIds });
+
+            console.log("Tasks updated successfully");
+
+            // Refetch project data
+            refetch();
+        } catch (err) {
+            console.error(err);
+            alert(err.message || "Error updating tasks");
+        }
     };
 
     if (loading) return <div>Loading...</div>;
     if (error) return <div>Error: {error}</div>;
-
-    const calculateProgress = (project) => {
-        if (!project?.phases?.length) return 0;
-
-        let totalTasks = 0;
-        let completedTasks = 0;
-
-        project.phases.forEach(phase => {
-            phase.tasks?.forEach(task => {
-                totalTasks += 1;
-                if (task.completed) completedTasks += 1;
-            });
-        });
-
-        if (totalTasks === 0) return 0;
-
-        return Math.round((completedTasks / totalTasks) * 100);
-    };
-
-    const progress = calculateProgress(project);
 
     return (
         <div className="justify-center bg-blue-50 px-20">
@@ -113,7 +125,7 @@ export const ProgressReport = () => {
                     {project?.trades?.length ? (
                         icons_trades_types
                             .filter(trade =>
-                                project?.trades?.includes(trade.trade_type)
+                                normalizedTrades.includes(trade.trade_type.toLowerCase())
                             )
                             .map((trade) => (
                                 <span
@@ -125,7 +137,7 @@ export const ProgressReport = () => {
                                 </span>
                             ))
                     ) : (
-                        <p className="text-slate-500">
+                        <p className="text-slate-500 font-bold">
                             There're no trades assigned to this project.
                         </p>
                     )}
@@ -146,7 +158,7 @@ export const ProgressReport = () => {
                         <h3 className="text-slate-500">(Check the completed tasks)</h3>
                     </div>
                     <div className="mx-4 p-8">
-                        {testTasks.map((task) => (
+                        {getPendingTasks(phases).map((task) => (
                             <div key={task.id} className="text-slate-500">
                                 <label className="flex items-center gap-2 cursor-pointer">
                                     <input
