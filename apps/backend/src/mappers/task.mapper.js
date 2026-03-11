@@ -1,6 +1,4 @@
-// src/mappers/task.mapper.js
 export const mapTask = (task) => {
-  // Historial de ejecuciones de la tarea
   const record_history =
     task.executedTasks?.map((execution) => ({
       completed_at: execution.dailyLog?.log_date
@@ -17,11 +15,7 @@ export const mapTask = (task) => {
     id: task.id,
     name: task.name,
     description: task.description || "",
-    status:
-      record_history.length > 0 &&
-      record_history.every((r) => r.completed_at)
-        ? "completed"
-        : "pending",
+    status: task.status || "pending", 
     record_history,
   };
 };
