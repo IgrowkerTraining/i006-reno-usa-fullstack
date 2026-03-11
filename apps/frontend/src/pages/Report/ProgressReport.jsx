@@ -147,6 +147,7 @@ export const ProgressReport = () => {
                     </div>
                     <div className="mx-4 p-8">
                         {testTasks.map((task) => (
+
                             <div key={task.id} className="text-slate-500">
                                 <label className="flex items-center gap-2 cursor-pointer">
                                     <input
