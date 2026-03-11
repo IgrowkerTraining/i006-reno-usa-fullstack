@@ -6,7 +6,6 @@ import { useProject } from "@/src/hooks/useProject";
 
 //utils
 import icons_trades_types from "../../components/common/icons_trades_types";
-import safetyStandards from "./security_standard";
 
 //components
 import { DonutChart } from "../../components/common/DonutChart";
@@ -19,14 +18,40 @@ export const ProgressReport = () => {
     const { id } = useParams();
     const { project, loading, error, refetch } = useProject(id);
     const [phases, setPhases] = useState([]);
+    const [updatedHistory, setUpdatedHistory] = useState([]);
 
     const normalizedTrades = project?.trades?.map(t => t.toLowerCase()) || [];
 
-    useEffect(() => {
-        if (project?.phases) {
-            setPhases(project.phases);
+    const loadHistory = async () => {
+        if (!project?.id) return;
+
+        try {
+            const history = await projectService.getHistory(project.id);
+            setUpdatedHistory(history.data || []);
+        } catch (err) {
+            console.error("Error loading history:", err);
+            setUpdatedHistory([]);
         }
-    }, [project]);
+    };
+
+    const loadPhases = async () => {
+        if (!project?.id) return;
+
+        try {
+            const response = await projectService.getPhases(project.id);
+            setPhases(response.data || []);
+        } catch (err) {
+            console.error("Error loading phases:", err);
+            setPhases([]);
+        }
+    };
+
+    useEffect(() => {
+        if (project?.id) {
+            loadHistory();
+            loadPhases();
+        }
+    }, [project?.id]);
 
     const getPendingTasks = (phases) => {
         if (!phases.length) return [];
@@ -34,15 +59,19 @@ export const ProgressReport = () => {
         return currentPhase?.tasks || [];
     };
 
-    const completedTasks = phases.flatMap(phase => phase.tasks).filter(task => task.status === "completed");
-
     const calculateProgress = (phases) => {
         if (!phases.length) return 0;
-        let total = 0, completed = 0;
-        phases.forEach(phase => phase.tasks.forEach(task => {
-            total++;
-            if (task.status === "completed") completed++;
-        }));
+
+        let total = 0;
+        let completed = 0;
+
+        phases.forEach(phase => {
+            (phase.tasks || []).forEach(task => {
+                total++;
+                if (task.status === "completed") completed++;
+            });
+        });
+
         return total === 0 ? 0 : Math.round((completed / total) * 100);
     };
 
@@ -84,7 +113,6 @@ export const ProgressReport = () => {
 
     const handleUpdate = async () => {
         try {
-            // Obtener todas las tareas que están marcadas como completed en el frontend
             const completedTaskIds = phases
                 .flatMap(phase => phase.tasks)
                 .filter(task => task.status === "completed")
@@ -95,15 +123,11 @@ export const ProgressReport = () => {
                 return;
             }
 
-            console.log(completedTaskIds);
+            await projectService.updateTaskStatus({ taskIds: completedTaskIds });
 
-            // Llamar al endpoint existente del backend
-            await taskService.updateTaskStatus({ tasksIds: completedTaskIds });
+            await loadPhases();
+            await loadHistory();
 
-            console.log("Tasks updated successfully");
-
-            // Refetch project data
-            refetch();
         } catch (err) {
             console.error(err);
             alert(err.message || "Error updating tasks");
@@ -150,7 +174,7 @@ export const ProgressReport = () => {
                 </div>
                 <div className="my-8">
                     <h3 className="mb-4 text-blue-800 font-bold text-lg flex items-center">Advance {progress}%</h3>
-                    <div className="ps-16"><DonutChart progress={progress} radiusChart={175} strokeChart={75}/></div>
+                    <div className="ps-16"><DonutChart progress={progress} radiusChart={175} strokeChart={75} /></div>
                 </div>
                 <div className="my-10 bg-blue-100 rounded-md">
                     <div className="justify-items-center mt-6 mt-2 pt-3">
@@ -207,7 +231,7 @@ export const ProgressReport = () => {
             <div className="mt-6 mb-20 bg-orange-100 p-6 rounded-md">
                 <h2 className="text-blue-900 w-full text-2xl font-bold mb-5">Record History</h2>
                 <ul className="space-y-0">
-                    {completedTasks.length > 0 ? completedTasks.map((task) => (
+                    {updatedHistory.length > 0 ? updatedHistory.map((task) => (
                         <li key={task.id} className="inline">
                             <div className="flex gap-3 items-center">
                                 <svg width="15" height="15" viewBox="0 0 15 15" fill="none" xmlns="http://www.w3.org/2000/svg">

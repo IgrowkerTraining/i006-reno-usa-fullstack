@@ -87,7 +87,7 @@ const Register: React.FC = () => {
         name: formData.name + " " + formData.lastName.trim(),
         email: formData.email.trim(),
         password: formData.password.trim(),
-        role: formData.role.trim().toUpperCase() || "USER",
+        role: formData.role.trim() || "user",
         trade: formData.trade.trim() || null
       });
       login(response.user);
@@ -161,7 +161,7 @@ const Register: React.FC = () => {
 
               <div className={formData.role === "user" ? "md:col-span-2" : "hidden"}>
                 <div className="text-zinc-600 mb-2">
-                  <label htmlFor="role">Select your trade:</label>
+                  <label htmlFor="trade">Select your trade:</label>
                 </div>
                 <select
                   name="trade"
@@ -181,7 +181,7 @@ const Register: React.FC = () => {
 
             <div className="md:col-span-2">
               <div className="text-zinc-600 mb-2">
-                <label htmlFor="role">Name:</label>
+                <label htmlFor="name">Name:</label>
               </div>
               <Input
                 name="name"
@@ -195,7 +195,7 @@ const Register: React.FC = () => {
             </div>
             <div className="md:col-span-2">
               <div className="text-zinc-600 mb-2">
-                <label htmlFor="role">Last name:</label>
+                <label htmlFor="lastName">Last name:</label>
               </div>
               <Input
                 name="lastName"
@@ -209,7 +209,7 @@ const Register: React.FC = () => {
             </div>
             <div className="md:col-span-2">
               <div className="text-zinc-600 mb-2">
-                <label htmlFor="role">Email:</label>
+                <label htmlFor="email">Email:</label>
               </div>
               <Input
                 name="email"
@@ -225,7 +225,7 @@ const Register: React.FC = () => {
 
             <div className="md:col-span-2">
               <div className="text-zinc-600 mb-2">
-                <label htmlFor="role">Password:</label>
+                <label htmlFor="password">Password:</label>
               </div>
               <Input
                 name="password"
@@ -242,7 +242,7 @@ const Register: React.FC = () => {
 
             <div className="md:col-span-2">
               <div className="text-zinc-600 mb-2">
-                <label htmlFor="role">Confirm password:</label>
+                <label htmlFor="confirmPassword">Confirm password:</label>
               </div>
               <Input
                 name="confirmPassword"

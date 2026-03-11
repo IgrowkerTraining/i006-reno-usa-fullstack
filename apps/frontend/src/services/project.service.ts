@@ -88,14 +88,27 @@ export const projectService = {
     return response.json();
   },
 
-  updateTaskStatus: async (tasksId: string[]) => {
-    const response = await fetch(`${API_URL}/tasks/log-progress`, {
-      method: 'PATCH',
-      headers: { 'Content-Type': 'application/json' },
-      credentials: 'include',
-      body: JSON.stringify({ tasksId }),
+  getMyPendingTasks: async (projectId: string) => {
+  const response = await fetch(`${API_URL}/tasks/my-pending-tasks?projectId=${projectId}`, {
+    method: 'GET',
+    headers: { 'Content-Type': 'application/json' },
+    credentials: 'include',
+  });
+
+  if (!response.ok) throw new Error('Error obtaining pending tasks');
+
+  return response.json();
+},
+
+  updateTaskStatus: async (data: { taskIds: string[] }) => {
+    const response = await fetch(`${API_ENDPOINTS.BASE}/api/tasks/log-progress`, {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      credentials: "include",
+      body: JSON.stringify(data),
     });
-    if (!response.ok) throw new Error('Error to update the tasks status');
+
+    if (!response.ok) throw new Error("Error to update the tasks status");
     return response.json();
   },
 };

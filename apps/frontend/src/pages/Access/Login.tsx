@@ -77,7 +77,7 @@ const Login: React.FC = () => {
 
             <div className="md:col-span-2">
               <div className="text-zinc-600 mb-2">
-                <label htmlFor="role">Email:</label>
+                <label htmlFor="email">Email:</label>
               </div>
               <Input
                 placeholder="name@company.com"
@@ -92,7 +92,7 @@ const Login: React.FC = () => {
 
             <div className="md:col-span-2">
               <div className="text-zinc-600 mb-2">
-                <label htmlFor="role">Password:</label>
+                <label htmlFor="password">Password:</label>
               </div>
               <Input
                 placeholder="••••••••"
