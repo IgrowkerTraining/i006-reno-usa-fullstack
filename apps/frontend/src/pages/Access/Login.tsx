@@ -12,7 +12,7 @@ import { Input } from "../../components/common/Input";
 import { Button } from "../../components/common/Button";
 
 //services
-import { api } from "../../services/api";
+import { api } from "../../services/authServices";
 
 //hooks
 import { useAuth } from "../../hooks/useAuth";
@@ -44,7 +44,7 @@ const Login: React.FC = () => {
   return (
     <div className="min-h-screen flex items-center justify-center p-8 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-blue-400">
       <div className="w-full max-w-md">
-        <div className="bg-white backdrop-blur-xl p-8 rounded-2xl shadow-2xl">
+        <div className="bg-white p-8 rounded-2xl shadow-2xl">
           <div className="flex flex-col items-center mb-10">
             <div className="w-32 h-32 rounded-xl items-center justify-center mb-4">
               <img alt="Reno" src={RenoLogo} className="h-32 w-auto" />
@@ -75,27 +75,35 @@ const Login: React.FC = () => {
               </div>
             )}
 
-            <Input
-              label="Correo electrónico"
-              placeholder="name@company.com"
-              type="email"
-              required
-              disabled={isLoading}
-              value={email}
-              className="text-zinc-600 bg-white placeholder:text-zinc-300"
-              onChange={(e) => setEmail(e.target.value)}
-            />
+            <div className="md:col-span-2">
+              <div className="text-zinc-600 mb-2">
+                <label htmlFor="role">Email:</label>
+              </div>
+              <Input
+                placeholder="name@company.com"
+                type="email"
+                required
+                disabled={isLoading}
+                value={email}
+                className="bg_inputs text-zinc-600 placeholder:text-zinc-300"
+                onChange={(e) => setEmail(e.target.value)}
+              />
+            </div>
 
-            <Input
-              label="Contraseña"
-              placeholder="••••••••"
-              type="password"
-              required
-              disabled={isLoading}
-              value={password}
-              className="text-zinc-600 bg-white placeholder:text-zinc-300"
-              onChange={(e) => setPassword(e.target.value)}
-            />
+            <div className="md:col-span-2">
+              <div className="text-zinc-600 mb-2">
+                <label htmlFor="role">Password:</label>
+              </div>
+              <Input
+                placeholder="••••••••"
+                type="password"
+                required
+                disabled={isLoading}
+                value={password}
+                className="bg_inputs text-zinc-600 placeholder:text-zinc-300"
+                onChange={(e) => setPassword(e.target.value)}
+              />
+            </div>
 
             <div className="flex items-center justify-between">
               <label className="flex items-center gap-2 cursor-pointer">
@@ -103,32 +111,32 @@ const Login: React.FC = () => {
                   type="checkbox"
                   className="w-4 h-4 rounded border-slate-700 accent-blue-800 focus:ring-blue-700 focus:ring-offset-slate-900"
                 />
-                <span className="text-sm text-slate-500 my-2">Recuérdame</span>
+                <span className="text-sm text-slate-500 my-2">Remember me</span>
               </label>
               <button
                 type="button"
                 className="text-sm text-blue-400 hover:text-blue-600 font-medium transition-colors"
               >
-                Recuperar contraseña
+                Recover password
               </button>
             </div>
 
             <Button
               type="submit"
-              className="w-full mt-4 bg-blue-900 hover:bg-blue-600"
+              className="w-full mt-4 bg-blue-900 hover:bg-blue-700"
               isLoading={isLoading}>
-              Acceder
+              Log In
             </Button>
           </form>
 
           <div className="mt-8 pt-6 border-t border-slate-800 text-center">
             <p className="text-slate-400 text-sm">
-              ¿No tienes una cuenta?{" "}
+              You don't have an account?{" "}
               <Link
                 to="/register"
                 className="text-blue-400 hover:text-blue-600 font-semibold transition-colors"
               >
-                Registrarse
+                Sign up
               </Link>
             </p>
           </div>

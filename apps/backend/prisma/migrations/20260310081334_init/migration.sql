@@ -1,3 +1,6 @@
+-- CreateEnum
+CREATE TYPE "Role" AS ENUM ('USER', 'PROFESSIONAL', 'ADMIN');
+
 -- CreateTable
 CREATE TABLE "User" (
     "id" TEXT NOT NULL,
@@ -6,9 +9,19 @@ CREATE TABLE "User" (
     "password" TEXT NOT NULL,
     "username" TEXT NOT NULL,
     "avatar" TEXT,
-    "role" TEXT NOT NULL,
+    "role" "Role" NOT NULL DEFAULT 'USER',
+    "trade" TEXT,
 
     CONSTRAINT "User_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE "ProjectTeamMember" (
+    "id" TEXT NOT NULL,
+    "projectId" TEXT NOT NULL,
+    "userId" TEXT NOT NULL,
+
+    CONSTRAINT "ProjectTeamMember_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateTable
@@ -16,10 +29,15 @@ CREATE TABLE "Project" (
     "id" TEXT NOT NULL,
     "code" TEXT NOT NULL,
     "name" TEXT NOT NULL,
+    "category" TEXT NOT NULL,
+    "initial_status" TEXT,
+    "assignedProfessionalId" TEXT,
+    "trades" TEXT[],
+    "project_plan_photo" TEXT,
     "location" TEXT NOT NULL,
-    "surface_sqft" DOUBLE PRECISION NOT NULL,
-    "structure_type" TEXT NOT NULL,
-    "intervention_type" TEXT NOT NULL,
+    "surface_sqft" DOUBLE PRECISION,
+    "structure_type" TEXT,
+    "intervention_type" TEXT,
     "userId" TEXT NOT NULL,
 
     CONSTRAINT "Project_pkey" PRIMARY KEY ("id")
@@ -29,9 +47,11 @@ CREATE TABLE "Project" (
 CREATE TABLE "Phase" (
     "id" TEXT NOT NULL,
     "name" TEXT NOT NULL,
+    "description" TEXT,
     "planned_start" TIMESTAMP(3) NOT NULL,
     "planned_end" TIMESTAMP(3) NOT NULL,
     "projectId" TEXT NOT NULL,
+    "status" TEXT NOT NULL DEFAULT 'pending',
 
     CONSTRAINT "Phase_pkey" PRIMARY KEY ("id")
 );
@@ -50,19 +70,27 @@ CREATE TABLE "Task" (
     "id" TEXT NOT NULL,
     "name" TEXT NOT NULL,
     "description" TEXT,
+    "status" TEXT NOT NULL DEFAULT 'pending',
+    "category" TEXT NOT NULL DEFAULT 'CORRECTION',
+    "order" INTEGER NOT NULL DEFAULT 0,
+    "is_incidence" BOOLEAN NOT NULL DEFAULT false,
+    "completedAt" TIMESTAMP(3),
     "phaseId" TEXT NOT NULL,
-    "tradeId" TEXT NOT NULL,
+    "tradeId" TEXT,
 
     CONSTRAINT "Task_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateTable
-CREATE TABLE "ExecutedTask" (
+CREATE TABLE "TaskExecution" (
     "id" TEXT NOT NULL,
     "taskId" TEXT NOT NULL,
     "dailyLogId" TEXT NOT NULL,
+    "progressPercentage" DOUBLE PRECISION,
+    "notes" TEXT,
+    "executedAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
 
-    CONSTRAINT "ExecutedTask_pkey" PRIMARY KEY ("id")
+    CONSTRAINT "TaskExecution_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateTable
@@ -166,6 +194,18 @@ CREATE UNIQUE INDEX "User_email_key" ON "User"("email");
 -- CreateIndex
 CREATE UNIQUE INDEX "Project_code_key" ON "Project"("code");
 
+-- CreateIndex
+CREATE UNIQUE INDEX "TaskExecution_taskId_dailyLogId_key" ON "TaskExecution"("taskId", "dailyLogId");
+
+-- AddForeignKey
+ALTER TABLE "ProjectTeamMember" ADD CONSTRAINT "ProjectTeamMember_projectId_fkey" FOREIGN KEY ("projectId") REFERENCES "Project"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "ProjectTeamMember" ADD CONSTRAINT "ProjectTeamMember_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "Project" ADD CONSTRAINT "Project_assignedProfessionalId_fkey" FOREIGN KEY ("assignedProfessionalId") REFERENCES "User"("id") ON DELETE SET NULL ON UPDATE CASCADE;
+
 -- AddForeignKey
 ALTER TABLE "Project" ADD CONSTRAINT "Project_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
@@ -176,19 +216,19 @@ ALTER TABLE "Phase" ADD CONSTRAINT "Phase_projectId_fkey" FOREIGN KEY ("projectI
 ALTER TABLE "Task" ADD CONSTRAINT "Task_phaseId_fkey" FOREIGN KEY ("phaseId") REFERENCES "Phase"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "Task" ADD CONSTRAINT "Task_tradeId_fkey" FOREIGN KEY ("tradeId") REFERENCES "Trade"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "Task" ADD CONSTRAINT "Task_tradeId_fkey" FOREIGN KEY ("tradeId") REFERENCES "Trade"("id") ON DELETE SET NULL ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "ExecutedTask" ADD CONSTRAINT "ExecutedTask_taskId_fkey" FOREIGN KEY ("taskId") REFERENCES "Task"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "TaskExecution" ADD CONSTRAINT "TaskExecution_dailyLogId_fkey" FOREIGN KEY ("dailyLogId") REFERENCES "DailyLog"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "ExecutedTask" ADD CONSTRAINT "ExecutedTask_dailyLogId_fkey" FOREIGN KEY ("dailyLogId") REFERENCES "DailyLog"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
-
--- AddForeignKey
-ALTER TABLE "DailyLog" ADD CONSTRAINT "DailyLog_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "TaskExecution" ADD CONSTRAINT "TaskExecution_taskId_fkey" FOREIGN KEY ("taskId") REFERENCES "Task"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "DailyLog" ADD CONSTRAINT "DailyLog_phaseId_fkey" FOREIGN KEY ("phaseId") REFERENCES "Phase"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "DailyLog" ADD CONSTRAINT "DailyLog_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "Incident" ADD CONSTRAINT "Incident_dailyLogId_fkey" FOREIGN KEY ("dailyLogId") REFERENCES "DailyLog"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
@@ -200,10 +240,10 @@ ALTER TABLE "SafetyMeasure" ADD CONSTRAINT "SafetyMeasure_dailyLogId_fkey" FOREI
 ALTER TABLE "WorkerCoverage" ADD CONSTRAINT "WorkerCoverage_dailyLogId_fkey" FOREIGN KEY ("dailyLogId") REFERENCES "DailyLog"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "TechnicalApproval" ADD CONSTRAINT "TechnicalApproval_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "TechnicalApproval" ADD CONSTRAINT "TechnicalApproval_phaseId_fkey" FOREIGN KEY ("phaseId") REFERENCES "Phase"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "TechnicalApproval" ADD CONSTRAINT "TechnicalApproval_phaseId_fkey" FOREIGN KEY ("phaseId") REFERENCES "Phase"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "TechnicalApproval" ADD CONSTRAINT "TechnicalApproval_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "ProjectSnapshot" ADD CONSTRAINT "ProjectSnapshot_projectId_fkey" FOREIGN KEY ("projectId") REFERENCES "Project"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
@@ -212,7 +252,7 @@ ALTER TABLE "ProjectSnapshot" ADD CONSTRAINT "ProjectSnapshot_projectId_fkey" FO
 ALTER TABLE "AIReport" ADD CONSTRAINT "AIReport_projectSnapshotId_fkey" FOREIGN KEY ("projectSnapshotId") REFERENCES "ProjectSnapshot"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "MaterialUsage" ADD CONSTRAINT "MaterialUsage_executedTaskId_fkey" FOREIGN KEY ("executedTaskId") REFERENCES "ExecutedTask"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "MaterialUsage" ADD CONSTRAINT "MaterialUsage_executedTaskId_fkey" FOREIGN KEY ("executedTaskId") REFERENCES "TaskExecution"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "MaterialUsage" ADD CONSTRAINT "MaterialUsage_materialId_fkey" FOREIGN KEY ("materialId") REFERENCES "Material"("id") ON DELETE RESTRICT ON UPDATE CASCADE;

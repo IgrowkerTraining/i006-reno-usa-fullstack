@@ -6,15 +6,15 @@ export const ROUTES = {
 } as const;
 
 export const API_ENDPOINTS = {
-  BASE: 'https://vigilant-meme-q7x5wvrwjpv5cx9jg-3000.app.github.dev/api',
+  BASE: import.meta.env.VITE_API_BASE_URL || "http://localhost:3000",
   AUTH: {
-    LOGIN: '/auth/login',
-    REGISTER: '/auth/register',
+    LOGIN: '/api/auth/login',
+    REGISTER: '/api/auth/register',
   },
   HEALTH: '/health',
 } as const;
 
 export const STORAGE_KEYS = {
-  USER: 'example_user',
-  TOKEN: 'example_token',
+  USER: 'user',
+  TOKEN: 'token',
 } as const;

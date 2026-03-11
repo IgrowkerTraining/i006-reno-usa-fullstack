@@ -1,53 +1,131 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { useParams } from "react-router-dom";
+
+//hooks
+import { useProject } from "@/src/hooks/useProject";
 
 //utils
-import icons_trades_types from "./icons_trades_types";
+import icons_trades_types from "../../components/common/icons_trades_types";
 import safetyStandards from "./security_standard";
+
+//components
+import { DonutChart } from "../../components/common/DonutChart";
+import { PhaseIcons } from "./phase_icons";
+import { projectService } from "@/src/services/project.service";
+import { taskService } from "@/src/services/taskServices";
 
 export const ProgressReport = () => {
 
-    const [projectDetails, setProjectDetails] = useState({
-        name: "Proyecto Gamma",
-        progress: 65,
-        trades_involved: ["Electricista", "Albañil", "Fontanero"],
-        security_standards: {
-            "OSHA 1926": true,
-            "ANSI A10 Series": false,
-            "NFPA 70": true,
-            "NFPA 241": false,
-            "EPA Asbestos Regulations": false,
-            "EPA Lead Renovation, Repair and Painting (RRP) Rule": true,
-            "NIOSH Guidelines": false,
-            "ANSI/ASSE Z117.1": false,
-            "OSHA 1910 Subpart D": false,
-            "OSHA 1910 Subpart F": false,
-            "ANSI/ISEA Z89.1": false,
-            "ANSI/ISEA Z87.1": false,
-            "NFPA 101": false,
-            "OSHA 1910.120": false
+    const { id } = useParams();
+    const { project, loading, error, refetch } = useProject(id);
+    const [phases, setPhases] = useState([]);
+
+    const normalizedTrades = project?.trades?.map(t => t.toLowerCase()) || [];
+
+    useEffect(() => {
+        if (project?.phases) {
+            setPhases(project.phases);
         }
-    })
+    }, [project]);
+
+    const getPendingTasks = (phases) => {
+        if (!phases.length) return [];
+        const currentPhase = phases.find(phase => phase.status !== "completed");
+        return currentPhase?.tasks || [];
+    };
+
+    const completedTasks = phases.flatMap(phase => phase.tasks).filter(task => task.status === "completed");
+
+    const calculateProgress = (phases) => {
+        if (!phases.length) return 0;
+        let total = 0, completed = 0;
+        phases.forEach(phase => phase.tasks.forEach(task => {
+            total++;
+            if (task.status === "completed") completed++;
+        }));
+        return total === 0 ? 0 : Math.round((completed / total) * 100);
+    };
+
+    const progress = calculateProgress(phases);
+
+    // const tasks = project?.phases?.flatMap(phase => phase.tasks) || [];
+    // const testTasks = getPendingTasks(phases);
+
+    const formatDate = (isoString) => {
+        if (!isoString) return "";
+        const date = new Date(isoString);
+
+        return date.toLocaleString("en-GB", {
+            day: "2-digit",
+            month: "numeric",
+            year: "numeric"
+        });
+    };
+
+    const handleCheckboxChange = (taskId) => {
+        const updatedPhases = phases.map(phase => ({
+            ...phase,
+            tasks: phase.tasks.map(task => {
+                if (task.id !== taskId) return task;
+
+                const isCompleted = task.completedAt != null;
+
+                return {
+                    ...task,
+                    status: isCompleted ? "pending" : "completed",
+                    completedAt: isCompleted ? null : new Date().toISOString(),
+                    completedBy: isCompleted ? null : "currentUser"
+                };
+            })
+        }));
+
+        setPhases(updatedPhases);
+    };
+
+    const handleUpdate = async () => {
+        try {
+            // Obtener todas las tareas que están marcadas como completed en el frontend
+            const completedTaskIds = phases
+                .flatMap(phase => phase.tasks)
+                .filter(task => task.status === "completed")
+                .map(task => task.id);
+
+            if (!completedTaskIds.length) {
+                console.log("No tasks to update");
+                return;
+            }
+
+            console.log(completedTaskIds);
+
+            // Llamar al endpoint existente del backend
+            await taskService.updateTaskStatus({ tasksIds: completedTaskIds });
+
+            console.log("Tasks updated successfully");
+
+            // Refetch project data
+            refetch();
+        } catch (err) {
+            console.error(err);
+            alert(err.message || "Error updating tasks");
+        }
+    };
+
+    if (loading) return <div>Loading...</div>;
+    if (error) return <div>Error: {error}</div>;
 
     return (
-        <div className="min-h-screen justify-center bg-blue-50 px-20">
-            <div className="grid grid-cols-3 gap-4 justify-between content-end pt-12 pb-4 border-b-2 border-blue-900">
-                <div className="col-start-1 col-end-3">
-                    <h1 className="text-blue-900 text-4xl font-bold">{projectDetails.name}</h1>
-                </div>
-                <div className="col-start-3 col-end-4 justify-self-end">
-                    <h1 className="text-blue-700 text-2xl font-bold">
-                        Fase | Estructura
-                    </h1>
-                </div>
+        <div className="justify-center bg-blue-50 px-20">
+            <div className="col-1 border-b-2 border-blue-900 pb-3 pt-6">
+                <h1 className="text-blue-900 text-4xl font-bold">{project.name}</h1>
             </div>
 
             <div className="grid grid-cols-1 gap-4 justify-between py-6">
-                <h2 className="text-blue-900 w-full text-2xl font-bold mb-5">Trades involucrados</h2>
+                <h2 className="text-blue-900 w-full text-2xl font-bold mb-5">Active Trades </h2>
                 <div className="col-start-1 col-end-4 flex flex-wrap">
-                    {projectDetails?.trades_involved?.length ? (
+                    {project?.trades?.length ? (
                         icons_trades_types
                             .filter(trade =>
-                                projectDetails.trades_involved.includes(trade.trade_type)
+                                normalizedTrades.includes(trade.trade_type.toLowerCase())
                             )
                             .map((trade) => (
                                 <span
@@ -59,106 +137,38 @@ export const ProgressReport = () => {
                                 </span>
                             ))
                     ) : (
-                        <p className="text-slate-500">
-                            No hay trades involucrados en este proyecto.
+                        <p className="text-slate-500 font-bold">
+                            There're no trades assigned to this project.
                         </p>
                     )}
                 </div>
             </div>
 
-            <div className="grid grid-cols-3 gap-4 justify-between pt-6 border-b-2 border-blue-900">
-                <div className="col-start-1 col-end-3">
-                    <h2 className="text-blue-900 w-full text-2xl font-bold mb-5">Registro de avances</h2>
+            <div className="grid grid-cols-2 justify-between pt-2 items-start">
+                <div className="col-span-1 col-span-2 mt-6 border-b-2 border-blue-900">
+                    <h2 className="text-blue-900 w-full text-2xl font-bold mb-5">Progress Tracking</h2>
                 </div>
-                <button type="button"
-                    className="bg-blue-900 text-white w-48 h-12 mb-2 py-1 px-1 rounded-md hover:bg-blue-700 justify-self-end">
-                    Agregar avance
-                </button>
-            </div>
-
-            <div className="grid grid-cols-3 gap-10 justify-between pt-6">
-                <div className="col-start-1 col-end-3">
-                    <div className="my-4">
-                        <h3 className="my-4 text-blue-700 font-bold text-lg">Avance {projectDetails.progress}%</h3>
-                        <svg
-                            width="400"
-                            height="400"
-                            viewBox="0 0 400 400"
-                            fill="none"
-                            xmlns="http://www.w3.org/2000/svg"
-                        >
-                            <path
-                                d="M200.002 3.72842e-09C228.956 0.000176621 257.565 6.28722 283.852 18.4267C310.139 30.5661 333.477 48.2685 352.252 70.3103C371.028 92.3522 384.793 118.208 392.598 146.091C400.403 173.974 402.06 203.219 397.455 231.805C392.851 260.391 382.095 287.636 365.929 311.658C349.764 335.68 328.576 355.906 303.829 370.937C279.082 385.969 251.366 395.448 222.597 398.719C193.828 401.991 164.692 398.977 137.202 389.885L168.602 294.942C182.347 299.488 196.915 300.995 211.3 299.36C225.685 297.724 239.543 292.985 251.916 285.469C264.29 277.953 274.884 267.841 282.967 255.829C291.049 243.818 296.428 230.196 298.73 215.902C301.032 201.609 300.204 186.987 296.301 173.045C292.399 159.104 285.516 146.176 276.128 135.155C266.74 124.134 255.071 115.282 241.927 109.213C228.784 103.143 214.479 99.9999 200.002 100L200.002 3.72842e-09Z"
-                                fill="url(#paint0_linear_370_1753)"
-                            />
-                            <path
-                                d="M137.202 389.885C92.0749 374.961 53.7383 344.453 29.0631 303.829C4.38782 263.205 -5.01301 215.121 2.54548 168.195C10.104 121.269 34.1276 78.5695 70.3108 47.7483C106.494 16.9271 152.471 -0.000289923 200.002 5.93553e-09L200.002 100C176.237 100 153.248 108.464 135.157 123.875C117.066 139.285 105.054 160.635 101.275 184.098C97.4959 207.56 102.196 231.602 114.533 251.914C126.871 272.225 146.039 287.48 168.602 294.942L137.202 389.885Z"
-                                fill="#B6D2FF"
-                            />
-                            <defs>
-                                <linearGradient
-                                    id="paint0_linear_370_1753"
-                                    x1="137"
-                                    y1="350.5"
-                                    x2="320.5"
-                                    y2="46"
-                                    gradientUnits="userSpaceOnUse"
-                                >
-                                    <stop offset="0.158604" stopColor="#3B64CE" />
-                                    <stop offset="1" stopColor="#1E3268" />
-                                </linearGradient>
-                            </defs>
-                        </svg>
-                    </div>
-                    <div className="my-10 bg-orange-100 p-6 rounded-md">
-                        <h2 className="text-blue-900 w-full text-2xl font-bold mb-5">Historial de registros</h2>
-                        <ul className="space-y-0">
-                            <li className="inline">
-                                <div className="flex gap-3 items-center">
-                                    <svg width="15" height="15" viewBox="0 0 15 15" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                        <path d="M7.32129 1.46387C10.5561 1.46387 13.1786 4.08654 13.1787 7.32129C13.1787 10.5561 10.5561 13.1787 7.32129 13.1787C4.08654 13.1786 1.46387 10.5561 1.46387 7.32129C1.46394 4.08659 4.08659 1.46394 7.32129 1.46387Z" fill="white" stroke="#1890FF" strokeWidth="2.92857" />
-                                    </svg>
-
-                                    <span className="font-medium text-slate-500">01/02/26</span>
-                                    <span className="text-slate-700">Chequeo de cimientos</span>
-                                </div>
-                                <div className="text-zinc-300 text-xl text-start w-12 ms-0.5">|</div>
-                            </li>
-
-                            <li className="gap-3 items-center">
-
-                                <div className="flex gap-3 items-center">
-                                    <svg width="15" height="15" viewBox="0 0 15 15" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                        <path d="M7.32129 1.46387C10.5561 1.46387 13.1786 4.08654 13.1787 7.32129C13.1787 10.5561 10.5561 13.1787 7.32129 13.1787C4.08654 13.1786 1.46387 10.5561 1.46387 7.32129C1.46394 4.08659 4.08659 1.46394 7.32129 1.46387Z" fill="white" stroke="#1890FF" strokeWidth="2.92857" />
-                                    </svg>
-
-                                    <span className="font-medium text-slate-500">05/02/26</span>
-                                    <span className="text-slate-700">Análisis de conexión eléctrica</span>
-                                </div>
-                                <div className="text-zinc-300 text-xl text-start w-12 ms-0.5">|</div>
-                            </li>
-
-                        </ul>
-
-                    </div>
+                <div className="my-8">
+                    <h3 className="mb-4 text-blue-800 font-bold text-lg flex items-center">Advance {progress}%</h3>
+                    <div className="ps-16"><DonutChart progress={progress} radiusChart={175} strokeChart={75}/></div>
                 </div>
-                <div className="bg-blue-100 col-start-3 col-end-4 rounded-md">
-                    <div className="justify-items-center mt-6 mt-2">
-                        <h2 className="text-blue-900 text-xl font-bold">Estandares de seguridad</h2>
-                        <h3 className="text-slate-500">(Marcar el casillero correcto)</h3>
+                <div className="my-10 bg-blue-100 rounded-md">
+                    <div className="justify-items-center mt-6 mt-2 pt-3">
+                        <h2 className="text-blue-900 text-xl font-bold">Security Standards</h2>
+                        <h3 className="text-slate-500">(Check the completed tasks)</h3>
                     </div>
-                    <div className="m-4">
-                        {safetyStandards.map((standard) => (
-                            <div key={standard.standard_name} className="text-slate-500">
+                    <div className="mx-4 p-8">
+                        {getPendingTasks(phases).map((task) => (
+                            <div key={task.id} className="text-slate-500">
                                 <label className="flex items-center gap-2 cursor-pointer">
                                     <input
                                         type="checkbox"
-                                        checked={projectDetails?.security_standards?.[standard.standard_name] || false}
-                                        readOnly
+                                        checked={task.status === "completed"}
+                                        onChange={() => handleCheckboxChange(task.id)}
                                         className="w-4 h-4 rounded border-slate-700 accent-blue-800 focus:ring-blue-700 focus:ring-offset-slate-900"
                                     />
                                     <span className="text-sm text-slate-500 py-2">
-                                        {standard.standard_name}
+                                        {task.name}
                                     </span>
                                 </label>
                             </div>
@@ -167,12 +177,61 @@ export const ProgressReport = () => {
                 </div>
             </div>
 
-            <div className="grid-cols-start-1 col-end-4 justify-self-center py-10">
-                <button type="submit"
-                    className="bg-blue-900 text-white w-80 px-4 py-2 rounded-md hover:bg-blue-800">
-                    Actualizar
-                </button>
+            <div className="p-2">
+                <h2 className="text-blue-900 w-full text-2xl font-bold mb-8">
+                    Project Duration
+                </h2>
+                <div className="mb-10 w-full h-8 bg-blue-200 rounded-full overflow-hidden">
+                    <div
+                        className="h-full bg-gradient-to-r from-blue-500 to-sky-500"
+                        style={{ width: `${progress}%` }}
+                    />
+                </div>
             </div>
+
+            <div className="grid grid-cols-4 gap-3 mb-16">
+                <div className="col-span-1 col-span-5 mt-6">
+                    <h2 className="text-blue-900 w-full text-2xl font-bold mb-5">Project Stages</h2>
+                </div>
+                {phases.map((phase, index) => (
+                    <div key={phase.id} className="p-2">
+                        <div className="flex align-items-center w-64">
+                            <PhaseIcons status={phase.status} number={index + 1} />
+                            <h2 className="ps-3 pt-3 text-slate-800 w-40 font-normal">{phase.name}</h2>
+                        </div>
+                        <p className="ms-16 text-slate-500 capitalize">{phase.status}</p>
+                    </div>
+                ))}
+            </div>
+
+            <div className="mt-6 mb-20 bg-orange-100 p-6 rounded-md">
+                <h2 className="text-blue-900 w-full text-2xl font-bold mb-5">Record History</h2>
+                <ul className="space-y-0">
+                    {completedTasks.length > 0 ? completedTasks.map((task) => (
+                        <li key={task.id} className="inline">
+                            <div className="flex gap-3 items-center">
+                                <svg width="15" height="15" viewBox="0 0 15 15" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <path d="M7.32129 1.46387C10.5561 1.46387 13.1786 4.08654 13.1787 7.32129C13.1787 10.5561 10.5561 13.1787 7.32129 13.1787C4.08654 13.1786 1.46387 10.5561 1.46387 7.32129C1.46394 4.08659 4.08659 1.46394 7.32129 1.46387Z" fill="white" stroke="#1890FF" strokeWidth="2.92857" />
+                                </svg>
+
+                                <span className="font-medium text-slate-500">{formatDate(task.completedAt)}</span>
+                                <span className="text-slate-700">{task.name}</span>
+                            </div>
+                            <div className="text-zinc-300 text-xl text-start w-12 ms-0.5">|</div>
+                        </li>
+                    )) :
+                        <p className="text-slate-500">No records yet.</p>}
+
+                </ul>
+
+            </div>
+
+            <button
+                type="submit"
+                onClick={handleUpdate}
+                className="bg-blue-900 text-lg w-full text-white px-4 py-2 mb-10 rounded-md hover:bg-blue-800">
+                Update
+            </button>
 
         </div>
     );

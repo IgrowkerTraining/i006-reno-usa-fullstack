@@ -6,8 +6,9 @@ import Login from "../pages/Access/Login";
 import Register from "../pages/Access/Register";
 import Dashboard from "../pages/Dashboard";
 import ProjectGeneralView from "../pages/Vista-proyecto";
-import ControlAvance  from "../pages/Control-avance";
+import ControlAvance from "../pages/Control-avance";
 import { ProgressReport } from "../pages/Report/ProgressReport";
+import ProjectRegister from '../pages/Crear-proyecto';
 
 export const AppRoutes: React.FC = () => {
   return (
@@ -55,12 +56,14 @@ export const AppRoutes: React.FC = () => {
       <Route
         path="/control-project"
         element={
-          <PublicRoute>
+          <ProtectedRoute>
             <ControlAvance />
-          </PublicRoute>
+          </ProtectedRoute>
         }
       />
-      
+
+      <Route path="/register-project" element={<ProtectedRoute> <ProjectRegister /> </ProtectedRoute>} />
+
       <Route path="/" element={<Navigate to="/login" replace />} />
     </Routes>
   );

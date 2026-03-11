@@ -58,8 +58,8 @@ export const login = async (req, res) => {
     return res
       .cookie("token", token, {
         httpOnly: true,
-        secure: false, // true en producción
-        sameSite: "lax",
+        secure: true, // cambiar a true en producción
+        sameSite: "none",
       })
       .json({
         message: "Login successful",
