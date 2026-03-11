@@ -4,6 +4,7 @@ export interface User {
   username: string;
   name: string;
   avatar?: string;
+  role: string;
 }
 
 export interface AuthState {
@@ -32,10 +33,17 @@ export interface Project {
 
 export interface ProjectInput {
   name: string;
+  code: string;            
+  category: string;        
   location: string;
   surface_sqft: number;
   structure_type: string;
   intervention_type: string;
+  assigned_professional: string; 
+  project_team: string[];        
+  trades: string[];              
+  project_plan_photo?: string;   
+  userId: string;                
 }
 
 // --- Fases del proyecto ---
