@@ -24,11 +24,18 @@ export interface Project {
   id: string;
   code: string;
   name: string;
+  category: string;
   location: string;
   surface_sqft: number;
   structure_type: string;
   intervention_type: string;
+  assigned_professional: any; //cuando sepamos lo  que nos traiga el backend pondremos string u objeto segun
+  project_team: any[]; //cuando sepamos lo  que nos traiga el backend pondremos string u objeto segun
+  trades: string[];
+  project_plan_photo?: string;
   userId: string;
+  phases?: any[];
+  projectSnapshots?: any[];
 }
 
 export interface ProjectInput {
