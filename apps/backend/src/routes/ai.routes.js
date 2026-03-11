@@ -28,6 +28,6 @@ const router = Router();
  *       '400':
  *         description: Error en la generación del reporte.
  */
-router.post("/analyze/:projectId", protect, authorize("ADMIN", "PROFESSIONAL"), generateReport);
+router.post("/analyze/:projectId", protect, authorize("professional"), generateReport);
 
 export default router;
