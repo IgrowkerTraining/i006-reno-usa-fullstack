@@ -1,9 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
+
+//icons
 import icons_trade_types from "../components/common/icons_trades_types";
+
+//components
 import { ButtonPlans } from '../components/common/Button_plans';
 import { ButtonDelete } from '../components/common/Button_delete';
-import { ButtonAI } from '../components/common/Button_AI';
+import { AiViewModal } from '../components/AiViewModal';
 
 const ControlAvance: React.FC = () => {
 
@@ -73,7 +77,7 @@ const ControlAvance: React.FC = () => {
                             <h1 className="text-3xl font-bold mb-3">{project.name}</h1>
                         </div>
                         <div className="flex basis-1/3 justify-end">
-                            <ButtonAI />
+                            <AiViewModal />
                             <ButtonPlans />
                             <ButtonDelete />
                         </div>
