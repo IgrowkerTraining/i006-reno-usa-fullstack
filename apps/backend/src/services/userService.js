@@ -21,7 +21,7 @@ class UserService {
         password: hashedPassword,
         username: email.split("@")[0],
         avatar: `https://picsum.photos/seed/${email}/200`,
-        role: role || "USER",
+        role: role || "user",
         trade, // 🔹 se guarda correctamente
       },
     });
