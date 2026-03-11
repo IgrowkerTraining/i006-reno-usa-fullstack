@@ -1,5 +1,28 @@
 import { registerUser, loginUser } from "../services/auth.service.js";
+import userService from "../services/userService.js";
 import Validator from "../utils/validator.js";
+
+/* =========================
+   GET CURRENT USER
+========================= */
+export const getCurrentUser = async (req, res) => {
+  try {
+    const userId = req.user.id;
+    const user = await userService.findById(userId);
+
+    if (!user) {
+      return res.status(404).json({ error: "User not found" });
+    }
+
+    const { password: _, ...safeUser } = user;
+    return res.status(200).json({
+      message: "Current user fetched",
+      user: safeUser,
+    });
+  } catch (error) {
+    return res.status(500).json({ error: error.message });
+  }
+};
 
 /* =========================
    REGISTER

@@ -10,8 +10,14 @@ const projectFullInclude = {
     },
   },
   phases: {
+    orderBy: {
+      planned_start: 'asc', 
+    },
     include: {
       tasks: {
+        orderBy: {
+          order: 'asc' 
+        },
         include: {
           executedTasks: {
             include: {
@@ -196,18 +202,24 @@ const defaultPhases = [
     }
   ];
 
-const now = new Date();
+let currentStartDate = new Date();
 
 for (const phaseData of defaultPhases) {
+  
+  const durationInDays = 7;
+  const currentEndDate = new Date(currentStartDate.getTime() + durationInDays * 86400000);
+
   const phase = await prisma.phase.create({
     data: {
       name: phaseData.name,
       projectId: project.id,
-      planned_start: now,
-      planned_end: new Date(now.getTime() + 7 * 86400000),
+      planned_start: currentStartDate, 
+      planned_end: currentEndDate,     
       status: "pending"
     }
   });
+
+  currentStartDate = new Date(currentEndDate);
 
   for (const [index, taskData] of phaseData.tasks.entries()) {
     let assignedTradeId = null;
@@ -244,7 +256,7 @@ for (const phaseData of defaultPhases) {
       phaseId: phase.id,
       userId,
       notes: "DailyLog inicial generado automáticamente",
-      log_date: now,
+      log_date: currentStartDate,
       completion_percentage: 0,
       schedule_deviation: 0,
     },
@@ -344,6 +356,7 @@ export const getProjectById = async (id, userId) => {
     where: { id, userId },
     include: projectFullInclude,
   });
+
   if (!project) return null;
   return mapProject(project);
 };

@@ -195,3 +195,8 @@ model MaterialUsage {
   material       Material      @relation(fields: [materialId], references: [id])
 }
 
+// enum Role {
+//   USER
+//   PROFESSIONAL
+//   ADMIN
+// }
