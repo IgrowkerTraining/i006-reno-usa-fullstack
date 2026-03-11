@@ -26,6 +26,8 @@ export interface Project {
   name: string;
   category: string;
   location: string;
+  status: string;
+  activeIncidences:any[];
   surface_sqft: number;
   structure_type: string;
   intervention_type: string;
