@@ -87,7 +87,11 @@ const Register: React.FC = () => {
         name: formData.name + " " + formData.lastName.trim(),
         email: formData.email.trim(),
         password: formData.password.trim(),
+<<<<<<< HEAD
         role: formData.role.trim() || "user",
+=======
+        role: formData.role.trim().toLowerCase() || "user", 
+>>>>>>> 006dc3a07177086b43a8b252474f0a577da806b4
         trade: formData.trade.trim() || null
       });
       login(response.user);
