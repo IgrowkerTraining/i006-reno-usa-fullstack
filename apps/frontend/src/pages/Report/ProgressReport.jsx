@@ -9,7 +9,7 @@ import icons_trades_types from "../../components/common/icons_trades_types";
 import safetyStandards from "./security_standard";
 
 //components
-import { DonutChart } from "./DonutChart";
+import { DonutChart } from "../../components/common/DonutChart";
 import { PhaseIcons } from "./phase_icons";
 import { projectService } from "@/src/services/project.service";
 import { taskService } from "@/src/services/taskServices";
@@ -149,8 +149,8 @@ export const ProgressReport = () => {
                     <h2 className="text-blue-900 w-full text-2xl font-bold mb-5">Progress Tracking</h2>
                 </div>
                 <div className="my-8">
-                    <h3 className="mb-4 text-blue-800 font-bold text-lg">Advance {progress}%</h3>
-                    <DonutChart progress={progress} />
+                    <h3 className="mb-4 text-blue-800 font-bold text-lg flex items-center">Advance {progress}%</h3>
+                    <div className="ps-16"><DonutChart progress={progress} radiusChart={175} strokeChart={75}/></div>
                 </div>
                 <div className="my-10 bg-blue-100 rounded-md">
                     <div className="justify-items-center mt-6 mt-2 pt-3">

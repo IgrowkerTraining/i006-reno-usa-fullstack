@@ -1,12 +1,12 @@
-export const DonutChart = ({ progress }) => {
-    const radius = 150;
-    const stroke = 65;
+export const DonutChart = ({ progress, radiusChart, strokeChart }) => {
+    const radius = radiusChart;
+    const stroke = strokeChart;
     const normalizedRadius = radius - stroke / 2;
     const circumference = normalizedRadius * 2 * Math.PI;
     const strokeDashoffset = circumference - (progress / 100) * circumference;
 
     return (
-        <svg height={radius * 2} width={radius * 4}>
+        <svg height={radius * 2} width={radius * 2}>
             {/* Gradient definition */}
             <defs>
                 <linearGradient id="progressGradient" x1="0%" y1="0%" x2="100%" y2="0%">
@@ -31,7 +31,7 @@ export const DonutChart = ({ progress }) => {
                 fill="transparent"
                 strokeWidth={stroke}
                 strokeDasharray={`${circumference} ${circumference}`}
-                style={{ strokeDashoffset, transition: "stroke-dashoffset 0.5s ease" }}
+                style={{ strokeDashoffset, transition: "stroke-dashoffset 0.5s ease"}}
                 r={normalizedRadius}
                 cx={radius}
                 cy={radius}
