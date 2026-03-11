@@ -1,29 +1,25 @@
 import React, { useState, useEffect } from "react";
-import { User, Project } from "../types";
+import { Project } from "../types";
 import { getAIGreeting } from "../services/service";
-import { api } from "../services/authServices";
 import { useAuth } from "../hooks/useAuth";
 import { useNavigate } from "react-router-dom";
 import { projectService } from "../services/project.service"
 import error_icons from "../components/common/error_icons";
-import { useProjects } from "../context/ProjectsContext";
 
 const Dashboard: React.FC = () => {
 
   const { user } = useAuth();
   const navigate = useNavigate();
-  const { filteredProjects, projects, setProjects } = useProjects();
 
-  // const [projects, setProjects] = useState<Project[]>([]);
+  const [projects, setProjects] = useState<Project[]>([]);
   const [loading, setLoading] = useState(true);
   const [greeting, setGreeting] = useState("");
 
-  localStorage.setItem("projects", JSON.stringify(projects));
-
+  // falta configurar las alertas
   const error = [
-    { id: "1", name: "ERROR-01", icon: error_icons["ERROR-01"] },
-    { id: "2", name: "ERROR-02", icon: error_icons["ERROR-02"] },
-    { id: "3", name: "ERROR-03", icon: error_icons["ERROR-03"] }
+    { id: "1", name: "SAFETY", icon: error_icons["ERROR-01"] },
+    { id: "2", name: "ELECTRICAL", icon: error_icons["ERROR-02"] },
+    { id: "3", name: "CORRECTION", icon: error_icons["ERROR-03"] }
 
   ]
   useEffect(() => {
@@ -50,6 +46,8 @@ const Dashboard: React.FC = () => {
 
     fetchProjects();
   }, [])
+
+  console.log(projects)
 
   if (loading) return (<div className="flex flex-col items-center justify-center h-screen bg-white gap-4">
     <div className="animate-spin rounded-full h-16 w-16 border-t-4 border-green-600"></div>
@@ -80,7 +78,7 @@ const Dashboard: React.FC = () => {
             </h1>
 
             <div className="mt-4 space-y-4">
-              {filteredProjects.map((project: Project) => (
+              {projects.map((project: Project) => (
                 <div
                   key={project.id}
                   className="flex p-4 gap-5 items-center rounded-lg bg-sky-100"
@@ -91,25 +89,26 @@ const Dashboard: React.FC = () => {
                     </h2>
 
                     <div className="flex gap-2 my-1 items-center">
-                      {/* <p>{project.status}</p> */}
+                      <p>{project.status}</p>
 
-                      {error.length === 0 ? (
-                        <p className="size-6 rounded-full bg-gray-400">There are not errors</p>) :
-                        (
-                          error.map((err) => {
-                            const errorInfo = error_icons.find((em) => em.error_code === err.name
-                            );
-                            return (
-                              <div
-                                key={err.id}
-                                className={`flex items-center justify-center px-2 py-2 rounded-lg text-white font-medium
-                                            ${errorInfo?.color_assigned}`}
-                              >
-                                {errorInfo?.icon}
-                              </div>
-                            )
-                          })
-                        )}
+                      {project.activeIncidences?.map((err) => {
+
+                        const errorInfo = error_icons.find(
+                          (em) => em.error_code === err.name
+                        );
+
+                        if (!errorInfo) return null;
+                        return (
+                          <div
+                            key={err.id}
+                            className={`flex items-center justify-center px-2 py-2 rounded-lg text-white font-medium
+                            ${errorInfo?.color_assigned}`}
+                          >
+                            {errorInfo?.icon}
+                          </div>
+                        )
+                      })
+                      }
                     </div>
                   </div>
 
