@@ -217,7 +217,7 @@ const ProjectRegister: React.FC = () => {
         {/* --- HEADER --- */}
         <div className="flex justify-between items-end mb-10 pb-4 border-b-[2px] border-[#0A1F61]">
           <div className="flex-1">
-            <h1 className="text-3xl font-bold text-[#0A1F61]">Project Register</h1>
+            <h1 className="text-3xl font-bold text-[#0C277B]">Project Register</h1>
             <p className="text-gray-400 text-sm mt-1 leading-relaxed">{internalCode || 'New Project'}</p>
           </div>
           

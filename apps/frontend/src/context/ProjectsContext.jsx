@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, useEffect } from "react";
+import React, { createContext, useContext, useState } from "react";
 
 const ProjectsContext = createContext(null);
 
@@ -6,12 +6,6 @@ export const ProjectsProvider = ({ children }) => {
   const [projects, setProjects] = useState([]);
   const [search, setSearch] = useState("");
   const [filter, setFilter] = useState("title");
-
-  //Loads project list from localStorage
-  useEffect(() => {
-    const stored = JSON.parse(localStorage.getItem("projects") || "[]");
-    setProjects(stored);
-  }, []);
 
   const filteredProjects = projects.filter((project) =>
     project.name.toLowerCase().includes(search.toLowerCase())
