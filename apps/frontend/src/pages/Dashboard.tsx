@@ -26,29 +26,31 @@ const Dashboard: React.FC = () => {
 
   ]
   useEffect(() => {
-
     if (!user) {
-      navigate("/login")
+      navigate("/login");
       return;
     }
 
     const fetchProjects = async () => {
       try {
-        const data = await projectService.getAll()
-        setProjects(data)
+        const data = await projectService.getAll();
+        setProjects(data);
 
-        const msg = await getAIGreeting(user.name)
+        const msg = await getAIGreeting(user.name);
         setGreeting(msg);
-
       } catch (error) {
-        console.log(error)
+        console.log(error);
       } finally {
-        setLoading(false)
+        setLoading(false);
       }
-    }
+    };
 
     fetchProjects();
-  }, [])
+  }, [user, navigate, setProjects]);
+
+  useEffect(() => {
+    localStorage.setItem("projects", JSON.stringify(projects));
+  }, [projects]);
 
   console.log(projects)
 
@@ -60,10 +62,7 @@ const Dashboard: React.FC = () => {
 
   return (
     <>
-      <div className="bg-white h-screen">
-        {greeting && (
-          <p className="text-2xl font-bold text-black mb-4">{greeting}</p>
-        )}
+      <div className="bg-blue-50 h-screen p-8">
 
         {projects.length === 0 ? (
           <div className="text-center text-black bg-white">
@@ -76,7 +75,7 @@ const Dashboard: React.FC = () => {
           </div>
         ) : (
           <div className="text-black mx-auto pt-10 p-4">
-            <h1 className="text-xl font-extrabold font-serif text-blue-950">
+            <h1 className="text-2xl font-extrabold text-blue-900 p-2">
               ALLOCATED PROJECTS
             </h1>
 
@@ -84,10 +83,10 @@ const Dashboard: React.FC = () => {
               {filteredProjects.map((project: Project) => (
                 <div
                   key={project.id}
-                  className="flex p-4 gap-5 items-center rounded-lg bg-sky-100"
+                  className="flex p-4 gap-5 items-center rounded-lg bg-blue-100"
                 >
                   <div className="flex-auto">
-                    <h2 className="text-xl font-semibold border-b border-gray-500">
+                    <h2 className="text-xl font-semibold border-b border-gray-500 capitalize">
                       {project.name}
                     </h2>
 
