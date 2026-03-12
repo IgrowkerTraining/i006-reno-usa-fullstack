@@ -141,13 +141,13 @@ export const ProgressReport = () => {
     if (error) return <div>Error: {error}</div>;
 
     return (
-        <div className="justify-center bg-blue-50 px-20">
-            <div className="col-1 border-b-2 border-blue-900 pb-3 pt-6">
-                <h1 className="text-blue-900 text-4xl font-bold">{project.name}</h1>
+        <div className="justify-center bg-[#F8FAFC] px-20">
+            <div className="col-1 border-b-2 border-[#0C277B] pb-3 pt-6">
+                <h1 className="text-[#0C277B] text-4xl font-bold">{project.name}</h1>
             </div>
 
             <div className="grid grid-cols-1 gap-4 justify-between py-6">
-                <h2 className="text-blue-900 w-full text-2xl font-bold mb-5">Active Trades </h2>
+                <h2 className="text-[#0C277B] w-full text-2xl font-bold mb-5">Active Trades </h2>
                 <div className="col-start-1 col-end-4 flex flex-wrap">
                     {project?.trades?.length ? (
                         icons_trades_types
@@ -172,11 +172,11 @@ export const ProgressReport = () => {
             </div>
 
             <div className="grid grid-cols-2 justify-between pt-2 items-start">
-                <div className="col-span-1 col-span-2 mt-6 border-b-2 border-blue-900">
-                    <h2 className="text-blue-900 w-full text-2xl font-bold mb-5">Progress Tracking</h2>
+                <div className="col-span-1 col-span-2 mt-6 border-b-2 border-[#0C277B]">
+                    <h2 className="text-[#0C277B] w-full text-2xl font-bold mb-5">Progress Tracking</h2>
                 </div>
                 <div className="my-8">
-                    <h3 className="mb-4 text-blue-800 font-bold text-lg flex items-center">Advance {progress}%</h3>
+                    <h3 className="mb-4 text-[#3B64CE] font-bold text-lg flex items-center">Advance {progress}%</h3>
                     <div className="ps-16">
                         <DonutChart
                             progress={progress}
@@ -186,7 +186,7 @@ export const ProgressReport = () => {
                 </div>
                 <div className="my-10 bg-blue-100 rounded-md">
                     <div className="justify-items-center mt-6 mt-2 pt-3">
-                        <h2 className="text-blue-900 text-xl font-bold">Security Standards</h2>
+                        <h2 className="text-[#0C277B] text-xl font-bold">Security Standards</h2>
                         <h3 className="text-slate-500">(Check the completed tasks)</h3>
                     </div>
                     <div className="mx-4 p-8">
@@ -212,7 +212,7 @@ export const ProgressReport = () => {
             </div>
 
             <div className="p-2">
-                <h2 className="text-blue-900 w-full text-2xl font-bold mb-8">
+                <h2 className="text-[#0C277B] w-full text-2xl font-bold mb-8">
                     Project Duration - {metrics?.duration?.totalDays || 0} days
                 </h2>
                 <div className="mb-10 w-full h-8 bg-blue-200 rounded-full overflow-hidden">
@@ -225,7 +225,7 @@ export const ProgressReport = () => {
 
             <div className="grid grid-cols-4 gap-3 mb-16">
                 <div className="col-span-1 col-span-5 mt-6">
-                    <h2 className="text-blue-900 w-full text-2xl font-bold mb-5">Project Stages</h2>
+                    <h2 className="text-[#0C277B] w-full text-2xl font-bold mb-5">Project Stages</h2>
                 </div>
                 {phases.map((phase, index) => (
                     <div key={phase.id} className="p-2">
@@ -239,7 +239,7 @@ export const ProgressReport = () => {
             </div>
 
             <div className="mt-6 mb-20 bg-orange-100 p-6 rounded-md max-h-72 overflow-y-auto">
-                <h2 className="text-blue-900 w-full text-2xl font-bold mb-5">Record History</h2>
+                <h2 className="text-[#0C277B] w-full text-2xl font-bold mb-5">Record History</h2>
                 <ul className="space-y-0">
                     {updatedHistory.length > 0 ? updatedHistory.map((task) => (
                         <li key={task.id} className="inline">
@@ -263,7 +263,7 @@ export const ProgressReport = () => {
             <button
                 type="submit"
                 onClick={handleUpdate}
-                className="bg-blue-900 text-lg w-full text-white px-4 py-2 mb-10 rounded-md hover:bg-blue-800">
+                className="bg-[#0C277B] text-lg w-full text-white px-4 py-2 mb-10 rounded-md hover:bg-[#1a2f71]">
                 Update
             </button>
 

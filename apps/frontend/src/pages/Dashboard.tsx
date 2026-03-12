@@ -62,7 +62,7 @@ const Dashboard: React.FC = () => {
 
   return (
     <>
-      <div className="bg-blue-50 h-screen p-8">
+      <div className="bg-[#F8FAFC] h-screen p-8">
 
         {projects.length === 0 ? (
           <div className="text-center text-black bg-white">
@@ -75,7 +75,7 @@ const Dashboard: React.FC = () => {
           </div>
         ) : (
           <div className="text-black mx-auto pt-10 p-4">
-            <h1 className="text-2xl font-extrabold text-blue-900 p-2">
+            <h1 className="text-2xl font-extrabold text-[#0C277B] p-2">
               ALLOCATED PROJECTS
             </h1>
 
@@ -83,7 +83,7 @@ const Dashboard: React.FC = () => {
               {filteredProjects.map((project: Project) => (
                 <div
                   key={project.id}
-                  className="flex p-4 gap-5 items-center rounded-lg bg-blue-100"
+                  className="flex p-4 gap-5 items-center rounded-lg bg-[#DAEAFF]"
                 >
                   <div className="flex-auto">
                     <h2 className="text-xl font-semibold border-b border-gray-500 capitalize">
@@ -116,7 +116,7 @@ const Dashboard: React.FC = () => {
 
                   <button
                     type="button"
-                    className="rounded w-35 p-2 bg-blue-900 text-white hover:bg-blue-600 hover:scale-95 transition-transform"
+                    className="rounded w-35 p-2 bg-[#0C277B] text-white hover:bg-blue-600 hover:scale-95 transition-transform"
                     onClick={() => navigate(`/proyecto/${project.id}`)}
                   >
                     Edit Project
@@ -124,8 +124,8 @@ const Dashboard: React.FC = () => {
                 </div>
               ))}
             </div>
-            <div className="p-2 text-center rounded-md bg-blue-900 mt-10 hover:bg-blue-600 hover:scale-95 transition-transform">
-              <button type="submit" className="text-white text-xl font-mono" onClick={() => navigate('/register-project')}>
+            <div className="p-2 text-center rounded-md bg-[#0C277B] mt-10 hover:bg-[#1a2f71] hover:scale-95 transition-transform">
+              <button type="submit" className="text-white text-xl font-mono rounded-md" onClick={() => navigate('/register-project')}>
                 New Project
               </button>
             </div>
