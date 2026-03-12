@@ -89,6 +89,7 @@ model Task {
   order         Int             @default(0)
   is_incidence  Boolean         @default(false)
   completedAt   DateTime?
+  completedBy   String?
   phaseId       String
   tradeId       String?
   phase         Phase           @relation(fields: [phaseId], references: [id])

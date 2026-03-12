@@ -1,5 +1,6 @@
 import { Router } from "express";
 import { register, login, getCurrentUser } from "../controllers/authController.js";
+import { getAllUsers } from "../controllers/userController.js";
 import { protect } from "../middleware/auth.middleware.js";
 
 const router = Router();
@@ -137,46 +138,46 @@ router.post("/login", login);
  * @swagger
  * /api/auth/users:
  *   get:
- *     summary: Get current authenticated user
+ *     summary: Get all registered users
  *     tags: [Auth]
  *     security:
  *       - cookieAuth: []
  *     responses:
  *       200:
- *         description: Current user retrieved successfully
+ *         description: All users retrieved successfully
  *         content:
  *           application/json:
  *             schema:
  *               type: object
  *               properties:
- *                 message:
- *                   type: string
- *                   example: "Current user fetched"
- *                 user:
- *                   type: object
- *                   properties:
- *                     id:
- *                       type: string
- *                     name:
- *                       type: string
- *                     email:
- *                       type: string
- *                     username:
- *                       type: string
- *                     avatar:
- *                       type: string
- *                     role:
- *                       type: string
- *                     trade:
- *                       type: string
- *                       nullable: true
+ *                 count:
+ *                   type: number
+ *                   example: 5
+ *                 users:
+ *                   type: array
+ *                   items:
+ *                     type: object
+ *                     properties:
+ *                       id:
+ *                         type: string
+ *                       name:
+ *                         type: string
+ *                       email:
+ *                         type: string
+ *                       username:
+ *                         type: string
+ *                       avatar:
+ *                         type: string
+ *                       role:
+ *                         type: string
+ *                       trade:
+ *                         type: string
+ *                         nullable: true
  *       401:
  *         description: Not authorized - Missing or invalid token
- *       404:
- *         description: User not found
  *       500:
  *         description: Server error
  */
-router.get("/users", protect, getCurrentUser);
+router.get("/users", protect, getAllUsers);
 
 export default router;
