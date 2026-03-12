@@ -184,7 +184,7 @@ export const ProgressReport = () => {
                             strokeChart={75} />
                     </div>
                 </div>
-                <div className="my-10 bg-blue-100 rounded-md">
+                <div className="my-10 bg-[#E3EDFF] rounded-md">
                     <div className="justify-items-center mt-6 mt-2 pt-3">
                         <h2 className="text-[#0C277B] text-xl font-bold">Security Standards</h2>
                         <h3 className="text-slate-500">(Check the completed tasks)</h3>
