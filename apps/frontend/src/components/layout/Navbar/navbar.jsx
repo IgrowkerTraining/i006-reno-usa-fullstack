@@ -130,7 +130,7 @@ export const Navbar = () => {
                                 )}
                             </button>
 
-                            <div className="absolute right-0 z-10 mt-1 w-96 rounded-md notification_bg py-1 shadow-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-150">
+                            <div className="absolute right-0 z-10 mt-1 w-96 max-h-96 overflow-y-auto custom-scroll rounded-md notification_bg py-1 shadow-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-150">
                                 {!projects || projects.length === 0 ? (
                                     <p className="text-sm text-gray-500 p-2 text-center">
                                         No tienes notificaciones
