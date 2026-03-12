@@ -89,16 +89,16 @@ export const projectService = {
   },
 
   getMyPendingTasks: async (projectId: string) => {
-  const response = await fetch(`${API_URL}/tasks/my-pending-tasks?projectId=${projectId}`, {
-    method: 'GET',
-    headers: { 'Content-Type': 'application/json' },
-    credentials: 'include',
-  });
+    const response = await fetch(`${API_URL}/tasks/my-pending-tasks?projectId=${projectId}`, {
+      method: 'GET',
+      headers: { 'Content-Type': 'application/json' },
+      credentials: 'include',
+    });
 
-  if (!response.ok) throw new Error('Error obtaining pending tasks');
+    if (!response.ok) throw new Error('Error obtaining pending tasks');
 
-  return response.json();
-},
+    return response.json();
+  },
 
   updateTaskStatus: async (data: { taskIds: string[] }) => {
     const response = await fetch(`${API_ENDPOINTS.BASE}/api/tasks/log-progress`, {

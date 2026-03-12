@@ -1,9 +1,11 @@
-export const DonutChart = ({ progress, radiusChart, strokeChart }) => {
+export const DonutChart = ({ progress, radiusChart, strokeChart  }) => {
+
+    const projectProgress = progress || 0;
     const radius = radiusChart;
     const stroke = strokeChart;
     const normalizedRadius = radius - stroke / 2;
     const circumference = normalizedRadius * 2 * Math.PI;
-    const strokeDashoffset = circumference - (progress / 100) * circumference;
+    const strokeDashoffset = circumference - (projectProgress / 100) * circumference;
 
     return (
         <svg height={radius * 2} width={radius * 2}>
@@ -35,7 +37,7 @@ export const DonutChart = ({ progress, radiusChart, strokeChart }) => {
                 r={normalizedRadius}
                 cx={radius}
                 cy={radius}
-                strokeLinecap="round"
+                transform={`rotate(-90 ${radius} ${radius})`}
             />
 
             {/* Inner mini SVG */}
@@ -52,7 +54,7 @@ export const DonutChart = ({ progress, radiusChart, strokeChart }) => {
                     fontWeight={600}
                     fill="#f5f5f5"
                 >
-                    {progress}%
+                    {projectProgress}%
                 </text>
             </svg>
         </svg>

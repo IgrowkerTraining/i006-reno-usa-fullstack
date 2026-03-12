@@ -11,14 +11,19 @@ import icons_trades_types from "../../components/common/icons_trades_types";
 import { DonutChart } from "../../components/common/DonutChart";
 import { PhaseIcons } from "./phase_icons";
 import { projectService } from "@/src/services/project.service";
-import { taskService } from "@/src/services/taskServices";
 
 export const ProgressReport = () => {
 
     const { id } = useParams();
     const { project, loading, error, refetch } = useProject(id);
     const [phases, setPhases] = useState([]);
+    const [pendingTasks, setPendingTasks] = useState([]);
+    const [metrics, setMetrics] = useState(null);
+
+    const [selectedTaskIds, setSelectedTaskIds] = useState([]);
     const [updatedHistory, setUpdatedHistory] = useState([]);
+    const progress = metrics?.progress?.advancePercentage || 0;
+    const duration = metrics?.duration?.remainingDays || 0;
 
     const normalizedTrades = project?.trades?.map(t => t.toLowerCase()) || [];
 
@@ -46,36 +51,36 @@ export const ProgressReport = () => {
         }
     };
 
-    useEffect(() => {
-        if (project?.id) {
-            loadHistory();
-            loadPhases();
-        }
-    }, [project?.id]);
-
     const getPendingTasks = (phases) => {
-        if (!phases.length) return [];
+        if (!phases?.length) return [];
+
         const currentPhase = phases.find(phase => phase.status !== "completed");
         return currentPhase?.tasks || [];
     };
 
-    const calculateProgress = (phases) => {
-        if (!phases.length) return 0;
+    // const getPendingTasks = async () => {
+    //     if (!project?.id) return;
 
-        let total = 0;
-        let completed = 0;
+    //     try {
+    //         const response = await projectService.getMyPendingTasks(project.id);
+    //         setPendingTasks(response.data || response || []);
+    //     } catch (err) {
+    //         console.error("Error loading pending tasks:", err);
+    //         setPendingTasks([]);
+    //     }
+    // };
 
-        phases.forEach(phase => {
-            (phase.tasks || []).forEach(task => {
-                total++;
-                if (task.status === "completed") completed++;
-            });
-        });
+    const loadMetrics = async () => {
+        if (!project?.id) return;
 
-        return total === 0 ? 0 : Math.round((completed / total) * 100);
+        try {
+            const response = await projectService.getMetrics(project.id);
+            setMetrics(response.data || response);
+        } catch (err) {
+            console.error("Error loading metrics:", err);
+            setMetrics(null);
+        }
     };
-
-    const progress = calculateProgress(phases);
 
     // const tasks = project?.phases?.flatMap(phase => phase.tasks) || [];
     // const testTasks = getPendingTasks(phases);
@@ -92,47 +97,44 @@ export const ProgressReport = () => {
     };
 
     const handleCheckboxChange = (taskId) => {
-        const updatedPhases = phases.map(phase => ({
-            ...phase,
-            tasks: phase.tasks.map(task => {
-                if (task.id !== taskId) return task;
-
-                const isCompleted = task.completedAt != null;
-
-                return {
-                    ...task,
-                    status: isCompleted ? "pending" : "completed",
-                    completedAt: isCompleted ? null : new Date().toISOString(),
-                    completedBy: isCompleted ? null : "currentUser"
-                };
-            })
-        }));
-
-        setPhases(updatedPhases);
+        setSelectedTaskIds(prev =>
+            prev.includes(taskId)
+                ? prev.filter(id => id !== taskId)
+                : [...prev, taskId]
+        );
     };
 
     const handleUpdate = async () => {
         try {
-            const completedTaskIds = phases
-                .flatMap(phase => phase.tasks)
-                .filter(task => task.status === "completed")
-                .map(task => task.id);
-
-            if (!completedTaskIds.length) {
+            if (!selectedTaskIds.length) {
                 console.log("No tasks to update");
                 return;
             }
 
-            await projectService.updateTaskStatus({ taskIds: completedTaskIds });
+            await projectService.updateTaskStatus({
+                taskIds: selectedTaskIds
+            });
 
+            setSelectedTaskIds([]);
+
+            await refetch();
             await loadPhases();
             await loadHistory();
-
+            await loadMetrics();
+            
         } catch (err) {
             console.error(err);
             alert(err.message || "Error updating tasks");
         }
     };
+
+    useEffect(() => {
+        if (project?.id) {
+            loadMetrics();
+            loadPhases();
+            loadHistory();
+        }
+    }, [project?.id]);
 
     if (loading) return <div>Loading...</div>;
     if (error) return <div>Error: {error}</div>;
@@ -174,7 +176,12 @@ export const ProgressReport = () => {
                 </div>
                 <div className="my-8">
                     <h3 className="mb-4 text-blue-800 font-bold text-lg flex items-center">Advance {progress}%</h3>
-                    <div className="ps-16"><DonutChart progress={progress} radiusChart={175} strokeChart={75} /></div>
+                    <div className="ps-16">
+                        <DonutChart
+                            progress={progress}
+                            radiusChart={175}
+                            strokeChart={75} />
+                    </div>
                 </div>
                 <div className="my-10 bg-blue-100 rounded-md">
                     <div className="justify-items-center mt-6 mt-2 pt-3">
@@ -182,12 +189,14 @@ export const ProgressReport = () => {
                         <h3 className="text-slate-500">(Check the completed tasks)</h3>
                     </div>
                     <div className="mx-4 p-8">
-                        {getPendingTasks(phases).map((task) => (
+                        {getPendingTasks(project?.phases).map((task) => (
                             <div key={task.id} className="text-slate-500">
                                 <label className="flex items-center gap-2 cursor-pointer">
                                     <input
                                         type="checkbox"
-                                        checked={task.status === "completed"}
+                                        checked={
+                                            task.status === "completed" || selectedTaskIds.includes(task.id)
+                                        }
                                         onChange={() => handleCheckboxChange(task.id)}
                                         className="w-4 h-4 rounded border-slate-700 accent-blue-800 focus:ring-blue-700 focus:ring-offset-slate-900"
                                     />
@@ -207,8 +216,8 @@ export const ProgressReport = () => {
                 </h2>
                 <div className="mb-10 w-full h-8 bg-blue-200 rounded-full overflow-hidden">
                     <div
-                        className="h-full bg-gradient-to-r from-blue-500 to-sky-500"
-                        style={{ width: `${progress}%` }}
+                        className="h-full bg-gradient-to-r from-blue-500 to-sky-500 rounded-full"
+                        style={{ width: `${duration}%` }}
                     />
                 </div>
             </div>
@@ -228,7 +237,7 @@ export const ProgressReport = () => {
                 ))}
             </div>
 
-            <div className="mt-6 mb-20 bg-orange-100 p-6 rounded-md">
+            <div className="mt-6 mb-20 bg-orange-100 p-6 rounded-md max-h-72 overflow-y-auto">
                 <h2 className="text-blue-900 w-full text-2xl font-bold mb-5">Record History</h2>
                 <ul className="space-y-0">
                     {updatedHistory.length > 0 ? updatedHistory.map((task) => (
