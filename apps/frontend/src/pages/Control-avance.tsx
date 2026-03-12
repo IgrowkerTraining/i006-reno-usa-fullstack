@@ -24,7 +24,7 @@ const ControlAvance: React.FC = () => {
     type TimelineState = 'completed' | 'current' | 'pending' | 'none';
 
     const projectData = [
-        { id: 1, name: "Project Alpha" },
+        { id: 1, name: "Project Beta" },
     ]
 
     const workers = [
@@ -76,9 +76,9 @@ const ControlAvance: React.FC = () => {
                         <div className="basis-2/3 text-black text-start flex items-center px-5" key={project.id}>
                             <h1 className="text-3xl font-bold mb-3">{project.name}</h1>
                         </div>
-                        <div className="flex basis-1/3 justify-end">
+                        <div className="flex basis-1/3 justify-around items-center">
                             <AiViewModal />
-                            <ButtonPlans />
+                            <ButtonPlans name={project.name}/>
                             <ButtonDelete />
                         </div>
                     </div>
@@ -182,13 +182,6 @@ const ControlAvance: React.FC = () => {
 
                             </div>
                         </div>
-                    </div>
-                </div>
-
-                {/* <!-- Button approve progress  --> */}
-                <div className="p-7">
-                    <div className="p-2 my-3 text-center bg-blue-900 hover:bg-blue-600 hover:scale-95 transition-transform mt-4 rounded">
-                        <button type="submit" id="approve_progress" className="text-white text-xl font-mono">Approve progress</button>
                     </div>
                 </div>
             </div>
