@@ -5,15 +5,18 @@ import { useAuth } from "../hooks/useAuth";
 import { useNavigate } from "react-router-dom";
 import { projectService } from "../services/project.service"
 import error_icons from "../components/common/error_icons";
+import { useProjects } from "../context/ProjectsContext";
 
 const Dashboard: React.FC = () => {
 
   const { user } = useAuth();
   const navigate = useNavigate();
 
-  const [projects, setProjects] = useState<Project[]>([]);
+  const { filteredProjects, projects, setProjects } = useProjects();
   const [loading, setLoading] = useState(true);
   const [greeting, setGreeting] = useState("");
+
+  localStorage.setItem("projects", JSON.stringify(projects));
 
   // falta configurar las alertas
   const error = [
@@ -78,7 +81,7 @@ const Dashboard: React.FC = () => {
             </h1>
 
             <div className="mt-4 space-y-4">
-              {projects.map((project: Project) => (
+              {filteredProjects.map((project: Project) => (
                 <div
                   key={project.id}
                   className="flex p-4 gap-5 items-center rounded-lg bg-sky-100"
