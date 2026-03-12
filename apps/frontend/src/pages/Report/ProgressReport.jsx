@@ -19,11 +19,12 @@ export const ProgressReport = () => {
     const [phases, setPhases] = useState([]);
     const [pendingTasks, setPendingTasks] = useState([]);
     const [metrics, setMetrics] = useState(null);
+    const durationData = metrics?.duration;
 
     const [selectedTaskIds, setSelectedTaskIds] = useState([]);
     const [updatedHistory, setUpdatedHistory] = useState([]);
     const progress = metrics?.progress?.advancePercentage || 0;
-    const duration = metrics?.duration?.remainingDays || 0;
+    const duration = durationData?.totalDays ? Math.round((durationData.elapsedDays / durationData.totalDays) * 100) : 0;
 
     const normalizedTrades = project?.trades?.map(t => t.toLowerCase()) || [];
 
@@ -121,7 +122,7 @@ export const ProgressReport = () => {
             await loadPhases();
             await loadHistory();
             await loadMetrics();
-            
+
         } catch (err) {
             console.error(err);
             alert(err.message || "Error updating tasks");
@@ -212,7 +213,7 @@ export const ProgressReport = () => {
 
             <div className="p-2">
                 <h2 className="text-blue-900 w-full text-2xl font-bold mb-8">
-                    Project Duration
+                    Project Duration - {metrics?.duration?.totalDays || 0} days
                 </h2>
                 <div className="mb-10 w-full h-8 bg-blue-200 rounded-full overflow-hidden">
                     <div
