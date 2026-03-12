@@ -238,7 +238,7 @@ export const ProgressReport = () => {
                 ))}
             </div>
 
-            <div className="mt-6 mb-20 bg-orange-100 p-6 rounded-md max-h-72 overflow-y-auto">
+            <div className="mt-6 mb-20 bg-[#FFF2EE] p-6 rounded-md max-h-72 overflow-y-auto">
                 <h2 className="text-[#0C277B] w-full text-2xl font-bold mb-5">Record History</h2>
                 <ul className="space-y-0">
                     {updatedHistory.length > 0 ? updatedHistory.map((task) => (
