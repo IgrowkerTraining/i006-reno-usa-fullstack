@@ -27,6 +27,7 @@ export const ProgressReport = () => {
     const duration = durationData?.totalDays ? Math.round((durationData.elapsedDays / durationData.totalDays) * 100) : 0;
 
     const normalizedTrades = project?.trades?.map(t => t.toLowerCase()) || [];
+    const isCompleted = phases.every(phase => phase.status === "completed");
 
     const loadHistory = async () => {
         if (!project?.id) return;
@@ -52,24 +53,17 @@ export const ProgressReport = () => {
         }
     };
 
-    const getPendingTasks = (phases) => {
-        if (!phases?.length) return [];
+    const getPendingTasks = async () => {
+        if (!project?.id) return;
 
-        const currentPhase = phases.find(phase => phase.status !== "completed");
-        return currentPhase?.tasks || [];
+        try {
+            const response = await projectService.getMyPendingTasks(project.id);
+            setPendingTasks(response.data || []);
+        } catch (err) {
+            console.error("Error loading pending tasks:", err);
+            setPendingTasks([]);
+        }
     };
-
-    // const getPendingTasks = async () => {
-    //     if (!project?.id) return;
-
-    //     try {
-    //         const response = await projectService.getMyPendingTasks(project.id);
-    //         setPendingTasks(response.data || response || []);
-    //     } catch (err) {
-    //         console.error("Error loading pending tasks:", err);
-    //         setPendingTasks([]);
-    //     }
-    // };
 
     const loadMetrics = async () => {
         if (!project?.id) return;
@@ -82,9 +76,6 @@ export const ProgressReport = () => {
             setMetrics(null);
         }
     };
-
-    // const tasks = project?.phases?.flatMap(phase => phase.tasks) || [];
-    // const testTasks = getPendingTasks(phases);
 
     const formatDate = (isoString) => {
         if (!isoString) return "";
@@ -119,9 +110,10 @@ export const ProgressReport = () => {
             setSelectedTaskIds([]);
 
             await refetch();
+            await getPendingTasks();
+            await loadMetrics();
             await loadPhases();
             await loadHistory();
-            await loadMetrics();
 
         } catch (err) {
             console.error(err);
@@ -134,6 +126,7 @@ export const ProgressReport = () => {
             loadMetrics();
             loadPhases();
             loadHistory();
+            getPendingTasks();
         }
     }, [project?.id]);
 
@@ -190,23 +183,35 @@ export const ProgressReport = () => {
                         <h3 className="text-slate-500">(Check the completed tasks)</h3>
                     </div>
                     <div className="mx-4 p-8">
-                        {getPendingTasks(project?.phases).map((task) => (
-                            <div key={task.id} className="text-slate-500">
-                                <label className="flex items-center gap-2 cursor-pointer">
-                                    <input
-                                        type="checkbox"
-                                        checked={
-                                            task.status === "completed" || selectedTaskIds.includes(task.id)
-                                        }
-                                        onChange={() => handleCheckboxChange(task.id)}
-                                        className="w-4 h-4 rounded border-slate-700 accent-blue-800 focus:ring-blue-700 focus:ring-offset-slate-900"
-                                    />
-                                    <span className="text-sm text-slate-500 py-2">
-                                        {task.name}
-                                    </span>
-                                </label>
-                            </div>
-                        ))}
+                        {pendingTasks?.length === 0 ? (
+                            isCompleted ? (
+                                <p className="text-green-600 text-center">
+                                    All tasks completed! Great job!
+                                </p>
+                            ) : (
+                                <p className="text-slate-500 text-center">
+                                    No pending tasks for your trade in this phase.
+                                </p>
+                            )
+                        ) : (
+                            pendingTasks.map((task) => (
+                                <div key={task.id} className="text-slate-500">
+                                    <label className="flex items-center gap-2 cursor-pointer">
+                                        <input
+                                            type="checkbox"
+                                            checked={
+                                                task.status === "completed" || selectedTaskIds.includes(task.id)
+                                            }
+                                            onChange={() => handleCheckboxChange(task.id)}
+                                            className="w-4 h-4 rounded border-slate-700 accent-blue-800 focus:ring-blue-700 focus:ring-offset-slate-900"
+                                        />
+                                        <span className="text-sm text-slate-500 py-2">
+                                            {task.name}
+                                        </span>
+                                    </label>
+                                </div>
+                            ))
+                        )}
                     </div>
                 </div>
             </div>
@@ -238,7 +243,7 @@ export const ProgressReport = () => {
                 ))}
             </div>
 
-            <div className="mt-6 mb-20 bg-[#FFF2EE] p-6 rounded-md max-h-72 overflow-y-auto">
+            <div className="mt-6 mb-20 bg-[#FFF2EE] p-6 rounded-md max-h-72 overflow-y-auto custom-scroll">
                 <h2 className="text-[#0C277B] w-full text-2xl font-bold mb-5">Record History</h2>
                 <ul className="space-y-0">
                     {updatedHistory.length > 0 ? updatedHistory.map((task) => (

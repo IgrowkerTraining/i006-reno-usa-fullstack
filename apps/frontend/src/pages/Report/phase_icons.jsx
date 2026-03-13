@@ -14,7 +14,7 @@ export const PhaseIcons = ({ status, number }) => {
                     height={size}
                     stroke="#08c3f2"
                     strokeWidth={2}
-                    className="p-1"
+                    className="mt-2"
                 >
                     <circle cx="25" cy="25" r="24" stroke="#08c3f2" strokeWidth="2" />
                     <path
@@ -32,6 +32,7 @@ export const PhaseIcons = ({ status, number }) => {
                     viewBox="0 0 50 50"
                     fill="none"
                     xmlns="http://www.w3.org/2000/svg"
+                    className="mt-2"
                 >
                     <circle
                         cx="25"
@@ -49,7 +50,6 @@ export const PhaseIcons = ({ status, number }) => {
                         fontSize="20"
                         fontWeight="bold"
                         fill="#ffffff"
-                        className="m-0 p-0"
                     >
                         {number}
                     </text>
