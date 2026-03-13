@@ -85,7 +85,7 @@ class Validator {
     }
 
     if (data.role === "user") {
-      const validTrades = ["electrician", "plumbing", "masonry"]; 
+      const validTrades = ["electrician", "plumber", "mason", "carpenter", "painter", "welder", "HVAC Installer"]; 
 
       if (typeof data.trade !== "string" || data.trade.trim() === "" || data.trade.trim().toLowerCase() === "null") {
         errors.push({ 
