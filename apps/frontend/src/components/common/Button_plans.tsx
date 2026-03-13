@@ -1,11 +1,10 @@
 import { useNavigate, useParams } from "react-router-dom";
 import React, { useState, useEffect } from 'react';
-import { projectService } from "@/src/services/project.service";
 import UploadPlan from "./Upload";
+import { useProjects } from "@/src/context/ProjectsContext";
 
 
 export const ButtonPlans: React.FC = ({ name }) => {
-    const { id } = useParams();
 
     return (
         <div className="flex justify-end items-center px-3 py-4 hover:scale-95 transition-transform duration-300">
@@ -49,6 +48,7 @@ export const ButtonPlans: React.FC = ({ name }) => {
                                     type="button"
                                     command="submit"
                                     className="hover:scale-110 transition-transform hover:bg-red-700 rounded-full"
+                                    // onclick={()=> deleteFile()}
                                 >
                                     <svg width="50" height="50" viewBox="0 0 64 64">
                                         <circle cx="32" cy="32" r="30" fill="#ff0000" />

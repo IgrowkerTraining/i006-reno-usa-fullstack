@@ -45,8 +45,8 @@ export default function UploadPlan() {
                 <div className="mt-6 flex justify-center items-center">
                     <iframe
                         src={preview}
-                        width="550px"
-                        height="500px"
+                        width="2000px"
+                        height="1000px"
                     />
                 </div>
             )}

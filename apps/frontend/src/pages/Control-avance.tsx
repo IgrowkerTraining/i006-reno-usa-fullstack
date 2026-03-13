@@ -24,14 +24,14 @@ const ControlAvance: React.FC = () => {
     type TimelineState = 'completed' | 'current' | 'pending' | 'none';
 
     const projectData = [
-        { id: 1, name: "Project Beta" },
+        { id: 5, name: "Project Beta" },
     ]
 
     const workers = [
         { id: 1, name: "Ramon Alcaide Gomez", role: "construction worker" },
         { id: 2, name: "Paco Fernandez Rodriguez", role: "Plumber" },
         { id: 3, name: "Piero Medina", role: "electrician" },
-        
+
     ]
 
     const projectManagers = [
@@ -66,27 +66,23 @@ const ControlAvance: React.FC = () => {
 
     return (
         <>
-            <div className="v-screen bg-white">
-                {projectData.length === 0 ? (
-                    <div className="mx-auto text-black text-center p-5 m-5">
-                        <h1 className="text-3xl font-bold mb-6">There are no projects available.</h1>
+            <div className="h-screen bg-white">
+                {projectData.map((project) => (
+                <div className=" flex text-black border-b-4 border-gray-600 pt-5" key={project.id}>
+                    <div className="basis-2/3 text-black text-start flex items-center px-5" key={project.id}>
+                        <h1 className="text-3xl font-bold mb-3">{project.name}</h1>
                     </div>
-                ) : (projectData.map((project) => (
-                    <div className=" flex text-black border-b-4 border-gray-600 pt-5" key={project.id}>
-                        <div className="basis-2/3 text-black text-start flex items-center px-5" key={project.id}>
-                            <h1 className="text-3xl font-bold mb-3">{project.name}</h1>
-                        </div>
-                        <div className="flex basis-1/3 justify-around items-center">
-                            <AiViewModal />
-                            <ButtonPlans name={project.name}/>
-                            <ButtonDelete />
-                        </div>
+                    <div className="flex basis-1/3 justify-around items-center">
+                        <AiViewModal />
+                        <ButtonPlans name={project.name} />
+                        <ButtonDelete id={project.name} />
                     </div>
+                </div>
                 ))
-                )}
+                }
 
-                <div className="grid grid-cols-2 mx-auto pb-10">
-                    <div className="col-span-1">
+                <div className="h-screen bg-white grid grid-cols-2 mx-auto pb-10">
+                    <div className="col-span-1 bg-white">
                         {/* Project Manager */}
                         <div className="text-black p-5">
                             <h2 className="text-3xl font-bold my-2">Project manager</h2>
@@ -124,7 +120,7 @@ const ControlAvance: React.FC = () => {
                     </div>
 
 
-                    <div className="col-span-1 p-2">
+                    <div className="col-span-1 p-2 bg-white">
                         {/* <!-- phases of the project -->*/}
                         <div className="relative text-black p-5">
                             <h2 className="text-xl font-semibold text-[#0A1F61] mb-8">Phases of the project</h2>
