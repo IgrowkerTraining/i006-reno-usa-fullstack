@@ -1,6 +1,6 @@
 const error_icons = [
     {
-        error_code: "ERROR-01",
+        error_code: "SAFETY",
         error_title: "Failure to comply with safety standards",
         description: "Attempted to urgently review the regulations and requirements to address the issue.",
         icon: (
@@ -12,7 +12,7 @@ const error_icons = [
         )
     },
     {
-        error_code: "ERROR-02",
+        error_code: "CORRECTION",
         error_title: "Work requires correction",
         description: "Please make a review and correction of some tasks is required.",
         icon: (
@@ -24,7 +24,7 @@ const error_icons = [
         )
     },
     {
-        error_code: "ERROR-03",
+        error_code: "ELECTRICAL",
         error_title: "Error in the electrical installation",
         description: "An electrical issue was detected and requires immediate attention.",
         icon: (
