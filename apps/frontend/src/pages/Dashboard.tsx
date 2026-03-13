@@ -48,8 +48,6 @@ const Dashboard: React.FC = () => {
     localStorage.setItem("projects", JSON.stringify(projects));
   }, [projects]);
 
-  console.log(projects)
-
   if (loading) return (<div className="flex flex-col items-center justify-center h-screen bg-white gap-4">
     <div className="animate-spin rounded-full h-16 w-16 border-t-4 border-green-600"></div>
     <p className="text-gray-700 font-bold text-lg">Loading projects...</p>
@@ -92,7 +90,6 @@ const Dashboard: React.FC = () => {
                       <p>{project.status}</p>
 
                       {project.activeIncidences?.map((err, index) => {
-                        console.log("Incidencia detectada:", err)
                         const errorInfo = error_icons.find(
                           iconObj => iconObj.type === err
                         );
