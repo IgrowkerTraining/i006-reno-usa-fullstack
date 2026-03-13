@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { projectService } from '../services/project.service';
 import { ProjectInput } from '../types';
 import { storage } from '../utils/storage'; // Importamos para obtener el userId
+import { API_ENDPOINTS } from '../constants/routes';
 
 // --- CONSTANTS & MOCK DATA ---
 const AVAILABLE_TRADES = [
@@ -74,8 +75,28 @@ const ProjectRegister: React.FC = () => {
   const [showUrlInput, setShowUrlInput] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
+  const [dbUsers, setDbUsers] = useState<any[]>([]);
 
   // --- LOGIC ---
+  useEffect(() => {
+    const fetchUsers = async () => {
+      try {
+        const response = await fetch(`${API_ENDPOINTS.BASE}/api/auth/users`, {
+          method: 'GET',
+          headers: { 'Content-Type': 'application/json' },
+          credentials: 'include',
+        });
+        if (response.ok) {
+          const data = await response.json();
+          setDbUsers(data.users || []);
+        }
+      } catch (err) {
+        console.error("Error fetching users:", err);
+      }
+    };
+    fetchUsers();
+  }, []);
+
   useEffect(() => {
     const currentUser = storage.getUser();
     if (!currentUser || currentUser.role !== 'professional') {
@@ -102,27 +123,28 @@ const ProjectRegister: React.FC = () => {
 
   const filteredAvailableProfessionals = useMemo(() => {
     const query = proSearchQuery.toLowerCase();
-    return MOCK_PROFESSIONALS_LIST
-      .filter(pro => !selectedProfessionalIds.includes(pro.id))
-      .filter(pro => {
-        const fullName = `${pro.firstName} ${pro.lastName}`.toLowerCase();
-        return fullName.includes(query) || pro.role.toLowerCase().includes(query);
+    return dbUsers
+      .filter(user => !selectedProfessionalIds.includes(user.id))
+      .filter(user => {
+        const fullName = (user.name || '').toLowerCase();
+        const role = (user.role || '').toLowerCase();
+        return fullName.includes(query) || role.includes(query);
       });
-  }, [proSearchQuery, selectedProfessionalIds]);
+  }, [proSearchQuery, selectedProfessionalIds, dbUsers]);
 
   const displaySelectedProfessionals = useMemo(() => {
     return selectedProfessionalIds.map(id => 
-      MOCK_PROFESSIONALS_LIST.find(pro => pro.id === id)
+      dbUsers.find(user => user.id === id)
     ).filter(Boolean);
-  }, [selectedProfessionalIds]);
+  }, [selectedProfessionalIds, dbUsers]);
 
   const selectedProfessionalsNamesText = useMemo(() => {
     if (selectedProfessionalIds.length === 0) return '';
     return selectedProfessionalIds.map(id => {
-      const pro = MOCK_PROFESSIONALS_LIST.find(p => p.id === id);
-      return pro ? `${pro.firstName} ${pro.lastName} - ${pro.role}` : '';
+      const pro = dbUsers.find(user => user.id === id);
+      return pro ? `${pro.name} - ${pro.role === 'user' ? `user - ${pro.trade}` : pro.role}` : '';
     }).join(', ');
-  }, [selectedProfessionalIds]);
+  }, [selectedProfessionalIds, dbUsers]);
 
   // --- ACTIONS ---
   const handlePlansClick = () => {
@@ -180,8 +202,8 @@ const ProjectRegister: React.FC = () => {
     const finalTypeOfWork = typeOfWorkPreset === OTHER_OPTION ? customTypeOfWork : typeOfWorkPreset;
     const finalCategory = categoryPreset === OTHER_OPTION ? customCategory : categoryPreset;
     
-    const assignedProfessionalId = currentUser.id;
-    const projectTeamIds = [currentUser.id];
+    const assignedProfessionalId = assignedProId || (selectedProfessionalIds.length > 0 ? selectedProfessionalIds[0] : currentUser.id);
+    const projectTeamIds = selectedProfessionalIds.length > 0 ? selectedProfessionalIds : [currentUser.id];
 
     const projectData: ProjectInput = {
       name: projectName.trim(),
@@ -443,7 +465,7 @@ const ProjectRegister: React.FC = () => {
                         onClick={() => addProfessional(pro.id)}
                         className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
                       >
-                        {pro.firstName} {pro.lastName} - <span className="text-gray-500">{pro.role}</span>
+                        {pro.name} - <span className="text-gray-500">{pro.role === 'user' ? `user - ${pro.trade}` : pro.role}</span>
                       </button>
                     )) : (
                       <p className="px-4 py-2 text-sm italic text-gray-400 text-center">No professionals found</p>
@@ -458,11 +480,11 @@ const ProjectRegister: React.FC = () => {
                     <div key={pro?.id} className="flex items-center justify-between bg-white rounded-lg p-3 shadow-sm border border-gray-100">
                       <div className="flex items-center gap-3">
                         <div className="w-9 h-9 rounded-full bg-gray-100 flex items-center justify-center font-bold text-sm text-[#0A1F61] border border-gray-200">
-                          {pro?.firstName[0]}{pro?.lastName[0]}
+                          {pro?.name?.charAt(0).toUpperCase()}
                         </div>
                         <div>
-                          <h4 className="text-[14px] font-bold text-[#0A1F61] mb-0.5">{pro?.firstName} {pro?.lastName}</h4>
-                          <p className="text-[12px] text-gray-500 m-0 italic">{pro?.role}</p>
+                          <h4 className="text-[14px] font-bold text-[#0A1F61] mb-0.5">{pro?.name}</h4>
+                          <p className="text-[12px] text-gray-500 m-0 italic">{pro?.role === 'user' ? `user - ${pro.trade}` : pro?.role}</p>
                         </div>
                       </div>
                       <div className="flex items-center gap-4">
