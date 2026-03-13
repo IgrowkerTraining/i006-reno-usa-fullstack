@@ -58,10 +58,6 @@ const projectFullInclude = {
 export const createProject = async (data) => {
   const { name, location, surface_sqft, structure_type, intervention_type, internal_code, category, initial_status, assigned_professional, project_team, trades, project_plan_photo, userId } = data;
 
-  if (!name || !location || !userId) {
-    throw new Error("Missing required fields");
-  }
-
   const projectInstance = Project.create(data);
   const project = await prisma.project.create({
   data: {
