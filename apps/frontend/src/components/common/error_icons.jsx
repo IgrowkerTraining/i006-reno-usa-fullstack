@@ -1,5 +1,6 @@
 const error_icons = [
     {
+        type: "SAFETY",
         error_code: "ERROR-01",
         error_title: "Failure to comply with safety standards",
         description: "Attempted to urgently review the regulations and requirements to address the issue.",
@@ -12,21 +13,10 @@ const error_icons = [
         )
     },
     {
+        type: "CORRECTION",
         error_code: "ERROR-02",
         error_title: "Work requires correction",
         description: "Please make a review and correction of some tasks is required.",
-        icon: (
-            <svg width="28" height="28" viewBox="0 0 37 37" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <rect y="2.08001e-09" width="36.16" height="36.16" rx="18.08" fill="#D5BC00" />
-                <path d="M26.047 15.1503L21.0988 15.1503L25.5483 9.52832C25.6404 9.40928 25.5573 9.23633 25.4068 9.23633L16.7931 9.23633C16.7302 9.23633 16.6695 9.27002 16.6381 9.32617L10.8185 19.3774C10.7488 19.4965 10.8342 19.647 10.9734 19.647L14.8906 19.647L12.8826 27.679C12.8399 27.8542 13.0511 27.9777 13.1813 27.852L26.1705 15.458C26.2873 15.3479 26.2087 15.1503 26.047 15.1503Z" fill="#EEEEEC" />
-            </svg>
-
-        )
-    },
-    {
-        error_code: "ERROR-03",
-        error_title: "Error in the electrical installation",
-        description: "An electrical issue was detected and requires immediate attention.",
         icon: (
             <svg width="28" height="28" viewBox="0 0 37 37" fill="none" xmlns="http://www.w3.org/2000/svg">
                 <rect y="0.106445" width="36.16" height="36.16" rx="18.08" transform="rotate(-0.168511 0 0.106445)" fill="#3B64CE" />
@@ -34,7 +24,21 @@ const error_icons = [
             </svg>
 
         )
+    },
+    {
+        type: "CORRECTION",
+        error_code: "ERROR-03",
+        error_title: "Error in the electrical installation",
+        description: "An electrical issue was detected and requires immediate attention.",
+        icon: (
+            <svg width="28" height="28" viewBox="0 0 37 37" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <rect y="2.08001e-09" width="36.16" height="36.16" rx="18.08" fill="#D5BC00" />
+                <path d="M26.047 15.1503L21.0988 15.1503L25.5483 9.52832C25.6404 9.40928 25.5573 9.23633 25.4068 9.23633L16.7931 9.23633C16.7302 9.23633 16.6695 9.27002 16.6381 9.32617L10.8185 19.3774C10.7488 19.4965 10.8342 19.647 10.9734 19.647L14.8906 19.647L12.8826 27.679C12.8399 27.8542 13.0511 27.9777 13.1813 27.852L26.1705 15.458C26.2873 15.3479 26.2087 15.1503 26.047 15.1503Z" fill="#EEEEEC" />
+            </svg>
+        )
     }
 ];
 
 export default error_icons
+
+

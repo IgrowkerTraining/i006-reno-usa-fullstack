@@ -12,24 +12,20 @@ const Dashboard: React.FC = () => {
   const { user } = useAuth();
   const navigate = useNavigate();
 
+  const userRole = user.role // <---To differentiate between user & professional
+
   const { filteredProjects, projects, setProjects } = useProjects();
   const [loading, setLoading] = useState(true);
   const [greeting, setGreeting] = useState("");
+  const [selectedErrorInfo, setSelectedErrorInfo] = useState<any | null>(null);
 
-  localStorage.setItem("projects", JSON.stringify(projects));
-
-  // falta configurar las alertas
-  const error = [
-    { id: "1", name: "SAFETY", icon: error_icons["ERROR-01"] },
-    { id: "2", name: "ELECTRICAL", icon: error_icons["ERROR-02"] },
-    { id: "3", name: "CORRECTION", icon: error_icons["ERROR-03"] }
-
-  ]
   useEffect(() => {
     if (!user) {
       navigate("/login");
       return;
     }
+
+    localStorage.setItem("projects", JSON.stringify(projects));
 
     const fetchProjects = async () => {
       try {
@@ -62,16 +58,18 @@ const Dashboard: React.FC = () => {
 
   return (
     <>
-      <div className="bg-[#F8FAFC] h-screen p-8">
+      <div className="bg-[#F8FAFC] h-screen p-2">
 
         {projects.length === 0 ? (
-          <div className="text-center text-black bg-white">
-            <p className="text-xl font-extrabold pt-10">There are no active projects</p>
-            <div className="p-2 mx-4 text-center rounded-md bg-blue-900 mt-10">
-              <button type="submit" className="text-white text-xl font-mono rounded-md" onClick={() => navigate('/register-project')}>
-                New Project
-              </button>
-            </div>
+          <div className="text-center text-black">
+            <p className="text-xl font-extrabold pt-10">There are no active projects.</p>
+            {userRole === "professional" && (
+              <div className="p-2 mx-4 text-center rounded-md bg-blue-900 mt-10 hover:scale-95 transition-transform">
+                <button type="submit" className="text-white text-xl font-mono rounded-md" onClick={() => navigate('/register-project')}>
+                  New Project
+                </button>
+              </div>
+            )}
           </div>
         ) : (
           <div className="text-black mx-auto pt-10 p-4">
@@ -93,17 +91,19 @@ const Dashboard: React.FC = () => {
                     <div className="flex gap-2 my-1 items-center">
                       <p>{project.status}</p>
 
-                      {project.activeIncidences?.map((err) => {
-
+                      {project.activeIncidences?.map((err, index) => {
+                        console.log("Incidencia detectada:", err)
                         const errorInfo = error_icons.find(
-                          (em) => em.error_code === err.name
+                          iconObj => iconObj.type === err
                         );
 
                         if (!errorInfo) return null;
                         return (
                           <div
-                            key={err.id}
-                            className={`flex items-center justify-center px-2 py-2 rounded-lg text-white font-medium
+                            key={`{project.id},{index}`}
+                            onClick={() => setSelectedErrorInfo(errorInfo)}
+                            title={errorInfo.error_title}
+                            className={`cursor-pointer flex items-center justify-center px-2 py-2 rounded-lg text-white font-medium
                             ${errorInfo?.color_assigned}`}
                           >
                             {errorInfo?.icon}
@@ -117,21 +117,60 @@ const Dashboard: React.FC = () => {
                   <button
                     type="button"
                     className="rounded w-35 p-2 bg-[#0C277B] text-white hover:bg-blue-600 hover:scale-95 transition-transform"
-                    onClick={() => navigate(`/proyecto/${project.id}`)}
+                    onClick={() => userRole === "user"? navigate(`/proyecto/${project.id}`) : navigate(`/control-project/${project.id}`)}
                   >
                     Edit Project
                   </button>
                 </div>
               ))}
             </div>
+
+            { userRole === "professional" && (
             <div className="p-2 text-center rounded-md bg-[#0C277B] mt-10 hover:bg-[#1a2f71] hover:scale-95 transition-transform">
               <button type="submit" className="text-white text-xl font-mono rounded-md" onClick={() => navigate('/register-project')}>
                 New Project
               </button>
             </div>
+            )}
           </div>
         )}
       </div>
+
+      {/* Modal error details */}
+      {selectedErrorInfo && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 backdrop-blur-sm p-4">
+          <div className="bg-white rounded-xl shadow-2xl max-w-md w-full overflow-hidden transform transition-all">
+
+            {/* Heading with color error */}
+            <div className={`p-4 flex items-center gap-3 text-white ${selectedErrorInfo.type === 'CORRECTION' ? 'bg-blue-600' :
+              selectedErrorInfo.type === 'SAFETY' ? 'bg-red-500' : 'bg-yellow-500'
+              }`}>
+              <div className="bg-white p-1 rounded-full text-black">
+                {selectedErrorInfo.icon}
+              </div>
+              <h3 className="font-bold text-lg leading-tight">
+                {selectedErrorInfo.error_code}: {selectedErrorInfo.error_title}
+              </h3>
+            </div>
+
+            {/* Content */}
+            <div className="p-6">
+              <p className="text-gray-600 text-base leading-relaxed">
+                {selectedErrorInfo.description}
+              </p>
+
+              <div className="mt-6 flex justify-end">
+                <button
+                  onClick={() => setSelectedErrorInfo(null)} // <--- Close modal
+                  className="px-6 py-2 bg-gray-800 text-white rounded-lg hover:bg-gray-700 transition-colors font-medium"
+                >
+                  ok
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </>
   );
 }
