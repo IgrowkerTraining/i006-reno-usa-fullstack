@@ -26,7 +26,7 @@ const error_icons = [
         )
     },
     {
-        type: "CORRECTION",
+        type: "ELECTRICAL",
         error_code: "ERROR-03",
         error_title: "Error in the electrical installation",
         description: "An electrical issue was detected and requires immediate attention.",
