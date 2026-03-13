@@ -18,7 +18,7 @@ export const Navbar = () => {
     const user = JSON.parse(localStorage.getItem("user") || "{}");
     const { projects } = useProjects();
 
-    const my_photo = useAvatar(user?.name || user?.username || "User");
+    const my_photo = user?.avatar || useAvatar(user?.name || user?.username || "User");
     const my_profile_name = user?.name || user?.username || "User";
 
     const hideOnNavigation =
@@ -45,6 +45,8 @@ export const Navbar = () => {
         <nav className="relative navbar_bg">
             <div className="mx-auto px-5">
                 <div className="relative flex h-16 items-center justify-between">
+
+                    {/* Logo */}
                     <Link to="/dashboard">
                         <div className="flex flex-1 items-stretch justify-start">
                             <div className="flex shrink-0 items-center">
@@ -53,10 +55,14 @@ export const Navbar = () => {
                             <p className="reno_logo_name font-bold ml-2 mt-1">RENO</p>
                         </div>
                     </Link>
-
+                    
+                    {/* Right side */}
                     <div className="absolute inset-y-0 right-0 flex items-center pr-2 sm:static sm:inset-auto sm:ml-6 sm:pr-0">
+                        
+                        {/* Search */}
                         <SearchBar hideOnNavigation={hideOnNavigation} />
 
+                        {/* FAQ button */}
                         <Link to="/#">
                             <svg
                                 xmlns="http://www.w3.org/2000/svg"
@@ -74,6 +80,7 @@ export const Navbar = () => {
                             </svg>
                         </Link>
 
+                        {/* Notificaciones */}
                         <div className={hideOnNavigation ? "hidden" : "relative group mt-1"}>
                             <button
                                 type="button"
