@@ -89,7 +89,7 @@ export const projectService = {
   },
 
   getMyPendingTasks: async (projectId: string) => {
-    const response = await fetch(`${API_URL}/tasks/my-pending-tasks?projectId=${projectId}`, {
+    const response = await fetch(`${API_ENDPOINTS.BASE}/api/tasks/my-pending-tasks?projectId=${projectId}`, {
       method: 'GET',
       headers: { 'Content-Type': 'application/json' },
       credentials: 'include',
