@@ -9,11 +9,6 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-enum Role {
-  user
-  professional
-}
-
 model User {
   id                 String              @id @default(cuid())
   name               String
@@ -21,7 +16,7 @@ model User {
   password           String
   username           String
   avatar             String?
-  role               Role                
+  role               Role
   trade              String?
   dailyLogs          DailyLog[]
   assignedProjects   Project[]           @relation("AssignedProfessional")
@@ -196,8 +191,7 @@ model MaterialUsage {
   material       Material      @relation(fields: [materialId], references: [id])
 }
 
-// enum Role {
-//   USER
-//   PROFESSIONAL
-//   ADMIN
-// }
+enum Role {
+  user
+  professional
+}
