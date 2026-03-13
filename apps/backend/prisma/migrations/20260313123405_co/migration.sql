@@ -75,6 +75,7 @@ CREATE TABLE "Task" (
     "order" INTEGER NOT NULL DEFAULT 0,
     "is_incidence" BOOLEAN NOT NULL DEFAULT false,
     "completedAt" TIMESTAMP(3),
+    "completedBy" TEXT,
     "phaseId" TEXT NOT NULL,
     "tradeId" TEXT,
 
