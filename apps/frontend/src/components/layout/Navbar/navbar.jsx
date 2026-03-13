@@ -18,7 +18,8 @@ export const Navbar = () => {
     const user = JSON.parse(localStorage.getItem("user") || "{}");
     const { projects } = useProjects();
 
-    const my_photo = user?.avatar || useAvatar(user?.name || user?.username || "User");
+    const fallbackAvatar = useAvatar(user?.name || user?.username || "User");
+    const my_photo = user?.avatar || fallbackAvatar;
     const my_profile_name = user?.name || user?.username || "User";
 
     const hideOnNavigation =
@@ -55,10 +56,10 @@ export const Navbar = () => {
                             <p className="reno_logo_name font-bold ml-2 mt-1">RENO</p>
                         </div>
                     </Link>
-                    
+
                     {/* Right side */}
                     <div className="absolute inset-y-0 right-0 flex items-center pr-2 sm:static sm:inset-auto sm:ml-6 sm:pr-0">
-                        
+
                         {/* Search */}
                         <SearchBar hideOnNavigation={hideOnNavigation} />
 
