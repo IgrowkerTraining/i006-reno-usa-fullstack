@@ -69,11 +69,41 @@ const Register: React.FC = () => {
     setServerError(null);
 
     const newErrors: Record<string, string> = {};
-    if (formData.password !== formData.confirmPassword) {
-      newErrors.confirmPassword = "Passwords don't match";
+
+    const trimmedName = formData.name.trim();
+    const trimmedLastName = formData.lastName.trim();
+    const trimmedEmail = formData.email.trim();
+    const trimmedPassword = formData.password.trim();
+    const trimmedConfirmPassword = formData.confirmPassword.trim();
+    const trimmedRole = formData.role.trim().toLowerCase();
+    const trimmedTrade = formData.trade.trim();
+
+    if (!trimmedRole) {
+      newErrors.role = "Required information";
     }
-    if (formData.password.length < 8) {
+
+    if (!trimmedName) {
+      newErrors.name = "Required information";
+    }
+
+    if (!trimmedLastName) {
+      newErrors.lastName = "Required information";
+    }
+
+    if (!trimmedEmail) {
+      newErrors.email = "Required information";
+    }
+
+    if (!trimmedPassword) {
+      newErrors.password = "Required information";
+    } else if (trimmedPassword.length < 8) {
       newErrors.password = "Password must be at least 8 characters";
+    }
+
+    if (!trimmedConfirmPassword) {
+      newErrors.confirmPassword = "Required information";
+    } else if (trimmedPassword !== trimmedConfirmPassword) {
+      newErrors.confirmPassword = "Passwords don't match";
     }
 
     if (Object.keys(newErrors).length > 0) {
@@ -84,12 +114,13 @@ const Register: React.FC = () => {
 
     try {
       const response = await api.register({
-        name: formData.name + " " + formData.lastName.trim(),
-        email: formData.email.trim(),
-        password: formData.password.trim(),
-        role: formData.role.trim().toLowerCase() || "user", 
-        trade: formData.trade.trim() || null
+        name: `${trimmedName} ${trimmedLastName}`,
+        email: trimmedEmail,
+        password: trimmedPassword,
+        role: trimmedRole || "user",
+        trade: trimmedTrade || null
       });
+
       login(response.user);
       navigate("/dashboard");
     } catch (err: any) {
@@ -156,6 +187,9 @@ const Register: React.FC = () => {
                   <option value="professional">Professional</option>
                   <option value="user">User</option>
                 </select>
+                {errors.role && (
+                  <p className="text-red-500 text-sm mt-1">{errors.role}</p>
+                )}
 
               </div>
 
@@ -167,6 +201,7 @@ const Register: React.FC = () => {
                   name="trade"
                   disabled={isLoading}
                   value={formData.trade}
+                  required={formData.role === "user"}
                   className="bg_inputs text-zinc-600 placeholder:text-zinc-300 my-2 w-48 p-2 border-2 border-slate-300 rounded-md"
                   onChange={handleChange}
                 >
@@ -192,6 +227,9 @@ const Register: React.FC = () => {
                 className="bg_inputs text-zinc-600 bg_inputs placeholder:text-zinc-300"
                 onChange={handleChange}
               />
+              {errors.name && (
+                <p className="text-red-500 text-sm mt-1">{errors.name}</p>
+              )}
             </div>
             <div className="md:col-span-2">
               <div className="text-zinc-600 mb-2">
@@ -206,6 +244,9 @@ const Register: React.FC = () => {
                 className="bg_inputs text-zinc-600 placeholder:text-zinc-300"
                 onChange={handleChange}
               />
+              {errors.lastName && (
+                <p className="text-red-500 text-sm mt-1">{errors.lastName}</p>
+              )}
             </div>
             <div className="md:col-span-2">
               <div className="text-zinc-600 mb-2">

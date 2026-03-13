@@ -32,17 +32,22 @@ export const register = async (req, res) => {
     const errors = Validator.validateRegistration(req.body);
 
     if (errors.length > 0) {
-      return res.status(400).json({ errors });
+      return res.status(400).json({
+        error: "Validation error",
+        message: errors[0].message 
+      });
     }
 
     const { name, email, password, role, trade, avatar } = req.body;
+
+    const finalTrade = role === "professional" ? null : trade.trim().toLowerCase();
 
     const { user, token } = await registerUser({
       name,
       email,
       password,
       role,
-      trade: trade || null,
+      trade: finalTrade, 
       avatar,
     });
 
@@ -55,7 +60,7 @@ export const register = async (req, res) => {
       .status(201)
       .json({
         message: "User created",
-        user, // 👈 devuelve safeUser con trade
+        user,
         token,
       });
   } catch (error) {
@@ -86,7 +91,7 @@ export const login = async (req, res) => {
       })
       .json({
         message: "Login successful",
-        user, // 👈 devuelve safeUser con trade
+        user, 
         token,
       });
   } catch (error) {
