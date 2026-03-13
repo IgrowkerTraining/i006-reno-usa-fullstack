@@ -2,15 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { storage } from "../../utils/storage";
 import { projectService } from "../../services/project.service";
 
-interface ButtonPlansProps {
-    name: string;
-    projectId?: string;
-    planUrl?: string;
-    projectManagerId?: string;
-    onPlanUpdate?: (newUrl: string) => void;
-}
-
-export const ButtonPlans: React.FC<ButtonPlansProps> = ({ name, projectId, planUrl: initialPlanUrl, projectManagerId, onPlanUpdate }) => {
+export const ButtonPlans = ({ name, projectId, planUrl: initialPlanUrl, projectManagerId, onPlanUpdate }) => {
     const currentUser = storage.getUser();
     const isProfessional = currentUser?.role === 'professional' || currentUser?.id === projectManagerId;
     const [currentPlanUrl, setCurrentPlanUrl] = useState(initialPlanUrl || '');
@@ -20,7 +12,7 @@ export const ButtonPlans: React.FC<ButtonPlansProps> = ({ name, projectId, planU
         setCurrentPlanUrl(initialPlanUrl || '');
     }, [initialPlanUrl]);
 
-    const handleAddUrl = async (e: React.KeyboardEvent<HTMLInputElement>) => {
+    const handleAddUrl = async (e) => {
         if (e.key === 'Enter' && newPlanUrl.trim() && isProfessional) {
             e.preventDefault();
             try {
