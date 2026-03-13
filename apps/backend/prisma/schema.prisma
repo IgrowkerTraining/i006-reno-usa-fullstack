@@ -21,7 +21,7 @@ model User {
   password           String
   username           String
   avatar             String?
-  role               Role                @default(user)
+  role               Role                
   trade              String?
   dailyLogs          DailyLog[]
   assignedProjects   Project[]           @relation("AssignedProfessional")
