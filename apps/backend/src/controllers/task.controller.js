@@ -9,15 +9,20 @@ import prisma from '../lib/prisma.js';
 
 export const logProgress = async (req, res) => {
   try {
-    // El frontend nos manda un array con los IDs de las tareas tildadas
     const { taskIds } = req.body; 
+
+    const userId = req.user.id; 
 
     if (!taskIds || !Array.isArray(taskIds) || taskIds.length === 0) {
       return res.status(400).json({ message: "Se requiere un array válido de taskIds" });
     }
 
-    // 1. Averiguar de qué fase(s) son estas tareas 
-    // (Por si el obrero tildó tareas de distintas fases al mismo tiempo)
+    const user = await prisma.user.findUnique({
+      where: { id: userId },
+      select: { name: true }
+    });
+    const userName = user ? user.name : "Usuario Desconocido";
+
     const tasksToUpdate = await prisma.task.findMany({
       where: { id: { in: taskIds } },
       select: { phaseId: true }
@@ -27,22 +32,20 @@ export const logProgress = async (req, res) => {
       return res.status(404).json({ message: "No se encontraron las tareas especificadas" });
     }
 
-    // Sacamos los IDs únicos de las fases afectadas
     const uniquePhaseIds = [...new Set(tasksToUpdate.map(t => t.phaseId))];
 
-    // 2. Actualizar las tareas tildadas a "completed" y apagarles la alarma por si la tenían
     await prisma.task.updateMany({
       where: { id: { in: taskIds } },
       data: {
         status: 'completed',
-        is_incidence: false, // Si la completaron, ya no es incidencia
-        completedAt: new Date()
+        is_incidence: false,
+        completedAt: new Date(),
+        completedBy: userName 
       }
     });
 
     for (const phaseId of uniquePhaseIds) {
-      
-      // 1. Lógica de Incidencias (ya la tenías, la mantenemos igual)
+      // 1. Lógica de Incidencias 
       const maxCompletedTask = await prisma.task.findFirst({
         where: { phaseId: phaseId, status: 'completed' },
         orderBy: { order: 'desc' }
@@ -61,7 +64,6 @@ export const logProgress = async (req, res) => {
       }
 
       // --- 2. CHECK DE CIERRE DE FASE ---
-      // Contamos si queda CUALQUIER tarea que no esté completada en esta fase
       const pendingTasksInPhase = await prisma.task.count({
         where: {
           phaseId: phaseId,
@@ -70,7 +72,6 @@ export const logProgress = async (req, res) => {
       });
 
       if (pendingTasksInPhase === 0) {
-        // Si no queda NADA pendiente, cerramos la fase
         await prisma.phase.update({
           where: { id: phaseId },
           data: { status: 'completed' }

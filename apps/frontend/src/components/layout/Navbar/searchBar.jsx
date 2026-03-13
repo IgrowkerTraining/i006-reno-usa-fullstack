@@ -1,14 +1,19 @@
 import { useProjects } from "@/src/context/ProjectsContext";
 import { useEffect, useRef, useState } from "react";
+import { useLocation } from "react-router-dom";
 
 //We can add more filters here, for now default is title
 const FILTER_OPTIONS = [{ label: "Title", key: "title" }];
 
 export const SearchBar = ({ hideOnNavigation }) => {
 
+    const location = useLocation();
+    const containerRef = useRef(null);
+
     const { search, setSearch, filter } = useProjects();
     const [showSearchBar, setShowSearchBar] = useState(false);
-    const containerRef = useRef(null);
+
+    const isDashboard = location.pathname === "/dashboard";
 
     const clearInput = () => setSearch("");
 
@@ -24,6 +29,8 @@ export const SearchBar = ({ hideOnNavigation }) => {
         };
     }, []);
 
+    if (hideOnNavigation || !isDashboard) return null;
+
     return (
         <div ref={containerRef} className="mt-2">
             {showSearchBar ? (
@@ -31,7 +38,7 @@ export const SearchBar = ({ hideOnNavigation }) => {
                     <div className="relative flex items-center">
                         {/* Search Icon */}
                         <div className="absolute left-3 top-1/2 -translate-y-1/2">
-                            {!hideOnNavigation && (
+                            {isDashboard && (
                                 <svg
                                     xmlns="http://www.w3.org/2000/svg"
                                     fill="none"
