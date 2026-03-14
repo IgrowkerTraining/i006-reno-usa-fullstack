@@ -60,7 +60,7 @@ template-react-node-fullstack/
 
 ```bash
 # Iniciar ambos servicios con Docker
-docker-compose up --build
+docker-compose up  --build
 
 # Detener los servicios
 docker-compose down
