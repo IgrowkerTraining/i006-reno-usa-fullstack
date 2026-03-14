@@ -1,6 +1,6 @@
 import prisma from '../lib/prisma.js';
 
-const AI_BACKEND_URL = process.env.AI_BACKEND_URL || "https://refactored-trout-ww5g9x4xp6jfpjr-8000.app.github.dev";
+const AI_BACKEND_URL = process.env.AI_BACKEND_URL || "http://host.docker.internal:8000/api/v1";
 
 export const getAiProjectAnalysis = async (projectId) => {
   // 1. Buscamos el proyecto con todas sus fases ordenadas y tareas

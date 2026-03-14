@@ -29,7 +29,7 @@ model ProjectTeamMember {
   id        String  @id @default(cuid())
   projectId String
   userId    String
-  project   Project @relation(fields: [projectId], references: [id])
+  project   Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
   user      User    @relation(fields: [userId], references: [id])
 }
 
@@ -63,7 +63,7 @@ model Phase {
   projectId          String
   status             String              @default("pending")
   dailyLogs          DailyLog[]
-  project            Project             @relation(fields: [projectId], references: [id])
+  project            Project             @relation(fields: [projectId], references: [id], onDelete: Cascade)
   tasks              Task[]
   technicalApprovals TechnicalApproval[]
 }
@@ -87,7 +87,7 @@ model Task {
   completedBy   String?
   phaseId       String
   tradeId       String?
-  phase         Phase           @relation(fields: [phaseId], references: [id])
+  phase         Phase           @relation(fields: [phaseId], references: [id], onDelete: Cascade)
   trade         Trade?          @relation(fields: [tradeId], references: [id])
   executedTasks TaskExecution[]
 }
@@ -100,8 +100,8 @@ model TaskExecution {
   notes              String?
   executedAt         DateTime        @default(now())
   materialUsages     MaterialUsage[]
-  dailyLog           DailyLog        @relation(fields: [dailyLogId], references: [id])
-  task               Task            @relation(fields: [taskId], references: [id])
+  dailyLog           DailyLog        @relation(fields: [dailyLogId], references: [id], onDelete: Cascade)
+  task               Task            @relation(fields: [taskId], references: [id], onDelete: Cascade)
 
   @@unique([taskId, dailyLogId])
 }
@@ -114,7 +114,7 @@ model DailyLog {
   schedule_deviation    Float?
   userId                String
   phaseId               String
-  phase                 Phase            @relation(fields: [phaseId], references: [id])
+  phase                 Phase            @relation(fields: [phaseId], references: [id], onDelete: Cascade)
   user                  User             @relation(fields: [userId], references: [id])
   incidents             Incident[]
   safetyMeasures        SafetyMeasure[]
@@ -134,7 +134,7 @@ model SafetyMeasure {
   id          String   @id @default(cuid())
   description String
   dailyLogId  String
-  dailyLog    DailyLog @relation(fields: [dailyLogId], references: [id])
+  dailyLog      DailyLog @relation(fields: [dailyLogId], references: [id], onDelete: Cascade)
 }
 
 model WorkerCoverage {
@@ -143,7 +143,7 @@ model WorkerCoverage {
   coverage_type    String
   policy_reference String
   dailyLogId       String
-  dailyLog         DailyLog @relation(fields: [dailyLogId], references: [id])
+  dailyLog         DailyLog @relation(fields: [dailyLogId], references: [id], onDelete: Cascade)
 }
 
 model TechnicalApproval {
@@ -153,7 +153,7 @@ model TechnicalApproval {
   approval_date DateTime @default(now())
   userId        String
   phaseId       String
-  phase         Phase    @relation(fields: [phaseId], references: [id])
+  phase         Phase    @relation(fields: [phaseId], references: [id], onDelete: Cascade)
   user          User     @relation(fields: [userId], references: [id])
 }
 
@@ -163,7 +163,7 @@ model ProjectSnapshot {
   period_label  String
   projectId     String
   aiReports     AIReport[]
-  project       Project    @relation(fields: [projectId], references: [id])
+  project       Project    @relation(fields: [projectId], references: [id], onDelete: Cascade)
 }
 
 model AIReport {
@@ -171,7 +171,7 @@ model AIReport {
   generated_at      DateTime        @default(now())
   summary           String?
   projectSnapshotId String
-  projectSnapshot   ProjectSnapshot @relation(fields: [projectSnapshotId], references: [id])
+  projectSnapshot   ProjectSnapshot @relation(fields: [projectSnapshotId], references: [id], onDelete: Cascade)
 }
 
 model Material {
@@ -187,7 +187,7 @@ model MaterialUsage {
   quantity       Float
   executedTaskId String
   materialId     String
-  executedTask   TaskExecution @relation(fields: [executedTaskId], references: [id])
+  executedTask   TaskExecution @relation(fields: [executedTaskId], references: [id], onDelete: Cascade)
   material       Material      @relation(fields: [materialId], references: [id])
 }
 
