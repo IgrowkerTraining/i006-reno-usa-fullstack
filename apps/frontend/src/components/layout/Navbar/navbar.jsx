@@ -28,8 +28,12 @@ export const Navbar = () => {
         location.pathname === "/forgot-password" ||
         location.pathname.startsWith("/reset-password/");
 
+    const projectsWithIncidences = projects?.filter(
+        (project) => project?.activeIncidences && project.activeIncidences.length > 0
+    ) || [];
+
     const errors = error_icons.filter((e) =>
-        projects?.some((project) =>
+        projectsWithIncidences.some((project) =>
             project?.activeIncidences?.some((n) => n === e.error_code)
         )
     );
@@ -110,48 +114,42 @@ export const Navbar = () => {
                             </button>
 
                             <div className="absolute right-0 z-10 mt-1 w-96 max-h-96 overflow-y-auto custom-scroll rounded-md notification_bg py-1 shadow-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-150">
-                                {!projects || projects.every(project => !project?.activeIncidences || project.activeIncidences.length === 0) ? (
+                                {projectsWithIncidences.length === 0 ? (
                                     <p className="text-sm text-gray-500 p-2 text-center">
                                         No tienes notificaciones
                                     </p>
                                 ) : (
-                                    projects.map((project) => (
+                                    projectsWithIncidences.map((project) => (
                                         <div key={project.id} className="border-b border-blue-100 pb-3">
                                             <h2 className="text-blue-900 font-bold py-2 ps-10 border-b">
                                                 {project.name}
                                             </h2>
 
-                                            {!project?.activeIncidences || project.activeIncidences.length === 0 ? (
-                                                <p className="text-sm text-gray-500 px-8 py-2">
-                                                    No incidences
-                                                </p>
-                                            ) : (
-                                                project.activeIncidences.map((notification) => {
-                                                    const errorInfo = errors.find(
-                                                        (e) => e.error_code === notification
-                                                    );
+                                            {project.activeIncidences.map((notification) => {
+                                                const errorInfo = error_icons.find(
+                                                    (e) => e.type === notification
+                                                );
 
-                                                    if (!errorInfo) return null;
+                                                if (!errorInfo) return null;
 
-                                                    return (
-                                                        <div
-                                                            key={`${project.id}-${notification}`}
-                                                            className="text-slate-700 px-8 py-2 hover:bg-blue-100"
-                                                        >
-                                                            <div className="flex mt-2">
-                                                                {errorInfo.icon}
-                                                                <h4 className="ms-3 text-sm font-bold my-2">
-                                                                    {errorInfo.error_title}
-                                                                </h4>
-                                                            </div>
-
-                                                            <p className="text-sm">
-                                                                {errorInfo.description}
-                                                            </p>
+                                                return (
+                                                    <div
+                                                        key={`${project.id}-${notification}`}
+                                                        className="text-slate-700 px-8 py-2 hover:bg-blue-100"
+                                                    >
+                                                        <div className="flex mt-2">
+                                                            {errorInfo.icon}
+                                                            <h4 className="ms-3 text-sm font-bold my-2">
+                                                                {errorInfo.error_title}
+                                                            </h4>
                                                         </div>
-                                                    );
-                                                })
-                                            )}
+
+                                                        <p className="text-sm">
+                                                            {errorInfo.description}
+                                                        </p>
+                                                    </div>
+                                                );
+                                            })}
                                         </div>
                                     ))
                                 )}
