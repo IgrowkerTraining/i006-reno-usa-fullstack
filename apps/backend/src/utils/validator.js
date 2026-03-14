@@ -1,12 +1,25 @@
 class Validator {
+
   /* =========================
      BASIC RULES
   ========================= */
 
   static required(value, fieldName) {
-    if (typeof value !== "string" || value.trim() === "") {
-      return `${fieldName} is required`;
+    
+    if (value === null || value === undefined) {
+      return `${fieldName} is required and cannot be null`;
     }
+
+    if (typeof value !== "string") {
+      return `${fieldName} must be a valid string`;
+    }
+
+    const trimmedValue = value.trim();
+
+    if (trimmedValue === "" || trimmedValue.toLowerCase() === "null") {
+      return `${fieldName} is required and cannot be empty or 'null'`;
+    }
+
     return null;
   }
 
@@ -33,6 +46,14 @@ class Validator {
       return `Must be at least ${min} characters long`;
     }
 
+    return null;
+  }
+
+  static role(value) {
+    if (value !== "user" && value !== "professional") {
+      return "Invalid role. Must be exactly 'user' or 'professional'";
+    }
+    
     return null;
   }
 
@@ -63,6 +84,26 @@ class Validator {
       errors.push({ field: "password", message: passwordError });
     }
 
+    if (data.role === "user") {
+      const validTrades = ["electrician", "plumber", "mason", "carpenter", "painter", "welder", "HVAC Installer"]; 
+
+      if (typeof data.trade !== "string" || data.trade.trim() === "" || data.trade.trim().toLowerCase() === "null") {
+        errors.push({ 
+          field: "trade", 
+          message: "trade is required for workers (users) and cannot be empty or 'null'" 
+        });
+      } else {
+        const normalizedTrade = data.trade.trim().toLowerCase();
+        
+        if (!validTrades.includes(normalizedTrade)) {
+          errors.push({ 
+            field: "trade", 
+            message: `Invalid trade. Must be one of: ${validTrades.join(', ')}` 
+          });
+        }
+      }
+    }
+
     return errors;
   }
 
@@ -84,6 +125,35 @@ class Validator {
 
     return errors;
   }
+
+/* =========================
+     PROJECT VALIDATIONS
+  ========================= */
+
+  static validateProjectCreation(data = {}) {
+    const errors = [];
+
+    // 1. Validamos el name
+    const nameError = this.required(data.name, "name");
+    if (nameError) {
+      errors.push({ field: "name", message: nameError });
+    }
+
+    // 2. Validamos la location
+    const locationError = this.required(data.location, "location");
+    if (locationError) {
+      errors.push({ field: "location", message: locationError });
+    }
+
+    // 3. Validamos el userId
+    const userIdError = this.required(data.userId, "userId");
+    if (userIdError) {
+      errors.push({ field: "userId", message: userIdError });
+    }
+
+    return errors;
+  }
+
 }
 
 export default Validator;

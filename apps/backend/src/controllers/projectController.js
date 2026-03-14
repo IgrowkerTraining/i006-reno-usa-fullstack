@@ -9,8 +9,19 @@ import {
   getProjectHistory
 } from "../services/project.service.js";
 
+import Validator from "../utils/validator.js";
+
 export const create = async (req, res, next) => {
   try {
+    const errors = Validator.validateProjectCreation(req.body);
+
+    if (errors.length > 0) {
+      return res.status(400).json({
+        error: "Validation error",
+        message: errors[0].message 
+      });
+    }
+
     const project = await createProject({
       ...req.body,
       userId: req.user.id,

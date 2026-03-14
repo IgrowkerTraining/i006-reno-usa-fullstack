@@ -58,10 +58,6 @@ const projectFullInclude = {
 export const createProject = async (data) => {
   const { name, location, surface_sqft, structure_type, intervention_type, internal_code, category, initial_status, assigned_professional, project_team, trades, project_plan_photo, userId } = data;
 
-  if (!name || !location || !userId) {
-    throw new Error("Missing required fields");
-  }
-
   const projectInstance = Project.create(data);
   const project = await prisma.project.create({
   data: {
@@ -120,84 +116,84 @@ const defaultPhases = [
     {
       name: "Planning and Design",
       tasks: [
-        { name: "Define requirements", category: "CORRECTION", tradeName: "Masonry" },
-        { name: "Preliminary design", category: "CORRECTION", tradeName: "Masonry" },
-        { name: "Architectural plans", category: "CORRECTION", tradeName: "Masonry" },
-        { name: "Structural and installations plans", category: "CORRECTION", tradeName: "Masonry" },
-        { name: "Estimated budget", category: "CORRECTION", tradeName: "Masonry" },
-        { name: "Municipal permits", category: "CORRECTION", tradeName: "Masonry" }
+        { name: "Define requirements", category: "CORRECTION", tradeName: "Mason" },
+        { name: "Preliminary design", category: "CORRECTION", tradeName: "Mason" },
+        { name: "Architectural plans", category: "CORRECTION", tradeName: "Mason" },
+        { name: "Structural and installations plans", category: "CORRECTION", tradeName: "Mason" },
+        { name: "Estimated budget", category: "CORRECTION", tradeName: "Mason" },
+        { name: "Municipal permits", category: "CORRECTION", tradeName: "Mason" }
       ]
     },
     {
       name: "Site Preparation",
       tasks: [
-        { name: "Clearing and cleaning", category: "SAFETY", tradeName: "Masonry" }, 
-        { name: "Leveling", category: "CORRECTION", tradeName: "Masonry" },
-        { name: "Soil study", category: "SAFETY", tradeName: "Masonry" }, 
-        { name: "Layout marking", category: "CORRECTION", tradeName: "Masonry" }
+        { name: "Clearing and cleaning", category: "SAFETY", tradeName: "Mason" }, 
+        { name: "Leveling", category: "CORRECTION", tradeName: "Mason" },
+        { name: "Soil study", category: "SAFETY", tradeName: "Mason" }, 
+        { name: "Layout marking", category: "CORRECTION", tradeName: "Mason" }
       ]
     },
     {
       name: "Foundation",
       tasks: [
-        { name: "Excavation", category: "SAFETY", tradeName: "Masonry" }, 
-        { name: "Footings and bases", category: "SAFETY", tradeName: "Masonry" },
-        { name: "Foundation slab", category: "CORRECTION", tradeName: "Masonry" },
-        { name: "Waterproofing", category: "CORRECTION", tradeName: "Masonry" }
+        { name: "Excavation", category: "SAFETY", tradeName: "Mason" }, 
+        { name: "Footings and bases", category: "SAFETY", tradeName: "Mason" },
+        { name: "Foundation slab", category: "CORRECTION", tradeName: "Mason" },
+        { name: "Waterproofing", category: "CORRECTION", tradeName: "Mason" }
       ]
     },
     {
       name: "Structure",
       tasks: [
-        { name: "Columns and beams", category: "SAFETY", tradeName: "Masonry" }, 
-        { name: "Slab construction", category: "SAFETY", tradeName: "Masonry" },
-        { name: "Load-bearing walls", category: "SAFETY", tradeName: "Masonry" },
-        { name: "Roof structure", category: "SAFETY", tradeName: "Masonry" } 
+        { name: "Columns and beams", category: "SAFETY", tradeName: "Mason" }, 
+        { name: "Slab construction", category: "SAFETY", tradeName: "Mason" },
+        { name: "Load-bearing walls", category: "SAFETY", tradeName: "Mason" },
+        { name: "Roof structure", category: "SAFETY", tradeName: "Mason" } 
       ]
     },
     {
       name: "Installations",
       tasks: [
         { name: "Electrical installation", category: "ELECTRICAL", tradeName: "Electrician" },
-        { name: "Plumbing installation", category: "CORRECTION", tradeName: "Plumbing" },
-        { name: "Gas installation", category: "SAFETY", tradeName: "Plumbing" }, 
-        { name: "Drainage", category: "CORRECTION", tradeName: "Plumbing" },
-        { name: "Rainwater system", category: "CORRECTION", tradeName: "Plumbing" }
+        { name: "Plumbing installation", category: "CORRECTION", tradeName: "Plumber" },
+        { name: "Gas installation", category: "SAFETY", tradeName: "Plumber" }, 
+        { name: "Drainage", category: "CORRECTION", tradeName: "Plumber" },
+        { name: "Rainwater system", category: "CORRECTION", tradeName: "Plumber" }
       ]
     },
     {
-      name: "Masonry and Enclosures",
+      name: "Mason and Enclosures",
       tasks: [
-        { name: "Wall construction", category: "CORRECTION", tradeName: "Masonry" },
-        { name: "Window and door installation", category: "CORRECTION", tradeName: "Masonry" },
-        { name: "Rough plaster", category: "CORRECTION", tradeName: "Masonry" },
-        { name: "Fine plaster", category: "CORRECTION", tradeName: "Masonry" }
+        { name: "Wall construction", category: "CORRECTION", tradeName: "Mason" },
+        { name: "Window and door installation", category: "CORRECTION", tradeName: "Mason" },
+        { name: "Rough plaster", category: "CORRECTION", tradeName: "Mason" },
+        { name: "Fine plaster", category: "CORRECTION", tradeName: "Mason" }
       ]
     },
     {
       name: "Roofing and Insulation",
       tasks: [
-        { name: "Roof covering installation", category: "SAFETY", tradeName: "Masonry" }, 
-        { name: "Thermal insulation", category: "CORRECTION", tradeName: "Masonry" },
-        { name: "Waterproof insulation", category: "CORRECTION", tradeName: "Masonry" }
+        { name: "Roof covering installation", category: "SAFETY", tradeName: "Mason" }, 
+        { name: "Thermal insulation", category: "CORRECTION", tradeName: "Mason" },
+        { name: "Waterproof insulation", category: "CORRECTION", tradeName: "Mason" }
       ]
     },
     {
       name: "Finishes",
       tasks: [
-        { name: "Flooring and wall coverings", category: "CORRECTION", tradeName: "Masonry" },
-        { name: "Painting", category: "CORRECTION", tradeName: "Masonry" },
-        { name: "Interior carpentry", category: "CORRECTION", tradeName: "Masonry" },
+        { name: "Flooring and wall coverings", category: "CORRECTION", tradeName: "Mason" },
+        { name: "Painting", category: "CORRECTION", tradeName: "Mason" },
+        { name: "Interior carpentry", category: "CORRECTION", tradeName: "Mason" },
         { name: "Fixture installation", category: "CORRECTION", tradeName: "Electrician" },
-        { name: "Sanitary fittings", category: "CORRECTION", tradeName: "Plumbing" }
+        { name: "Sanitary fittings", category: "CORRECTION", tradeName: "Plumber" }
       ]
     },
     {
       name: "Inspection and Final Details",
       tasks: [
-        { name: "Quality control", category: "CORRECTION", tradeName: "Masonry" },
-        { name: "Fixing defects", category: "CORRECTION", tradeName: "Masonry" },
-        { name: "Final cleaning", category: "CORRECTION", tradeName: "Masonry" }
+        { name: "Quality control", category: "CORRECTION", tradeName: "Mason" },
+        { name: "Fixing defects", category: "CORRECTION", tradeName: "Mason" },
+        { name: "Final cleaning", category: "CORRECTION", tradeName: "Mason" }
       ]
     }
   ];

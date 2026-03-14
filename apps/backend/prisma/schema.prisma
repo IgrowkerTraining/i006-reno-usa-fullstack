@@ -9,23 +9,18 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-enum Role {
-  user
-  professional
-}
-
 model User {
-  id                  String              @id @default(cuid())
-  name                String
-  email               String              @unique
-  password            String
-  username            String
-  avatar              String?
-  role                Role                @default(user)
-  trade               String?
-  dailyLogs           DailyLog[]
-  assignedProjects    Project[]           @relation("AssignedProfessional")
-  projects            Project[]
+  id                 String              @id @default(cuid())
+  name               String
+  email              String              @unique
+  password           String
+  username           String
+  avatar             String?
+  role               Role
+  trade              String?
+  dailyLogs          DailyLog[]
+  assignedProjects   Project[]           @relation("AssignedProfessional")
+  projects           Project[]
   projectTeamMembers ProjectTeamMember[]
   technicalApprovals TechnicalApproval[]
 }
@@ -60,16 +55,16 @@ model Project {
 }
 
 model Phase {
-  id             String              @id @default(cuid())
-  name           String
-  description    String?
-  planned_start  DateTime
-  planned_end    DateTime
-  projectId      String
-  status         String              @default("pending")
-  dailyLogs      DailyLog[]
-  project        Project             @relation(fields: [projectId], references: [id], onDelete: Cascade)
-  tasks          Task[]
+  id                 String              @id @default(cuid())
+  name               String
+  description        String?
+  planned_start      DateTime
+  planned_end        DateTime
+  projectId          String
+  status             String              @default("pending")
+  dailyLogs          DailyLog[]
+  project            Project             @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  tasks              Task[]
   technicalApprovals TechnicalApproval[]
 }
 
@@ -132,14 +127,14 @@ model Incident {
   description   String
   incident_date DateTime @default(now())
   dailyLogId    String
-  dailyLog      DailyLog @relation(fields: [dailyLogId], references: [id], onDelete: Cascade)
+  dailyLog      DailyLog @relation(fields: [dailyLogId], references: [id])
 }
 
 model SafetyMeasure {
   id          String   @id @default(cuid())
   description String
   dailyLogId  String
-  dailyLog    DailyLog @relation(fields: [dailyLogId], references: [id], onDelete: Cascade)
+  dailyLog      DailyLog @relation(fields: [dailyLogId], references: [id], onDelete: Cascade)
 }
 
 model WorkerCoverage {
@@ -196,8 +191,7 @@ model MaterialUsage {
   material       Material      @relation(fields: [materialId], references: [id])
 }
 
-// enum Role {
-//   USER
-//   PROFESSIONAL
-//   ADMIN
-// }
+enum Role {
+  user
+  professional
+}
