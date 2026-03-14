@@ -102,7 +102,7 @@ const ControlAvance: React.FC = () => {
                 <div className="mb-10 border-b-[2px] border-[#0A1F61] pb-3 flex justify-between items-end">
                     <h1 className="text-3xl font-bold text-[#0A1F61] capitalize">{data.name}</h1>
                     <div className="flex items-center gap-4 relative">
-                        <AiViewModal />
+                        <AiViewModal project_id={data.id} />
                         <ButtonPlans name={data.name} projectId={data.id} planUrl={data.project_plan_photo} onPlanUpdate={handlePlanUpdate} />
                         <ButtonDelete id={data.id} />
                     </div>

@@ -2,7 +2,7 @@ import React, { useState, useRef, useMemo, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { projectService } from '../services/project.service';
 import { ProjectInput } from '../types';
-import { storage } from '../utils/storage'; // Importamos para obtener el userId
+import { storage } from '../utils/storage';
 import { API_ENDPOINTS } from '../constants/routes';
 
 //icons

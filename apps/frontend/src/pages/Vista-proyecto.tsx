@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import { API_ENDPOINTS } from '../constants/routes'; // Asegúrate de que esta ruta sea correcta
+import { API_ENDPOINTS } from '../constants/routes';
 import { projectService } from '../services/project.service';
 
 //components
@@ -103,6 +103,10 @@ const ProjectGeneralView: React.FC = () => {
     if (id) fetchProject();
   }, [id]);
 
+  const handlePlanUpdate = (newUrl: string) => {
+    setData((prev: any) => prev ? { ...prev, project_plan_photo: newUrl } : null);
+  };
+
   const getProfessionalName = (prof: any): string => {
     if (!prof) return MOCK_PROFESSIONAL.name;
     if (typeof prof === 'string') return prof;
@@ -150,7 +154,7 @@ const ProjectGeneralView: React.FC = () => {
         <div className="mb-10 border-b-[2px] border-[#0A1F61] pb-3 flex justify-between items-end">
           <h1 className="text-3xl font-bold text-[#0A1F61] capitalize">{data.name}</h1>
           <div className="flex flex-col items-end gap-2 relative">
-            <ButtonPlans name={data.name} projectId={data.id} planUrl={data.project_plan_photo} />
+            <ButtonPlans name={data.name} projectId={data.id} planUrl={data.project_plan_photo} onPlanUpdate={handlePlanUpdate} />
           </div>
         </div>
 
