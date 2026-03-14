@@ -216,7 +216,7 @@ const ProjectRegister: React.FC = () => {
     }
   };
 
-  // --- RENDER ---
+  // --- RENDER --- 
   return (
     <div className="min-h-screen bg-[#F8FAFC] p-8 md:p-12 font-sans text-slate-800">
       <form onSubmit={handleSubmit} className="w-full max-w-[1400px] mx-auto">
