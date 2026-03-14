@@ -6,7 +6,7 @@
 
 Esta es una aplicación de autenticación completa con:
 
-- **Frontend**: React + TypeScript + Vite + Tailwind CSS
+- **Frontend**: React + TypeScript + Vite +  Tailwind CSS
 - **Backend**: Node.js + Express + JavaScript
 - **Autenticación**: Sistema de login y registro
 - **UI/UX**: Diseño moderno y responsivo
