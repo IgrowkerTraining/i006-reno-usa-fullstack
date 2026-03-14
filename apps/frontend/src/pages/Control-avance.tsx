@@ -90,6 +90,15 @@ const ControlAvance: React.FC = () => {
     const { project, loading, error, refetch } = useProject(id);
     const normalizedTrades = project?.trades?.map(t => t.toLowerCase()) || [];
 
+    const handlePlanUpdate = (updatedPlanUrl: string) => {
+        setPlanUrl(updatedPlanUrl);
+        setData((prev) =>
+            prev
+                ? { ...prev, project_plan_photo: updatedPlanUrl }
+                : prev
+        );
+    };
+
     // --- PETICIÓN AL BACKEND ---
     // useEffect(() => {
     //   const fetchProject = async () => {
@@ -257,7 +266,13 @@ const ControlAvance: React.FC = () => {
 
                         <div className="flex basis-1/3 justify-around items-center">
                             <AiViewModal project_id={data.id} />
-                            <ButtonPlans name={data.name} />
+                            <ButtonPlans
+                                name={data.name}
+                                projectId={data.id}
+                                planUrl={data.project_plan_photo}
+                                projectManagerId={data.assigned_professional?.id}
+                                onPlanUpdate={handlePlanUpdate}
+                            />
                             <ButtonDelete id={data.id} />
                         </div>
                     </div>

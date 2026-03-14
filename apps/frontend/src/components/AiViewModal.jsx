@@ -14,9 +14,6 @@ export const AiViewModal = ({ project_id }) => {
     const [report, setReport] = useState(null);
     const { project } = useProject(project_id);
 
-    console.log(project_id);
-    
-
     const progress = report?.advancePercentage || 0;
     const pendingTasks = report?.inProcessTasks || [];
     const correctionIncidences = report?.correctionCount || 0;
@@ -35,10 +32,7 @@ export const AiViewModal = ({ project_id }) => {
     const handleAIAnalysis = async () => {
         try {
             const result = await aiService.analyzeProject(project.id);
-            console.log("AI report full:", result);
-            console.log("AI report data:", result?.data);
-            console.log("AI report nested data:", result?.data?.data);
-            setReport(result?.data?.data);
+            setReport(result?.data);
         } catch (err) {
             console.error(err);
         }

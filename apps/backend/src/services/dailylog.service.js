@@ -1,3 +1,4 @@
+
 import prisma from "../lib/prisma.js";
 
 export const createDailyLog = async (data) => {
