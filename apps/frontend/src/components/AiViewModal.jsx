@@ -1,25 +1,30 @@
 import { useEffect, useState } from "react";
-import { useProject } from "../hooks/useProject";
-import { useParams } from "react-router-dom";
 
 //services
-import { projectService } from "../services/project.service";
+import { aiService } from "../services/aiServices";
 
 //components
 import { DonutChart } from "./common/DonutChart";
-import { useProjects } from "../context/ProjectsContext";
-import { aiService } from "../services/aiServices";
 
-export const AiViewModal = () => {
+//hooks
+import { useProject } from "../hooks/useProject";
 
-    const { id } = useParams();
-    const { project, loading, error, refetch } = useProject(id);
-    const { projects } = useProjects();
+export const AiViewModal = ({ project_id }) => {
+    
+    const [report, setReport] = useState(null);
+    const { project } = useProject(project_id);
 
-    const [metrics, setMetrics] = useState(null);
-    const progress = metrics?.progress?.advancePercentage || 0;
-    const totalTasks =
-        project?.phases?.reduce((acc, phase) => acc + (phase.tasks?.length || 0), 0) || 0;
+    console.log(project_id);
+    
+
+    const progress = report?.advancePercentage || 0;
+    const pendingTasks = report?.inProcessTasks || [];
+    const correctionIncidences = report?.correctionCount || 0;
+    const correctionIncidencesPercentage = report?.correctionPercent || 0;
+    const safetyIncidences = report?.safetyCount || 0;
+    const safetyIncidencesPercentage = report?.safetyPercent || 0;
+    const electricalIncidences = report?.electricalCount || 0;
+    const electricalIncidencesPercentage = report?.electricalPercent || 0;
 
     const nextPendingPhase = project?.phases?.find(
         (phase) =>
@@ -27,42 +32,13 @@ export const AiViewModal = () => {
             phase.tasks?.some((task) => task.status !== "completed")
     );
 
-    const pendingTasks = nextPendingPhase?.tasks?.filter(
-        (task) => task.status !== "completed"
-    ) || [];
-
-    const currentProject = projects?.find((p) => p.id === project?.id);
-
-    const activeIncidences = currentProject?.activeIncidences || [];
-
-    const incidencesCount = {
-        SAFETY: activeIncidences.filter((i) => i === "SAFETY").length,
-        ELECTRICAL: activeIncidences.filter((i) => i === "ELECTRICAL").length,
-        CORRECTION: activeIncidences.filter((i) => i === "CORRECTION").length,
-    };
-
-    const incidencesPercentage = {
-        SAFETY: totalTasks ? Math.round((incidencesCount.SAFETY / totalTasks) * 100) : 0,
-        ELECTRICAL: totalTasks ? Math.round((incidencesCount.ELECTRICAL / totalTasks) * 100) : 0,
-        CORRECTION: totalTasks ? Math.round((incidencesCount.CORRECTION / totalTasks) * 100) : 0,
-    };
-
-    const loadMetrics = async () => {
-        if (!project?.id) return;
-
-        try {
-            const response = await projectService.getMetrics(project.id);
-            setMetrics(response.data || response);
-        } catch (err) {
-            console.error("Error loading metrics:", err);
-            setMetrics(null);
-        }
-    };
-
     const handleAIAnalysis = async () => {
         try {
             const result = await aiService.analyzeProject(project.id);
-            console.log("AI report:", result);
+            console.log("AI report full:", result);
+            console.log("AI report data:", result?.data);
+            console.log("AI report nested data:", result?.data?.data);
+            setReport(result?.data?.data);
         } catch (err) {
             console.error(err);
         }
@@ -70,7 +46,7 @@ export const AiViewModal = () => {
 
     useEffect(() => {
         if (project?.id) {
-            loadMetrics();
+            handleAIAnalysis();
         }
     }, [project?.id]);
 
@@ -113,7 +89,6 @@ export const AiViewModal = () => {
                                         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 20 20" strokeWidth={1.5} stroke="currentColor" className="size-12">
                                             <path strokeLinecap="round" strokeLinejoin="round" d="M6 18 18 6M6 6l12 12" />
                                         </svg>
-
                                     </button>
                                 </div>
 
@@ -121,6 +96,7 @@ export const AiViewModal = () => {
                                     <div className="col-span-1 h-96 bg-blue-100 rounded-xl text-white flex items-center justify-center">
                                         <DonutChart progress={progress} radiusChart={175} strokeChart={75} />
                                     </div>
+
                                     <div className="col-span-1 bg-blue-900 text-white rounded-xl">
                                         <div className="flex p-4 items-center">
                                             <div className="pt-3 self-center">
@@ -137,8 +113,8 @@ export const AiViewModal = () => {
                                         <div className="p-8">
                                             {pendingTasks.length > 0 ? (
                                                 <ul className="space-y-3 text-2xl">
-                                                    {pendingTasks.map((task) => (
-                                                        <li key={task.id}>• {task.name}</li>
+                                                    {pendingTasks.map((task, index) => (
+                                                        <li key={index}>• {task}</li>
                                                     ))}
                                                 </ul>
                                             ) : (
@@ -154,8 +130,10 @@ export const AiViewModal = () => {
                                             <path d="M115.11 48.7722H85.2062L112.097 14.7959C112.653 14.0765 112.151 13.0312 111.242 13.0312H59.1845C58.8044 13.0312 58.4379 13.2349 58.2478 13.5742L23.077 74.3188C22.6562 75.0383 23.1721 75.9478 24.0137 75.9478H47.6871L35.5517 124.489C35.2938 125.548 36.5698 126.295 37.3571 125.534L115.857 50.6318C116.563 49.9667 116.088 48.7722 115.11 48.7722Z" fill="#EEEEEC" />
                                         </svg>
                                         <h3 className="text-xl font-semibold my-2">Safety</h3>
-                                        <p className="my-2">{incidencesCount.SAFETY} active incidence alert{incidencesCount.SAFETY !== 1 ? "s" : ""}</p>
-                                        <p className="text-4xl font-bold">{incidencesPercentage.SAFETY}%</p>
+                                        <p className="my-2">
+                                            {safetyIncidences} active incidence alert{safetyIncidences !== 1 ? "s" : ""}
+                                        </p>
+                                        <p className="text-4xl font-bold">{safetyIncidencesPercentage}%</p>
                                     </div>
 
                                     <div className="col-span-1 p-6 rounded-xl bg-red-400 justify-items-center text-white">
@@ -164,8 +142,10 @@ export const AiViewModal = () => {
                                         </svg>
 
                                         <h3 className="text-xl font-semibold my-2">Electrical</h3>
-                                        <p className="my-2">{incidencesCount.ELECTRICAL} active incidence alert{incidencesCount.ELECTRICAL !== 1 ? "s" : ""}</p>
-                                        <p className="text-4xl font-bold">{incidencesPercentage.ELECTRICAL}%</p>
+                                        <p className="my-2">
+                                            {electricalIncidences} active incidence alert{electricalIncidences !== 1 ? "s" : ""}
+                                        </p>
+                                        <p className="text-4xl font-bold">{electricalIncidencesPercentage}%</p>
                                     </div>
 
                                     <div className="col-span-1 p-6 rounded-xl bg-blue-500 justify-items-center text-white">
@@ -173,8 +153,10 @@ export const AiViewModal = () => {
                                             <path d="M97.043 89.4346C94.3441 89.4346 92.1621 91.6166 92.1621 94.3154C92.1621 97.0143 94.3441 99.1963 97.043 99.1963C99.7418 99.1963 101.924 97.0143 101.924 94.3154C101.924 91.6166 99.7418 89.4346 97.043 89.4346ZM126.328 24.1172H95.8945C95.8945 19.6813 92.2913 16.0781 87.8555 16.0781H76.3711C71.9353 16.0781 68.332 19.6813 68.332 24.1172H37.8984C35.3575 24.1172 33.3047 26.17 33.3047 28.7109V57.4219H20.6719C18.131 57.4219 16.0781 59.4747 16.0781 62.0156V126.328C16.0781 128.869 18.131 130.922 20.6719 130.922H68.9062C71.4472 130.922 73.5 128.869 73.5 126.328V124.031H126.328C128.869 124.031 130.922 121.978 130.922 119.438V28.7109C130.922 26.17 128.869 24.1172 126.328 24.1172ZM64.3125 121.734H25.2656V88.4297H64.3125V121.734ZM64.3125 79.2422H25.2656V66.6094H64.3125V79.2422ZM67.1836 40.1953V33.3047H77.5195V25.2656H86.707V33.3047H97.043V40.1953H67.1836ZM93.0234 64.3125V72.3516C93.0234 72.9832 92.5066 73.5 91.875 73.5H84.9844C84.3527 73.5 83.8359 72.9832 83.8359 72.3516V64.3125C83.8359 63.6809 84.3527 63.1641 84.9844 63.1641H91.875C92.5066 63.1641 93.0234 63.6809 93.0234 64.3125ZM97.043 107.522C89.7504 107.522 83.8359 101.608 83.8359 94.3154C83.8359 87.0229 89.7504 81.1084 97.043 81.1084C104.336 81.1084 110.25 87.0229 110.25 94.3154C110.25 101.608 104.336 107.522 97.043 107.522ZM110.25 72.3516C110.25 72.9832 109.733 73.5 109.102 73.5H102.211C101.579 73.5 101.062 72.9832 101.062 72.3516V58.5703C101.062 57.9387 101.579 57.4219 102.211 57.4219H109.102C109.733 57.4219 110.25 57.9387 110.25 58.5703V72.3516ZM97.043 81.1084C89.7504 81.1084 83.8359 87.0229 83.8359 94.3154C83.8359 101.608 89.7504 107.522 97.043 107.522C104.336 107.522 110.25 101.608 110.25 94.3154C110.25 87.0229 104.336 81.1084 97.043 81.1084ZM97.043 99.1963C94.3441 99.1963 92.1621 97.0143 92.1621 94.3154C92.1621 91.6166 94.3441 89.4346 97.043 89.4346C99.7418 89.4346 101.924 91.6166 101.924 94.3154C101.924 97.0143 99.7418 99.1963 97.043 99.1963Z" fill="#EEEEEC" />
                                         </svg>
                                         <h3 className="text-xl font-semibold my-2">Correction</h3>
-                                        <p className="my-2">{incidencesCount.CORRECTION} active incidence alert{incidencesCount.CORRECTION !== 1 ? "s" : ""}</p>
-                                        <p className="text-4xl font-bold">{incidencesPercentage.CORRECTION}%</p>
+                                        <p className="my-2">
+                                            {correctionIncidences} active incidence alert{correctionIncidences !== 1 ? "s" : ""}
+                                        </p>
+                                        <p className="text-4xl font-bold">{correctionIncidencesPercentage}%</p>
                                     </div>
                                 </div>
                             </div>
@@ -196,6 +178,5 @@ export const AiViewModal = () => {
                 </dialog>
             </el-dialog>
         </>
-
     );
-}
+};
