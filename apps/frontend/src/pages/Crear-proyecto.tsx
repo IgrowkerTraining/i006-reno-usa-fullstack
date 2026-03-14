@@ -2,14 +2,17 @@ import React, { useState, useRef, useMemo, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { projectService } from '../services/project.service';
 import { ProjectInput } from '../types';
-import { storage } from '../utils/storage'; // Importamos para obtener el userId
+import { storage } from '../utils/storage';
 import { API_ENDPOINTS } from '../constants/routes';
 
+//icons
+import icons_trade_types from "../components/common/icons_trades_types";
+
+//components
+import { ButtonPlans } from '../components/common/Button_plans';
+
 // --- CONSTANTS & MOCK DATA ---
-const AVAILABLE_TRADES = [
-  'Bricklayer', 'Plumber', 'Electrician', 'Carpenter', 'Painter',
-  'Drywaller', 'Roofer', 'HVAC Technician', 'Welder', 'Mason'
-];
+const AVAILABLE_TRADES = icons_trade_types.map(t => t.trade_type);
 
 const TYPE_OF_WORK_PRESETS = [
   'Residential Construction', 'Commercial Renovation', 'Industrial Facility',
@@ -23,18 +26,6 @@ const CATEGORY_PRESETS = [
 
 const STATUS_OPTIONS = [
   'To Do', 'Started', 'In Progress', 'Pending Approval', 'Completed'
-];
-
-// MOCK: IDs simulados como UUIDs para que el backend no se queje si valida el formato
-const MOCK_PROFESSIONALS_LIST = [
-  { id: '11111111-1111-1111-1111-111111111111', firstName: 'John', lastName: 'Doe', role: 'Architect' },
-  { id: '22222222-2222-2222-2222-222222222222', firstName: 'Jane', lastName: 'Smith', role: 'Electrician' },
-  { id: '33333333-3333-3333-3333-333333333333', firstName: 'Mike', lastName: 'Johnson', role: 'Plumber' },
-  { id: '44444444-4444-4444-4444-444444444444', firstName: 'Aurelio', lastName: 'Robles', role: 'Master Builder' },
-  { id: '55555555-5555-5555-5555-555555555555', firstName: 'German', lastName: 'Perruelo', role: 'Electrician' },
-  { id: '66666666-6666-6666-6666-666666666666', firstName: 'Kevin', lastName: 'Campos', role: 'Builder' },
-  { id: '77777777-7777-7777-7777-777777777777', firstName: 'Laura', lastName: 'García', role: 'Interior Designer' },
-  { id: '88888888-8888-8888-8888-888888888888', firstName: 'Carlos', lastName: 'Rodríguez', role: 'Site Engineer' },
 ];
 
 const OTHER_OPTION = 'Other: (please specify)';
@@ -59,12 +50,12 @@ const ProjectRegister: React.FC = () => {
   const [projectName, setProjectName] = useState('');
   const [projectLocation, setProjectLocation] = useState('');
   const [internalCode, setInternalCode] = useState('');
-  const [status, setStatus] = useState('To Do');
+  const [status, setStatus] = useState('Started');
   const [selectedTrades, setSelectedTrades] = useState<string[]>([]);
   const [showTradeSelector, setShowTradeSelector] = useState(false);
-  const [typeOfWorkPreset, setTypeOfWorkPreset] = useState(TYPE_OF_WORK_PRESETS[0]);
+  const [typeOfWorkPreset, setTypeOfWorkPreset] = useState('Restoration');
   const [customTypeOfWork, setCustomTypeOfWork] = useState('');
-  const [categoryPreset, setCategoryPreset] = useState(CATEGORY_PRESETS[0]);
+  const [categoryPreset, setCategoryPreset] = useState('Luxury');
   const [customCategory, setCustomCategory] = useState('');
   const [selectedProfessionalIds, setSelectedProfessionalIds] = useState<string[]>([]);
   const [assignedProId, setAssignedProId] = useState<string>('');
@@ -72,7 +63,6 @@ const ProjectRegister: React.FC = () => {
   const [showProSelector, setShowProSelector] = useState(false);
   const [selectedPlanFile, setSelectedPlanFile] = useState<File | null>(null);
   const [planUrl, setPlanUrl] = useState('');
-  const [showUrlInput, setShowUrlInput] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
   const [dbUsers, setDbUsers] = useState<any[]>([]);
@@ -147,10 +137,6 @@ const ProjectRegister: React.FC = () => {
   }, [selectedProfessionalIds, dbUsers]);
 
   // --- ACTIONS ---
-  const handlePlansClick = () => {
-    setShowUrlInput(true);
-  };
-
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     if (event.target.files && event.target.files[0]) {
       setSelectedPlanFile(event.target.files[0]);
@@ -180,7 +166,6 @@ const ProjectRegister: React.FC = () => {
     }
   };
 
-  // handleSubmit provisional hasta tener endpoint get users con ids reales
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
@@ -234,7 +219,7 @@ const ProjectRegister: React.FC = () => {
   // --- RENDER ---
   return (
     <div className="min-h-screen bg-[#F8FAFC] p-8 md:p-12 font-sans text-slate-800">
-      <form onSubmit={handleSubmit} className="w-full">
+      <form onSubmit={handleSubmit} className="w-full max-w-[1400px] mx-auto">
         
         {/* --- HEADER --- */}
         <div className="flex justify-between items-end mb-10 pb-4 border-b-[2px] border-[#0A1F61]">
@@ -244,30 +229,7 @@ const ProjectRegister: React.FC = () => {
           </div>
           
           <div className="flex flex-col items-end gap-2 min-w-[300px]">
-            {!showUrlInput ? (
-              <button 
-                type="button"
-                onClick={handlePlansClick}
-                className="flex items-center bg-[#0A1F61] hover:bg-[#1a2f71] text-white px-7 py-2.5 rounded-md font-medium transition shadow-sm ml-auto"
-              >
-                Plans <span className="ml-2 font-bold">+</span>
-              </button>
-            ) : (
-              <div className="relative">
-                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                   <PaperclipIcon />
-                </div>
-                <input 
-                  type="url"
-                  value={planUrl}
-                  onChange={(e) => setPlanUrl(e.target.value)}
-                  placeholder="https://example.com/plan.pdf"
-                  className="w-[250px] pl-10 pr-4 py-2.5 rounded-md border border-gray-200 text-sm focus:ring-1 focus:ring-[#0A1F61] focus:border-[#0A1F61] transition outline-none"
-                  autoFocus
-                />
-              </div>
-            )}
-            {planUrl && !showUrlInput && <p className="text-xs text-green-600 font-medium max-w-[150px] truncate ml-auto">Link added</p>}
+            <ButtonPlans name={projectName || 'New Project'} projectId="temp" planUrl={planUrl} onPlanUpdate={setPlanUrl} />
             <input type="file" ref={fileInputRef} onChange={handleFileChange} className="hidden" accept=".pdf,.dwg,.jpg,.png" />
             {selectedPlanFile && <p className="text-xs text-green-600 font-medium max-w-[150px] truncate">{selectedPlanFile.name}</p>}
           </div>
@@ -280,28 +242,18 @@ const ProjectRegister: React.FC = () => {
           <label className="block text-[#0A1F61] text-lg mb-3 font-medium">Trades <span className="text-red-500">*</span></label>
           <div className="flex flex-wrap gap-x-3 gap-y-3 items-center min-h-[44px]">
             {selectedTrades.map(trade => {
-              let colorClass = '';
-              let iconSvg = null;
-              
-              if (trade === 'Plumber') {
-                  colorClass = 'bg-[#FFA756] border-[#E89243]';
-                  iconSvg = <svg className="w-4 h-4 fill-black" viewBox="0 0 24 24"><path d="M15 13H17V17H20V19H15V13ZM6 5H8V9H11V11H6V5Z"/></svg>;
-              }
-              else if (trade === 'Electrician') {
-                  colorClass = 'bg-[#B156FF] border-[#9A41E8] text-white';
-                  iconSvg = <svg className="w-4 h-4 fill-yellow-300" viewBox="0 0 24 24"><path d="M13 3L4 14H12L11 21L20 10H12L13 3Z"/></svg>;
-              }
-              else if (trade === 'Bricklayer') {
-                  colorClass = 'bg-[#6B78B4] border-[#55619A] text-white';
-                  iconSvg = <svg className="w-4 h-4 fill-orange-300" viewBox="0 0 24 24"><path d="M4 6H10V10H4V6ZM14 6H20V10H14V6ZM4 12H8V16H4V12ZM10 12H20V16H10V12ZM4 18H14V22H4V18ZM16 18H20V22H16V18Z"/></svg>;
-              }
-              else {
-                  colorClass = 'bg-gray-500 border-gray-600 text-white';
-              }
+              const tradeInfo = icons_trade_types.find(
+                (item) => item.trade_type.toLowerCase() === trade.toLowerCase()
+              );
 
               return (
-                <div key={trade} className={`flex items-center gap-2 ${colorClass} border px-4 py-1.5 rounded-md text-sm font-medium cursor-pointer hover:opacity-90 transition`} onClick={() => removeTrade(trade)}>
-                  {iconSvg}
+                <div 
+                    key={trade} 
+                    className={`flex items-center gap-2 px-4 py-1.5 rounded-md text-sm font-medium shadow-sm capitalize cursor-pointer hover:opacity-90 transition
+                    ${tradeInfo?.color_assigned ? `${tradeInfo.color_assigned} text-white` : "bg-gray-500 text-white"}`} 
+                    onClick={() => removeTrade(trade)}
+                >
+                  {tradeInfo?.icon}
                   {trade}
                 </div>
               );
@@ -316,18 +268,25 @@ const ProjectRegister: React.FC = () => {
                 <PlusIconWhite />
               </button>
               {showTradeSelector && (
-                <div className="absolute top-full mt-2 left-0 w-56 bg-white border border-gray-100 rounded-lg shadow-xl z-20 py-1.5 max-h-60 overflow-y-auto">
-                  {filteredAvailableTrades.length > 0 ? filteredAvailableTrades.map(trade => (
-                    <button 
-                      key={trade} 
-                      type="button"
-                      onClick={() => addTrade(trade)}
-                      className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
-                    >
-                      {trade}
-                    </button>
-                  )) : (
-                    <p className="px-4 py-2 text-sm italic text-gray-400">All trades selected</p>
+                <div className="absolute top-full mt-2 left-0 w-64 bg-white border border-gray-100 rounded-lg shadow-xl z-20 py-2 max-h-60 overflow-y-auto flex flex-col gap-2 p-2">
+                  {filteredAvailableTrades.length > 0 ? filteredAvailableTrades.map(trade => {
+                    const tradeInfo = icons_trade_types.find(
+                      (item) => item.trade_type.toLowerCase() === trade.toLowerCase()
+                    );
+                    return (
+                      <button 
+                        key={trade} 
+                        type="button"
+                        onClick={() => addTrade(trade)}
+                        className={`flex items-center gap-2 px-3 py-1.5 w-full text-left rounded-md text-sm font-medium shadow-sm capitalize hover:opacity-90 transition
+                        ${tradeInfo?.color_assigned ? `${tradeInfo.color_assigned} text-white` : "bg-gray-500 text-white"}`}
+                      >
+                        {tradeInfo?.icon}
+                        {trade}
+                      </button>
+                    );
+                  }) : (
+                    <p className="px-4 py-2 text-sm italic text-gray-400 text-center w-full">All trades selected</p>
                   )}
                 </div>
               )}
