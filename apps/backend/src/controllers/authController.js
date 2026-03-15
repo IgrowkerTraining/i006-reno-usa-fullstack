@@ -54,7 +54,7 @@ export const register = async (req, res) => {
     return res
       .cookie("token", token, {
         httpOnly: true,
-        secure: false, // true en producción
+        secure: true, // true en producción
         sameSite: "lax",
       })
       .status(201)
