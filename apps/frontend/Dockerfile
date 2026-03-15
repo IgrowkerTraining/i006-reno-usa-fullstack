@@ -1,54 +1,56 @@
 # Use Node.js 18 Alpine as base image
-FROM node:18-alpine AS base
+FROM node:20-alpine AS base
 
 # Set working directory
 WORKDIR /app
 
 # Copy package files
-COPY package*.json pnpm-lock.yaml* ./
-
-# Install pnpm
-RUN npm install -g pnpm
+COPY package*.json ./
 
 # Install dependencies
-RUN pnpm install --frozen-lockfile && pnpm store prune
+RUN npm ci --only=production && npm cache clean --force
 
 # Development stage
 FROM base AS development
 
-# Copy source code
-COPY . .
-
-# Expose port
-EXPOSE 5173
-
-# Start the development server
-CMD ["pnpm", "run", "dev"]
-
-# Build stage
-FROM base AS build
+# Install all dependencies including devDependencies
+RUN npm ci
 
 # Copy source code
 COPY . .
 
-# Build the application
-RUN pnpm run build
-
-# Production stage
-FROM nginx:alpine AS production
-
-# Copy built application to nginx
-COPY --from=build /app/dist /usr/share/nginx/html
-
-# Copy nginx configuration
-COPY nginx.conf /etc/nginx/conf.d/default.conf
-
 # Expose port
-EXPOSE 80
+EXPOSE 3000
 
 # Health check
 HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
-  CMD wget --no-verbose --tries=1 --spider http://localhost/ || exit 1
+  CMD node -e "require('http').get('http://localhost:3000/api/health', (res) => { process.exit(res.statusCode === 200 ? 0 : 1) })"
 
-# Start nginx
-CMD ["nginx", "-g", "daemon off;"]
+# Start the application
+CMD ["npm", "run", "dev"]
+
+# Production stage
+FROM base AS production
+
+# Create non-root user
+RUN addgroup -g 1001 -S nodejs && \
+  adduser -S nodejs -u 1001
+
+# Copy source code
+COPY --chown=nodejs:nodejs . .
+
+# Change ownership of the app directory
+RUN chown -R nodejs:nodejs /app
+
+# Switch to non-root user
+USER nodejs
+
+# Expose port
+EXPOSE 3000
+
+# Health check
+HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
+  CMD node -e "require('http').get('http://localhost:3000/api/health', (res) => { process.exit(res.statusCode === 200 ? 0 : 1) })"
+
+# Start the application
+CMD ["npm", "run", "start"]
