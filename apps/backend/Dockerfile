@@ -1,4 +1,4 @@
-# Use Node.js 18 Alpine as base image
+# Use Node.js 20 Alpine as base image
 FROM node:20-alpine AS base
 
 # Set working directory
@@ -39,7 +39,10 @@ RUN addgroup -g 1001 -S nodejs && \
 # Copy source code
 COPY --chown=nodejs:nodejs . .
 
-# Change ownership of the app directory
+# Generar el cliente de Prisma durante el build (como root)
+RUN npx prisma generate
+
+# Change ownership of the app directory (asegura que nodejs sea dueño de los archivos generados)
 RUN chown -R nodejs:nodejs /app
 
 # Switch to non-root user
