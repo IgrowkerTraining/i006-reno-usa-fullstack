@@ -18,11 +18,9 @@ model User {
   avatar             String?
   role               Role
   trade              String?
-  dailyLogs          DailyLog[]
   assignedProjects   Project[]           @relation("AssignedProfessional")
   projects           Project[]
   projectTeamMembers ProjectTeamMember[]
-  technicalApprovals TechnicalApproval[]
 }
 
 model ProjectTeamMember {
@@ -50,7 +48,6 @@ model Project {
   phases                 Phase[]
   assignedProfessional   User?               @relation("AssignedProfessional", fields: [assignedProfessionalId], references: [id])
   user                   User                @relation(fields: [userId], references: [id])
-  projectSnapshots       ProjectSnapshot[]
   projectTeam            ProjectTeamMember[]
 }
 
@@ -62,10 +59,8 @@ model Phase {
   planned_end        DateTime
   projectId          String
   status             String              @default("pending")
-  dailyLogs          DailyLog[]
   project            Project             @relation(fields: [projectId], references: [id], onDelete: Cascade)
   tasks              Task[]
-  technicalApprovals TechnicalApproval[]
 }
 
 model Trade {
@@ -89,106 +84,6 @@ model Task {
   tradeId       String?
   phase         Phase           @relation(fields: [phaseId], references: [id], onDelete: Cascade)
   trade         Trade?          @relation(fields: [tradeId], references: [id])
-  executedTasks TaskExecution[]
-}
-
-model TaskExecution {
-  id                 String          @id @default(cuid())
-  taskId             String
-  dailyLogId         String
-  progressPercentage Float?
-  notes              String?
-  executedAt         DateTime        @default(now())
-  materialUsages     MaterialUsage[]
-  dailyLog           DailyLog        @relation(fields: [dailyLogId], references: [id], onDelete: Cascade)
-  task               Task            @relation(fields: [taskId], references: [id], onDelete: Cascade)
-
-  @@unique([taskId, dailyLogId])
-}
-
-model DailyLog {
-  id                    String           @id @default(cuid())
-  notes                 String?
-  log_date              DateTime         @default(now())
-  completion_percentage Float?
-  schedule_deviation    Float?
-  userId                String
-  phaseId               String
-  phase                 Phase            @relation(fields: [phaseId], references: [id], onDelete: Cascade)
-  user                  User             @relation(fields: [userId], references: [id])
-  incidents             Incident[]
-  safetyMeasures        SafetyMeasure[]
-  executedTasks         TaskExecution[]
-  workerCoverages       WorkerCoverage[]
-}
-
-model Incident {
-  id            String   @id @default(cuid())
-  description   String
-  incident_date DateTime @default(now())
-  dailyLogId    String
-  dailyLog      DailyLog @relation(fields: [dailyLogId], references: [id])
-}
-
-model SafetyMeasure {
-  id          String   @id @default(cuid())
-  description String
-  dailyLogId  String
-  dailyLog      DailyLog @relation(fields: [dailyLogId], references: [id], onDelete: Cascade)
-}
-
-model WorkerCoverage {
-  id               String   @id @default(cuid())
-  coverage_status  String
-  coverage_type    String
-  policy_reference String
-  dailyLogId       String
-  dailyLog         DailyLog @relation(fields: [dailyLogId], references: [id], onDelete: Cascade)
-}
-
-model TechnicalApproval {
-  id            String   @id @default(cuid())
-  status        String
-  comments      String?
-  approval_date DateTime @default(now())
-  userId        String
-  phaseId       String
-  phase         Phase    @relation(fields: [phaseId], references: [id], onDelete: Cascade)
-  user          User     @relation(fields: [userId], references: [id])
-}
-
-model ProjectSnapshot {
-  id            String     @id @default(cuid())
-  snapshot_date DateTime   @default(now())
-  period_label  String
-  projectId     String
-  aiReports     AIReport[]
-  project       Project    @relation(fields: [projectId], references: [id], onDelete: Cascade)
-}
-
-model AIReport {
-  id                String          @id @default(cuid())
-  generated_at      DateTime        @default(now())
-  summary           String?
-  projectSnapshotId String
-  projectSnapshot   ProjectSnapshot @relation(fields: [projectSnapshotId], references: [id], onDelete: Cascade)
-}
-
-model Material {
-  id             String          @id @default(cuid())
-  name           String
-  unit           String
-  description    String?
-  materialUsages MaterialUsage[]
-}
-
-model MaterialUsage {
-  id             String        @id @default(cuid())
-  quantity       Float
-  executedTaskId String
-  materialId     String
-  executedTask   TaskExecution @relation(fields: [executedTaskId], references: [id], onDelete: Cascade)
-  material       Material      @relation(fields: [materialId], references: [id])
 }
 
 enum Role {

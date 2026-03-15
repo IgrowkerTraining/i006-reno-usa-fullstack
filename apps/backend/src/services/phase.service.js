@@ -15,8 +15,7 @@ export const createPhase = async (data) => {
 export const getPhases = async () => {
   return await prisma.phase.findMany({
     include: {
-      tasks: true,
-      dailyLogs: true,
+      tasks: true
     },
   });
 };
@@ -25,8 +24,7 @@ export const getPhaseById = async (id) => {
   return await prisma.phase.findUnique({
     where: { id: Number(id) },
     include: {
-      tasks: true,
-      dailyLogs: true,
+      tasks: true
     },
   });
 };

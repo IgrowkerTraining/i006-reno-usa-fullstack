@@ -18,42 +18,10 @@ const projectFullInclude = {
         orderBy: {
           order: 'asc' 
         },
-        include: {
-          executedTasks: {
-            include: {
-              dailyLog: {
-                include: {
-                  user: true,
-                },
-              },
-            },
-          },
-        },
       },
     },
   },
-  projectSnapshots: true,
 };
-// const projectFullInclude = {
-//   phases: {
-//     include: {
-//       tasks: {
-//         include: {
-//           executedTasks: {
-//             include: {
-//               dailyLog: {
-//                 include: {
-//                   user: true,
-//                 },
-//               },
-//             },
-//           },
-//         },
-//       },
-//     },
-//   },
-//   projectSnapshots: true,
-// };
 
 export const createProject = async (data) => {
   const { name, location, surface_sqft, structure_type, intervention_type, internal_code, category, initial_status, assigned_professional, project_team, trades, project_plan_photo, userId } = data;
@@ -245,18 +213,6 @@ for (const phaseData of defaultPhases) {
       }
     });
   }
-
-  // (Esto posiblemente se vaya pronto)
-  await prisma.dailyLog.create({
-    data: {
-      phaseId: phase.id,
-      userId,
-      notes: "DailyLog inicial generado automáticamente",
-      log_date: currentStartDate,
-      completion_percentage: 0,
-      schedule_deviation: 0,
-    },
-  });
 }
 
 const projectWithPhases = await prisma.project.findUnique({
