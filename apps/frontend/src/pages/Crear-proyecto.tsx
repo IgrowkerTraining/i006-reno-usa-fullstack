@@ -71,10 +71,13 @@ const ProjectRegister: React.FC = () => {
   useEffect(() => {
     const fetchUsers = async () => {
       try {
+        const token = localStorage.getItem('token');
         const response = await fetch(`${API_ENDPOINTS.BASE}/api/auth/users`, {
           method: 'GET',
-          headers: { 'Content-Type': 'application/json' },
-          credentials: 'include',
+          headers: { 
+            'Content-Type': 'application/json',
+            ...(token ? { 'Authorization': `Bearer ${token}` } : {})
+          },
         });
         if (response.ok) {
           const data = await response.json();
