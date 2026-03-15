@@ -29,3 +29,14 @@ app.use("/api/docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 app.listen(config.port, () => {
   logger.info(`Server running on http://localhost:${config.port}`);
 });
+
+const wakeUpIA = async () => {
+  const aiHealthUrl = process.env.AI_BACKEND_URL + "/health";
+  try {
+    await fetch(aiHealthUrl);
+  } catch (error) {
+    // Silently fail if IA is sleeping
+  }
+};
+
+wakeUpIA();
