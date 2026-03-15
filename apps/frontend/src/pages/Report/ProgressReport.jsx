@@ -136,7 +136,7 @@ export const ProgressReport = () => {
     return (
         <div className="justify-center bg-[#F8FAFC] px-20">
             <div className="col-1 border-b-2 border-[#0C277B] pb-3 pt-6">
-                <h1 className="text-[#0C277B] text-4xl font-bold">{project.name}</h1>
+                <h1 className="text-[#0C277B] text-4xl font-bold capitalize">{project.name}</h1>
             </div>
 
             <div className="grid grid-cols-1 gap-4 justify-between py-6">
