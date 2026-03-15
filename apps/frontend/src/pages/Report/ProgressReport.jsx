@@ -58,7 +58,20 @@ export const ProgressReport = () => {
 
         try {
             const response = await projectService.getMyPendingTasks(project.id);
-            setPendingTasks(response.data || []);
+            if (response.data && Array.isArray(response.data.data)) {
+                setPendingTasks(response.data.data);
+            }
+
+            else if (response.data && Array.isArray(response.data)) {
+                setPendingTasks(response.data);
+            }
+
+            else if (Array.isArray(response)) {
+                setPendingTasks(response);
+            }
+            else {
+                setPendingTasks([]);
+            }
         } catch (err) {
             console.error("Error loading pending tasks:", err);
             setPendingTasks([]);
