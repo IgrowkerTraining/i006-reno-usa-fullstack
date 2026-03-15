@@ -1,14 +1,22 @@
-const cors = require('cors');
-const bodyParser = require('body-parser');
+import cors from "cors";
+import express from "express";
+import pinoHttp from "pino-http";
+import logger from "../utils/logger.js";
 
 const setupMiddleware = (app) => {
-  app.use(cors());
-  app.use(bodyParser.json());
-  
-  app.use((req, res, next) => {
-    console.log(`${new Date().toISOString()} - ${req.method} ${req.path}`);
-    next();
-  });
+  const allowedOrigin = (process.env.FRONTEND_URL || "http://localhost:5173").replace(/\/$/, "");
+  app.use(cors({
+  origin: allowedOrigin,
+  credentials: true,
+}));
+
+  app.use(
+    pinoHttp({
+      logger,
+    })
+  );
+
+  app.use(express.json());
 };
 
-module.exports = { setupMiddleware };
+export default setupMiddleware;

@@ -1,0 +1,26 @@
+/* This is to check errors on the frontend uncomment to use it */
+/* * {
+  outline: 1px solid rgba(255, 0, 0, 0.2);
+}
+html,
+body {
+  border: 2px solid blue;
+} */
+
+.custom-scroll::-webkit-scrollbar {
+  width: 8px;
+}
+
+.custom-scroll::-webkit-scrollbar-track {
+  background: #E0ECFF;
+  border-radius: 10px;
+}
+
+.custom-scroll::-webkit-scrollbar-thumb {
+  background: #203e8f;
+  border-radius: 10px;
+}
+
+.custom-scroll::-webkit-scrollbar-thumb:hover {
+  background: #3B64CE;
+}

@@ -1,40 +1,58 @@
-const User = require('../models/User');
+import bcrypt from "bcrypt";
+import prisma from "../lib/prisma.js";
 
 class UserService {
-  constructor() {
-    this.users = [];
-  }
 
-  findByEmail(email) {
-    return this.users.find(user => user.email === email);
-  }
+  async createUser({ name, email, password, role, trade }) {
+    const existingUser = await prisma.user.findUnique({
+      where: { email },
+    });
 
-  findById(id) {
-    return this.users.find(user => user.id === id);
-  }
-
-  async create(userData) {
-    const existingUser = this.findByEmail(userData.email);
     if (existingUser) {
-      throw new Error('User already exists');
+      throw new Error("User already exists");
     }
 
-    const newUser = User.create(userData);
-    this.users.push(newUser);
-    return newUser;
+    const hashedPassword = await bcrypt.hash(password, 10);
+
+    const user = await prisma.user.create({
+      data: {
+        name,
+        email,
+        password: hashedPassword,
+        username: email.split("@")[0],
+        avatar: `https://picsum.photos/seed/${email}/200`,
+        role: role || "user",
+        trade, // 🔹 se guarda correctamente
+      },
+    });
+
+    const { password: _, ...safeUser } = user;
+    return safeUser;
   }
 
-  async authenticate(email, password) {
-    const user = this.findByEmail(email);
-    if (!user || user.password !== password) {
-      throw new Error('Invalid email or password');
-    }
-    return user;
+  async getUsers() {
+    const users = await prisma.user.findMany({
+      select: {
+        id: true,
+        name: true,
+        email: true,
+        username: true,
+        role: true,
+        trade: true,
+        avatar: true
+      }
+    });
+
+    return users;
   }
 
-  getAllUsers() {
-    return this.users.map(user => user.toJSON());
+  async findByEmail(email) {
+    return prisma.user.findUnique({ where: { email } });
+  }
+
+  async findById(id) {
+    return prisma.user.findUnique({ where: { id } });
   }
 }
 
-module.exports = new UserService();
+export default new UserService();

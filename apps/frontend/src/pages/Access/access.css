@@ -1,0 +1,16 @@
+.text_logo{
+    font-size: 2rem;
+    font-weight: bold;
+    color:black
+}
+
+.bg_inputs{
+    background-color: whitesmoke;
+    border: none;
+}
+
+.bg_inputs:focus, .bg_inputs:active .bg_inputs.options:focus, .bg_inputs.options:active{
+    background-color: #e3edff97;
+    box-shadow: 0 0 5px #789fe9;
+    outline: none;
+}

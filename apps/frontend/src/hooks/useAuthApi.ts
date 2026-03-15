@@ -1,6 +1,6 @@
 import { useCallback } from 'react';
 import { useApi } from './useApi';
-import { api } from '../services/api';
+import { api } from '../services/authServices';
 import { User } from '../types';
 
 export const useAuthApi = () => {
