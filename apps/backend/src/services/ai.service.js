@@ -8,7 +8,7 @@ export const getAiProjectAnalysis = async (projectId) => {
     where: { id: projectId },
     include: {
       phases: {
-        orderBy: { planned_start: 'asc' }, // Orden cronológico
+        orderBy: { planned_start: 'asc' },
         include: {
           tasks: {
             select: { 
@@ -56,18 +56,18 @@ export const getAiProjectAnalysis = async (projectId) => {
   };
 
   // 5. Llamada al Microservicio de IA (Python)
-  const response = await fetch(`${AI_BACKEND_URL}/reportes/`, {
+  const response = await fetch(`${AI_BACKEND_URL}/reportes`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ snapshot: snapshotDTO }),
   });
 
+  // Cambio 2: Manejo de errores a prueba de balas
   if (!response.ok) {
-    const errorData = await response.json();
-    throw new Error(`Error del servicio de IA: ${JSON.stringify(errorData)}`);
+    const errorText = await response.text();
+    throw new Error(`Error del servicio de IA (Código ${response.status}): ${errorText.substring(0, 150)}...`);
   }
 
-  // Obtenemos la respuesta
   const aiData = await response.json();
 
   // 6. Retornamos la respuesta directo al Frontend 
