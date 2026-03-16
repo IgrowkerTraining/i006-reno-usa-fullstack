@@ -164,23 +164,23 @@ export const AiViewModal = ({ project_id }) => {
                                             <svg width="139" height="139" viewBox="0 0 120 120" fill="none" xmlns="http://www.w3.org/2000/svg">
                                                 <path d="M115.11 48.7722H85.2062L112.097 14.7959C112.653 14.0765 112.151 13.0312 111.242 13.0312H59.1845C58.8044 13.0312 58.4379 13.2349 58.2478 13.5742L23.077 74.3188C22.6562 75.0383 23.1721 75.9478 24.0137 75.9478H47.6871L35.5517 124.489C35.2938 125.548 36.5698 126.295 37.3571 125.534L115.857 50.6318C116.563 49.9667 116.088 48.7722 115.11 48.7722Z" fill="#EEEEEC" />
                                             </svg>
-                                            <h3 className="text-xl font-semibold my-2">Safety</h3>
+                                            <h3 className="text-xl font-semibold my-2">Electrical</h3>
                                             <p className="my-2">
-                                                {safetyIncidences} active incidence alert{safetyIncidences !== 1 ? "s" : ""}
+                                                {electricalIncidences} active incidence alert{electricalIncidences !== 1 ? "s" : ""}
                                             </p>
-                                            <p className="text-4xl font-bold">{safetyIncidencesPercentage}%</p>
+                                            <p className="text-4xl font-bold">{electricalIncidencesPercentage}%</p>
                                         </div>
 
                                         <div className="col-span-1 p-6 rounded-xl bg-red-400 justify-items-center text-white">
                                             <svg width="149" height="149" viewBox="0 0 149 149" fill="none" xmlns="http://www.w3.org/2000/svg">
                                                 <path d="M139.061 124.555L78.53 19.7891C77.6279 18.2321 76.071 17.4609 74.4995 17.4609C72.928 17.4609 71.3565 18.2321 70.4689 19.7891L9.93766 124.555C8.14791 127.669 10.3887 131.539 13.9682 131.539L135.031 131.539C138.61 131.539 140.851 127.669 139.061 124.555ZM69.8432 60.5313C69.8432 59.891 70.367 59.3672 71.0073 59.3672L77.9917 59.3672C78.6319 59.3672 79.1557 59.891 79.1557 60.5313L79.1557 87.3047C79.1557 87.9449 78.6319 88.4688 77.9917 88.4688L71.0073 88.4688C70.367 88.4688 69.8432 87.9449 69.8432 87.3047L69.8432 60.5313ZM74.4995 111.75C72.6718 111.713 70.9315 110.96 69.6522 109.655C68.3728 108.349 67.6562 106.594 67.6562 104.766C67.6562 102.938 68.3728 101.182 69.6522 99.8766C70.9315 98.5708 72.6718 97.8186 74.4995 97.7813C76.3271 97.8186 78.0674 98.5708 79.3468 99.8766C80.6262 101.182 81.3427 102.938 81.3427 104.766C81.3427 106.594 80.6262 108.349 79.3468 109.655C78.0674 110.96 76.3271 111.713 74.4995 111.75Z" fill="white" />
                                             </svg>
-
-                                            <h3 className="text-xl font-semibold my-2">Electrical</h3>
+                                            <h3 className="text-xl font-semibold my-2">Safety</h3>
                                             <p className="my-2">
-                                                {electricalIncidences} active incidence alert{electricalIncidences !== 1 ? "s" : ""}
+                                                {safetyIncidences} active incidence alert{safetyIncidences !== 1 ? "s" : ""}
                                             </p>
-                                            <p className="text-4xl font-bold">{electricalIncidencesPercentage}%</p>
+                                            <p className="text-4xl font-bold">{safetyIncidencesPercentage}%</p>
+
                                         </div>
 
                                         <div className="col-span-1 p-6 rounded-xl bg-blue-500 justify-items-center text-white">
