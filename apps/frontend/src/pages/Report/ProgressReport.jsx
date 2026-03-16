@@ -34,7 +34,11 @@ export const ProgressReport = () => {
 
         try {
             const history = await projectService.getHistory(project.id);
-            setUpdatedHistory(history.data || []);
+            setUpdatedHistory(history || []);
+            console.log(history);
+            console.log(updatedHistory);
+            
+            
         } catch (err) {
             console.error("Error loading history:", err);
             setUpdatedHistory([]);
